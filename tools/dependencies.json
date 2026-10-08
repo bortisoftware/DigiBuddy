@@ -1,0 +1,78 @@
+{
+  "buildTools": [
+    {
+      "file": "platform.zip",
+      "url": "https://dl.google.com/android/repository/platform-35_r02.zip",
+      "sha256": "0988cacad01b38a18a47bac14a0695f246bc76c1b06c0eeb8eb0dc825ab0c8e0",
+      "bytes": 64273788
+    },
+    {
+      "file": "ndk.zip",
+      "url": "https://dl.google.com/android/repository/android-ndk-r27c-windows.zip",
+      "sha256": "27e49f11e0cee5800983d8af8f4acd5bf09987aa6f790d4439dda9f3643d2494",
+      "bytes": 781511249
+    },
+    {
+      "file": "build-tools.zip",
+      "url": "https://dl.google.com/android/repository/build-tools_r35_windows.zip",
+      "sha256": "5753c679a1b90bcf6fbc9945a2ce39dfb9e74f1df0831a1e1866ae5b594326f0",
+      "bytes": 59878107
+    },
+    {
+      "file": "platform-tools.zip",
+      "url": "https://dl.google.com/android/repository/platform-tools_r37.0.1-win.zip",
+      "sha256": "45f4d63113e895ebde0c90f194099a4676b6ac653bd28d54314a9e022bbc1a99",
+      "bytes": 8044989
+    },
+    {
+      "file": "jdk.zip",
+      "url": "https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.20.1%2B1/OpenJDK17U-jdk_x64_windows_hotspot_17.0.20.1_1.zip",
+      "sha256": "e53a79c3c3d86865bd7e787903884331068e71321714ffd44f145785affc7cb0",
+      "bytes": 190817615
+    }
+  ],
+  "developmentCores": [
+    {
+      "file": "swan-core.zip",
+      "sha256": "e2d4bc9381d75f0b402ef44874e95077ffe924803302fb87c727b89cb8cadc7f",
+      "bytes": 1745397,
+      "url": "https://buildbot.libretro.com/nightly/android/latest/arm64-v8a/swanstation_libretro_android.so.zip"
+    },
+    {
+      "file": "pcsx-core.zip",
+      "sha256": "72e211709d95fcd07e4cb545e5b113b25862f28acbf2562ca4d995a5796a4ae6",
+      "bytes": 532588,
+      "url": "https://buildbot.libretro.com/nightly/android/latest/arm64-v8a/pcsx_rearmed_libretro_android.so.zip"
+    },
+    {
+      "file": "swan-windows.zip",
+      "sha256": "25f1fed4636a874594b5ab151c84f20d169dbe6e7e511af1f4a4269ab05ef4fb",
+      "bytes": 3076388,
+      "url": "https://buildbot.libretro.com/nightly/windows/x86_64/latest/swanstation_libretro.dll.zip"
+    },
+    {
+      "file": "pcsx-windows.zip",
+      "sha256": "546848071de8305ffef4d1c726b4ad4cd2a1a254f8815979eb35fbcd7122f12e",
+      "bytes": 846164,
+      "url": "https://buildbot.libretro.com/nightly/windows/x86_64/latest/pcsx_rearmed_libretro.dll.zip"
+    }
+  ],
+  "coreSources": [
+    {
+      "file": "swanstation-pinned-source.zip",
+      "url": "https://codeload.github.com/libretro/swanstation/zip/b6c30a7b270a3f68ac41f268eafdfa678d17dea2",
+      "sha256": "3dcd8cf18372e16ee5f7299c1981b575284bca31533a3395d436eb75f6dea1a3",
+      "bytes": 9672055,
+      "repository": "https://github.com/libretro/swanstation",
+      "commit": "b6c30a7b270a3f68ac41f268eafdfa678d17dea2"
+    },
+    {
+      "file": "pcsx_rearmed-pinned-source.zip",
+      "url": "https://codeload.github.com/libretro/pcsx_rearmed/zip/c8816799b50388e61cfe237fe2cdbb7d8175f20a",
+      "sha256": "5e1b15f17d0e97225d8b2eb29a8412fb0d3b03ff242c5456d055ec2967667a83",
+      "bytes": 6531672,
+      "repository": "https://github.com/libretro/pcsx_rearmed",
+      "commit": "c8816799b50388e61cfe237fe2cdbb7d8175f20a"
+    }
+  ]
+}

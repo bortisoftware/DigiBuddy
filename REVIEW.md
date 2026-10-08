@@ -1,0 +1,24 @@
+# Validación y límites
+
+## Comprobado
+
+- AYN Thor: doble pantalla, navegación, controles y confirmaciones. En 0.3.2 se verificaron cambios 4:3/pantalla completa con el juego activo y pausado: conserva imagen, pausa y sesión sin reconstruir las pantallas.
+- Anbernic RG DS: distribución de pantallas; guardar y cargar estados verificados en dispositivo.
+- Acciones sobre copias de partidas: uso de objetos y evolución nativa. La reversión Greymon → Agumon conservó inventario, dinero, reloj y progreso del compañero.
+- Control del contenido del repositorio y de la APK: sin BIOS, imágenes de disco, partidas ni claves privadas. Los commits usan una dirección noreply.
+
+## Límites conocidos
+
+- El panel está validado para la edición de referencia; USA, PAL y otros parches no tienen validación completa.
+- No se han probado todos los objetos, evoluciones ni eventos. El filtro de enemigos puede omitir encuentros cuyo script no interpreta.
+- La dificultad estimada no modela todas las técnicas, resistencias ni decisiones del jugador.
+- Deshacer una evolución conserva los atributos actuales y puede retener bonus anteriores; es una ayuda, no una mecánica oficial.
+- El contador de generaciones satura en 99; dos renacimientos el mismo día después de esa saturación pueden compartir identidad.
+- Las pruebas de memoria y cierre son cortas. Quedan sesiones prolongadas, combinaciones gráficas y proveedores de archivos reales que ignoren la cancelación.
+- Los núcleos precompilados no se han sometido aquí a una auditoría independiente ni fuzzing.
+
+## Antes de distribuir la APK
+
+Cerrar las fuentes correspondientes y opciones de construcción de los núcleos según [CORE_PROVENANCE.md](CORE_PROVENANCE.md), y disponer de una copia de seguridad independiente y recuperable de la firma definitiva. La firma de publicación es distinta de la utilizada en las APK de desarrollo.
+
+La revisión reduce riesgos concretos; no certifica ausencia absoluta de errores o vulnerabilidades.

@@ -1,0 +1,61 @@
+# Diseño de DigiBuddy
+
+## Estado actual
+
+Aplicación Android ARM64 funcional, probada con Digimon World de referencia en AYN Thor y Anbernic RG DS. El juego y el panel se asignan mediante DisplayManager y Presentation. La imagen del juego ocupa su pantalla sin cabeceras de la aplicación.
+
+## Responsabilidades
+
+- MainActivity: selección de archivos, pantallas, ajustes e interfaz. Los cuadros de confirmación bloquean los controles físicos y pausan la partida; restauran la pausa previa al cerrar.
+- EmulatorSession: un único hilo posee el núcleo, EGL, sonido y comandos. Una reserva atómica impide iniciar otro núcleo antes de completar su cierre. El cierre no bloquea el hilo de interfaz.
+- bridge.cpp: interfaz libretro, superficie y audio, memoria PSX y guardados. Comprueba tamaños y límites; escribe guardados mediante archivo temporal y cambio de nombre.
+- ProfileLoader y GameData: metadatos acotados, huellas SHA-256 y validación de estructuras antes de leer estadísticas, inventario, requisitos o mapas.
+- EncounterClassifier: interpreta de forma limitada el script de interacción vigente. Solo muestra contactos que conducen a combate reconocido; oculta los casos inciertos.
+- ItemUse: automatiza los menús originales con pulsaciones acotadas y verifica el consumo de una unidad. No reproduce efectos ni resta objetos escribiendo RAM.
+- EvolutionAction: valida el contexto y la ruta sobre memoria fresca. La evolución y su reversión usan la secuencia original; una reversión conserva el progreso actual del compañero y deja al juego elegir técnicas compatibles. EvolutionHistory guarda solo especies, perfil, generación y fecha de nacimiento por disco y motor.
+- FileImporter y CardExporter: importación y exportación acotadas en trabajadores de archivos. Usan el resolver de Application y callbacks débiles; los proveedores de documentos no trabajan en el hilo del emulador.
+- SpriteAtlas y ModelIconRenderer: cargan gráficos del disco del usuario; trabajo fuera del hilo de interfaz, cachés acotadas y cierre del ejecutor.
+- Cheats: planes de escritura de datos, ejecutados por el propietario del núcleo sobre memoria fresca, con confirmación y respaldo previo.
+- StartupFlow: decide los pasos desde archivos realmente presentes y configuración persistida; selecciona el estado más reciente por disco y motor. StartupView muestra el asistente y el inicio sobre la pantalla del juego, y desaparece al arrancar el núcleo.
+
+## Guardados y archivos privados
+
+BIOS y disco se importan al almacenamiento privado de Android mediante el selector del sistema. La app no solicita acceso general al almacenamiento ni permiso de Internet. Copias, estados y tarjeta se separan por hash del disco; los estados rápidos distinguen el núcleo.
+
+Las acciones directas se limitan al perfil de referencia reconocido. Durante objetos o evolución se reserva una acción, se bloquean los comandos que puedan interferir y se neutraliza el mando. Antes de modificar la partida se guarda un estado. Deshacer una evolución vuelve a la especie anterior con la animación del juego, sin cargar el estado antiguo. Conserva estadísticas, edad, vida restante, cuidados y técnicas aprendidas del momento de deshacer; reinicia el tiempo en etapa para evitar otra evolución inmediata. Inventario, reloj, dinero y progreso del pueblo siguen actuales. Solo un fallo de la secuencia restaura el respaldo creado justo antes de esa acción. El historial no autoriza una reversión si cambian especie, generación o fecha de nacimiento.
+
+## Mapa
+
+Las coordenadas se obtienen de las entidades del juego y se convierten a casillas. El ajuste del mapa depende de su contenido y del tamaño del panel, sin usar la resolución del renderizador ni el estiramiento del juego. Los marcadores de enemigos usan el script activo, no solo la especie; los personajes amistosos no se clasifican por compartir un modelo con enemigos.
+
+La estimación de dificultad utiliza estadísticas conocidas, pero no modela técnicas, IA, resistencias ni habilidad del jugador. Los encuentros que dependen de opciones o rutinas no verificadas pueden faltar.
+
+## Límites
+
+El controlador de interfaz sigue concentrado en MainActivity. La separación del núcleo y de los decodificadores evita accesos simultáneos a libretro, pero una refactorización futura puede dividir las vistas sin cambiar su comportamiento. No existe una garantía de compatibilidad universal ni una auditoría que demuestre ausencia absoluta de errores o fugas.
+
+## Desarrollo y compilación
+
+### Compilar en Windows
+
+Python 3.11 o posterior y conexión para obtener las herramientas. Las descargas quedan en .tools, fuera del repositorio:
+
+    python tools/fetch_dependencies.py --development-cores --sources
+    python tools/extract_tools.py --development-cores --sources
+    python tools/build_apk.py --mode local
+
+Las dependencias se verifican por tamaño y SHA-256. Las URL de los núcleos de desarrollo apuntan al buildbot: si su contenido cambia, se rechaza la descarga hasta revisar una nueva versión. Los commits de sus fuentes y la procedencia están en [CORE_PROVENANCE.md](CORE_PROVENANCE.md).
+
+El modo local desactiva la depuración y usa una clave de desarrollo local. El modo debug permite las pruebas por ADB. Ninguno es una firma definitiva para distribuir actualizaciones.
+
+El modo release requiere DIGIMAP_KEYSTORE, DIGIMAP_KEY_ALIAS, DIGIMAP_STORE_PASSWORD y DIGIMAP_KEY_PASSWORD en el entorno, y se construye con:
+
+    python tools/build_apk.py --mode release
+
+No guardar la clave ni las contraseñas en Git. Las actualizaciones de una APK necesitan la misma clave de firma. La versión instalada conserva el identificador es.digimap.thor para mantener los datos existentes.
+
+Antes de publicar, revisa todos los archivos preparados en Git y el contenido de la APK:
+
+    python tools/check_publish.py --all --apk dist/DigiBuddy-0.3.2-local.apk
+
+El comprobador aplica una lista de archivos permitidos y busca formatos privados, rutas personales y patrones de secretos. No sustituye la revisión de código.

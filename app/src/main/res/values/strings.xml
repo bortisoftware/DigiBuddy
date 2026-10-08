@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">DigiBuddy</string>
+    <style name="AppTheme" parent="android:style/Theme.Material.Light.NoActionBar">
+        <item name="android:colorAccent">#65E7C9</item>
+        <item name="android:windowBackground">#0B131A</item>
+        <item name="android:fontFamily">sans</item>
+    </style>
+</resources>
