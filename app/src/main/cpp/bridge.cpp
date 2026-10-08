@@ -664,6 +664,13 @@ static bool atomicWrite(const std::string &destination, const void *data,
     unlink(temporary.c_str());
   return ok;
 }
+extern "C" JNIEXPORT jlong JNICALL
+Java_es_digimap_thor_NativeCore_stateBytes(JNIEnv *, jclass) {
+  std::lock_guard<std::mutex> lock(guard);
+  if (!loaded) return 0;
+  size_t size = core_state_size();
+  return size <= MAX_STATE_BYTES ? static_cast<jlong>(size) : 0;
+}
 extern "C" JNIEXPORT jboolean JNICALL
 Java_es_digimap_thor_NativeCore_saveState(JNIEnv *env, jclass, jstring path) {
   std::lock_guard<std::mutex> lock(guard);

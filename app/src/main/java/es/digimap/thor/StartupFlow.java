@@ -30,11 +30,22 @@ final class StartupFlow {
     if (folder == null) return null;
     if (!"swan-gl".equals(engine) && !"swan-sw".equals(engine) && !"pcsx".equals(engine))
       return null;
-    File auto = new File(folder, engine + "-auto.state");
-    File quick = new File(folder, engine + "-quick.state");
-    boolean hasAuto = auto.isFile() && auto.length() > 0;
-    boolean hasQuick = quick.isFile() && quick.length() > 0;
-    if (!hasAuto) return hasQuick ? quick : null;
-    return !hasQuick || auto.lastModified() > quick.lastModified() ? auto : quick;
+    File latest = null;
+    File[] states =
+        folder.listFiles(
+            file -> {
+              String name = file.getName();
+              return name.equals(engine + "-auto.state")
+                  || name.equals(engine + "-quick.state")
+                  || name.matches(engine + "-imported-[0-9]+\\.state");
+            });
+    if (states == null) return null;
+    for (File state : states) {
+      if (state.isFile()
+          && state.length() > 0
+          && state.length() <= 64L * 1024 * 1024
+          && (latest == null || state.lastModified() > latest.lastModified())) latest = state;
+    }
+    return latest;
   }
 }

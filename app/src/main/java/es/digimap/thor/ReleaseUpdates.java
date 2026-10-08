@@ -1,0 +1,129 @@
+package es.digimap.thor;
+
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.net.URL;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicBoolean;
+import javax.net.ssl.HttpsURLConnection;
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+final class ReleaseUpdates implements AutoCloseable {
+  interface Callback {
+    void completed(Result result);
+  }
+
+  static final class Result {
+    final String version, page;
+    final boolean failed;
+
+    Result(String version, String page, boolean failed) {
+      this.version = version;
+      this.page = page;
+      this.failed = failed;
+    }
+  }
+
+  private static final String REPOSITORY = "bortisoftware/DigiBuddy";
+  private final ExecutorService worker = Executors.newSingleThreadExecutor();
+  private final AtomicBoolean busy = new AtomicBoolean();
+  private volatile boolean closed;
+  private volatile HttpsURLConnection connection;
+
+  boolean check(String installedVersion, Callback callback) {
+    if (closed || !busy.compareAndSet(false, true)) return false;
+    worker.execute(
+        () -> {
+          Result result;
+          try {
+            result = fetch(installedVersion);
+          } catch (Exception exception) {
+            result = new Result("", "", true);
+          } finally {
+            busy.set(false);
+          }
+          if (!closed) callback.completed(result);
+        });
+    return true;
+  }
+
+  private Result fetch(String installedVersion) throws Exception {
+    HttpsURLConnection request =
+        (HttpsURLConnection)
+            new URL("https://api.github.com/repos/" + REPOSITORY + "/releases/latest")
+                .openConnection();
+    connection = request;
+    try {
+      if (closed) throw new InterruptedException();
+      request.setConnectTimeout(8000);
+      request.setReadTimeout(8000);
+      request.setInstanceFollowRedirects(false);
+      request.setRequestProperty("Accept", "application/vnd.github+json");
+      request.setRequestProperty("User-Agent", "DigiBuddy-update-check");
+      int status = request.getResponseCode();
+      if (status == 404) return new Result("", "", false);
+      if (status != 200 || request.getContentLengthLong() > 262144)
+        throw new IllegalArgumentException("Invalid release response");
+      ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+      try (InputStream input = request.getInputStream()) {
+        byte[] buffer = new byte[4096];
+        int count;
+        while ((count = input.read(buffer)) != -1) {
+          if (closed || bytes.size() + count > 262144) throw new IllegalArgumentException();
+          bytes.write(buffer, 0, count);
+        }
+      }
+      JSONObject release = new JSONObject(bytes.toString("UTF-8"));
+      String tag = release.getString("tag_name");
+      if (!tag.matches("v?[0-9]{1,6}(\\.[0-9]{1,6}){2,3}"))
+        throw new IllegalArgumentException("Invalid release version");
+      String version = tag.startsWith("v") ? tag.substring(1) : tag;
+      String page = "https://github.com/" + REPOSITORY + "/releases/tag/" + tag;
+      if (!page.equals(release.getString("html_url"))) throw new IllegalArgumentException();
+      if (release.optBoolean("draft", true)
+          || release.optBoolean("prerelease", true)
+          || !newer(version, installedVersion)) return new Result("", "", false);
+      JSONArray assets = release.getJSONArray("assets");
+      String expectedName = "DigiBuddy-" + version + ".apk";
+      String expectedUrl =
+          "https://github.com/" + REPOSITORY + "/releases/download/" + tag + "/" + expectedName;
+      for (int i = 0; i < assets.length(); i++) {
+        JSONObject asset = assets.getJSONObject(i);
+        long size = asset.optLong("size", 0);
+        if (expectedName.equals(asset.optString("name"))
+            && expectedUrl.equals(asset.optString("browser_download_url"))
+            && "uploaded".equals(asset.optString("state"))
+            && size > 0
+            && size <= 67108864) return new Result(version, page, false);
+      }
+      return new Result("", "", false);
+    } finally {
+      request.disconnect();
+      connection = null;
+    }
+  }
+
+  static boolean newer(String candidate, String installed) {
+    if (candidate == null
+        || installed == null
+        || !candidate.matches("[0-9]{1,6}(\\.[0-9]{1,6}){2,3}")
+        || !installed.matches("[0-9]{1,6}(\\.[0-9]{1,6}){2,3}")) return false;
+    String[] left = candidate.split("\\."), right = installed.split("\\.");
+    for (int i = 0; i < Math.max(left.length, right.length); i++) {
+      int a = i < left.length ? Integer.parseInt(left[i]) : 0;
+      int b = i < right.length ? Integer.parseInt(right[i]) : 0;
+      if (a != b) return a > b;
+    }
+    return false;
+  }
+
+  @Override
+  public void close() {
+    closed = true;
+    HttpsURLConnection active = connection;
+    if (active != null) active.disconnect();
+    worker.shutdownNow();
+  }
+}

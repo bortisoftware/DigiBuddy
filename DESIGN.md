@@ -20,7 +20,7 @@ Aplicación Android ARM64 funcional, probada con Digimon World de referencia en 
 
 ## Guardados y archivos privados
 
-BIOS y disco se importan al almacenamiento privado de Android mediante el selector del sistema. La app no solicita acceso general al almacenamiento ni permiso de Internet. Copias, estados y tarjeta se separan por hash del disco; los estados rápidos distinguen el núcleo.
+BIOS y disco se importan al almacenamiento privado de Android mediante el selector del sistema. La app no solicita acceso general al almacenamiento. El permiso de Internet se usa para consultar releases públicas por HTTPS; la emulación y los datos del panel son locales. Copias, estados y tarjeta se separan por hash del disco; los estados rápidos distinguen el núcleo.
 
 Las acciones directas se limitan al perfil de referencia reconocido. Durante objetos o evolución se reserva una acción, se bloquean los comandos que puedan interferir y se neutraliza el mando. Antes de modificar la partida se guarda un estado. Deshacer una evolución vuelve a la especie anterior con la animación del juego, sin cargar el estado antiguo. Conserva estadísticas, edad, vida restante, cuidados y técnicas aprendidas del momento de deshacer; reinicia el tiempo en etapa para evitar otra evolución inmediata. Inventario, reloj, dinero y progreso del pueblo siguen actuales. Solo un fallo de la secuencia restaura el respaldo creado justo antes de esa acción. El historial no autoriza una reversión si cambian especie, generación o fecha de nacimiento.
 
@@ -59,3 +59,13 @@ Antes de publicar, revisa todos los archivos preparados en Git y el contenido de
     python tools/check_publish.py --all --apk dist/DigiBuddy-0.3.2-local.apk
 
 El comprobador aplica una lista de archivos permitidos y busca formatos privados, rutas personales y patrones de secretos. No sustituye la revisión de código.
+
+## Pistas y actualizaciones
+
+RecruitmentHints filtra los reclutamientos pendientes leídos del perfil validado. Prioriza la zona actual, los nombres de las salidas presentes y, después, la misma región. Devuelve hasta cuatro pistas sin duplicar especies. Los requisitos detectables se muestran separados; las pistas no garantizan que un NPC esté presente ni interpretan todas las etapas de las misiones. El catálogo usa nombres de zona estables, sin depender del idioma del disco.
+
+Referencias de hechos de juego: [guía de reclutamiento de HeroesAndCons](https://gamefaqs.gamespot.com/ps/913684-digimon-world/faqs/73895), [guía de Neve](https://gamefaqs.gamespot.com/ps/913684-digimon-world/faqs/71504) y [ubicaciones de Wikimon](https://wikimon.net/Digimon_World_Guide). Las pistas están redactadas para la app; no se incorpora una copia de esas guías.
+
+ReleaseUpdates usa un trabajador cerrado con la Activity, conexiones HTTPS con tiempos y respuesta acotados y validación del repositorio, versión y adjunto APK. Solo las releases estables con una APK nombrada para esa versión generan un aviso. Las consultas automáticas se realizan al abrir o volver a la app; el botón manual permite reintentar. El aviso usa el diálogo del panel y conserva la pausa anterior del juego.
+
+StateTransfer importa estados del tamaño exacto solicitado al núcleo activo en un trabajador de documentos. Primero escribe un temporal y después lo publica por cambio de nombre; no carga ni sobrescribe estados automáticamente. La exportación captura el estado en el propietario del núcleo y entrega una copia temporal al trabajador. Cancelación, descriptores y temporales se cierran con la Activity.

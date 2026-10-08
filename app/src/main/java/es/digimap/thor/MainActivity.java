@@ -45,6 +45,10 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
   private final List<GameData.Profile> profiles = new ArrayList<>();
   private CardExporter cardExporter;
   private FileImporter fileImporter;
+  private StateTransfer stateTransfer;
+  private ReleaseUpdates releaseUpdates;
+  private ReleaseUpdates.Result availableUpdate;
+  private boolean updateNoticeShown;
   private SharedPreferences prefs;
   private DisplayManager displays;
   private Presentation secondary;
@@ -75,6 +79,7 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
             if (profile == null && lastRam != null) profile = detectProfile(lastRam);
             snapshot = GameData.decode(lastRam, profile);
           }
+          showUpdateNotice();
           updateStartupViews();
           if (panel != null) panel.update();
           String itemNotice = session.actionNotice.getAndSet(null);
@@ -99,8 +104,21 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
     getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     fullscreen(getWindow().getDecorView());
     prefs = getSharedPreferences("digimap", MODE_PRIVATE);
+    releaseUpdates = new ReleaseUpdates();
     WeakReference<MainActivity> activity = new WeakReference<>(this);
     Handler mainHandler = ui;
+    stateTransfer =
+        new StateTransfer(
+            getApplicationContext().getContentResolver(),
+            message ->
+                mainHandler.post(
+                    () -> {
+                      MainActivity current = activity.get();
+                      if (current != null && !current.destroyed) {
+                        current.showMessage(message);
+                        current.updateStartupViews();
+                      }
+                    }));
     cardExporter =
         new CardExporter(
             getApplicationContext().getContentResolver(),
@@ -533,6 +551,38 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
     startActivityForResult(intent, request);
   }
 
+  private void chooseState(boolean export) {
+    if (!session.running || session.actionBusy) {
+      showMessage("Inicia el juego y espera a que termine cualquier acción.");
+      return;
+    }
+    Intent intent =
+        new Intent(export ? Intent.ACTION_CREATE_DOCUMENT : Intent.ACTION_OPEN_DOCUMENT);
+    intent.setType(export ? "application/octet-stream" : "*/*");
+    intent.addCategory(Intent.CATEGORY_OPENABLE);
+    if (export)
+      intent.putExtra(
+          Intent.EXTRA_TITLE, "DigiBuddy-" + prefs.getString("engine", "swan-gl") + ".state");
+    startActivityForResult(intent, export ? 5 : 4);
+  }
+
+  private void exportState(Uri destination) {
+    if (!session.command(
+        () -> {
+          File temporary = null;
+          try {
+            temporary = File.createTempFile("export-state-", ".state", getCacheDir());
+            if (!NativeCore.saveState(temporary.getAbsolutePath())) throw new java.io.IOException();
+            stateTransfer.exportState(temporary, destination);
+            temporary = null;
+          } catch (java.io.IOException exception) {
+            ui.post(() -> showMessage("No se pudo preparar el estado actual."));
+          } finally {
+            if (temporary != null) temporary.delete();
+          }
+        })) showMessage("Espera a que termine la acción actual.");
+  }
+
   private void exportCard(Uri destination) {
     if (session.saveFolder == null || cardExporter == null) return;
     File card = new File(session.saveFolder, "memory-card.mcr");
@@ -568,6 +618,20 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
   protected void onActivityResult(int request, int result, Intent data) {
     super.onActivityResult(request, result, data);
     if (result != RESULT_OK || data == null || data.getData() == null) return;
+    if (request == 4) {
+      String engine = prefs.getString("engine", "swan-gl");
+      Uri source = data.getData();
+      if (!session.command(
+          () ->
+              stateTransfer.importState(
+                  source, session.saveFolder, engine, NativeCore.stateBytes())))
+        showMessage("Inicia la partida para importar un estado.");
+      return;
+    }
+    if (request == 5) {
+      exportState(data.getData());
+      return;
+    }
     if (request != 1 && request != 2 && request != 3) return;
     if (request == 3) {
       exportCard(data.getData());
@@ -1007,6 +1071,118 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
     }
   }
 
+  private void checkUpdates(boolean manual) {
+    if (releaseUpdates == null || prefs == null || destroyed) return;
+    if (!manual && !prefs.getBoolean("automaticUpdates", true)) return;
+    String installed;
+    try {
+      installed = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
+    } catch (Exception exception) {
+      if (manual) showMessage("No se pudo consultar la versión.");
+      return;
+    }
+    WeakReference<MainActivity> activity = new WeakReference<>(this);
+    Handler handler = ui;
+    boolean started =
+        releaseUpdates.check(
+            installed,
+            result ->
+                handler.post(
+                    () -> {
+                      MainActivity owner = activity.get();
+                      if (owner == null || owner.destroyed) return;
+                      if (result.failed) {
+                        if (manual)
+                          owner.showMessage(
+                              "No se pudo comprobar. Revisa tu conexión y prueba más tarde.");
+                        return;
+                      }
+                      if (result.version.isEmpty()) {
+                        if (manual) owner.showMessage("Tienes la última versión publicada.");
+                        return;
+                      }
+                      boolean alreadyShown =
+                          owner.updateNoticeShown
+                              && owner.availableUpdate != null
+                              && owner.availableUpdate.version.equals(result.version);
+                      owner.availableUpdate = result;
+                      owner.updateNoticeShown = !manual && alreadyShown;
+                      owner.showUpdateNotice();
+                    }));
+    if (manual) showMessage(started ? "Buscando actualizaciones…" : "Ya se está comprobando.");
+  }
+
+  private void showUpdateNotice() {
+    if (availableUpdate == null
+        || updateNoticeShown
+        || panel == null
+        || session.suspended
+        || session.actionBusy
+        || (panelDialog != null && panelDialog.isShowing())) return;
+    ReleaseUpdates.Result update = availableUpdate;
+    updateNoticeShown = true;
+    Dialog dialog = createPanelDialog();
+    LinearLayout box = new LinearLayout(panel.ctx);
+    box.setOrientation(LinearLayout.VERTICAL);
+    box.setPadding(dp(20), dp(18), dp(20), dp(18));
+    box.setBackground(card(RetroSkin.PAPER, 0));
+    box.addView(text(panel.ctx, "DigiBuddy " + update.version + " disponible", 20, RetroSkin.INK));
+    box.addView(
+        text(
+            panel.ctx,
+            "Puedes descargar la nueva APK desde la release oficial de GitHub. Android comprobará"
+                + " su firma al actualizar. Tu partida permanece en la app.",
+            14,
+            MUTED));
+    box.addView(
+        button(
+            panel.ctx,
+            "Actualizar",
+            () -> {
+              dialog.dismiss();
+              try {
+                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(update.page)));
+              } catch (android.content.ActivityNotFoundException exception) {
+                showMessage("No hay un navegador disponible para abrir GitHub.");
+              }
+            }));
+    box.addView(
+        button(
+            panel.ctx,
+            "Cancelar",
+            () -> {
+              dialog.dismiss();
+            }));
+    showPanelDialog(dialog, box);
+  }
+
+  private void showRecruitHint(RecruitmentHints.Hint hint) {
+    if (panel == null || session.actionBusy || (panelDialog != null && panelDialog.isShowing()))
+      return;
+    Dialog dialog = createPanelDialog();
+    LinearLayout box = new LinearLayout(panel.ctx);
+    box.setOrientation(LinearLayout.VERTICAL);
+    box.setPadding(dp(20), dp(18), dp(20), dp(18));
+    box.setBackground(card(RetroSkin.PAPER, 0));
+    box.addView(
+        text(panel.ctx, hint.recruit.name + " · +" + hint.recruit.points, 20, RetroSkin.INK));
+    box.addView(text(panel.ctx, hint.location + " · " + hint.proximity, 13, MUTED));
+    TextView clue = text(panel.ctx, hint.clue, 16, RetroSkin.INK);
+    clue.setPadding(0, dp(14), 0, dp(14));
+    box.addView(clue);
+    if (!hint.requirements.isEmpty())
+      box.addView(text(panel.ctx, "Antes necesitas: " + hint.requirements, 14, MUTED));
+    box.addView(
+        text(
+            panel.ctx,
+            "Pista de un reclutamiento pendiente. Algunos encuentros dependen de horarios y"
+                + " eventos.",
+            12,
+            MUTED));
+    box.addView(button(panel.ctx, "Cerrar", dialog::dismiss));
+    showPanelDialog(dialog, box);
+  }
+
   private void showEnemy(GameData.Enemy enemy) {
     if (panel == null || session.actionBusy || (panelDialog != null && panelDialog.isShowing()))
       return;
@@ -1229,6 +1405,7 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
   protected void onResume() {
     super.onResume();
     session.suspended = false;
+    checkUpdates(false);
     fullscreen(getWindow().getDecorView());
   }
 
@@ -1245,6 +1422,8 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
     destroyed = true;
     if (cardExporter != null) cardExporter.close();
     if (fileImporter != null) fileImporter.close();
+    if (releaseUpdates != null) releaseUpdates.close();
+    if (stateTransfer != null) stateTransfer.close();
     atlasGeneration++;
     if (atlas != null) atlas.close();
     atlas = null;
@@ -1418,6 +1597,8 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
     }
 
     void settings() {
+      toggle("Buscar actualizaciones al abrir", "automaticUpdates", true, false);
+      content.addView(button(ctx, "Buscar actualizaciones ahora", () -> checkUpdates(true)));
       TextView graphicsTitle = text(ctx, "Gráficos y sonido", 16, ACCENT);
       graphicsTitle.setPadding(0, dp(8), 0, dp(4));
       content.addView(graphicsTitle);
@@ -1518,6 +1699,15 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
                       })),
           new LinearLayout.LayoutParams(0, -2, 1));
       content.addView(saves);
+      content.addView(button(ctx, "Exportar estado actual", () -> chooseState(true)));
+      content.addView(button(ctx, "Importar estado", () -> chooseState(false)));
+      content.addView(
+          text(
+              ctx,
+              "Los estados requieren el mismo juego y núcleo. Importar conserva tus estados"
+                  + " anteriores; elige «Continuar última sesión» para cargar el importado.",
+              12,
+              MUTED));
       LinearLayout screens = new LinearLayout(ctx);
       screens.addView(
           button(
@@ -1575,7 +1765,7 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
           (v, checked) -> {
             prefs.edit().putBoolean(key, checked).apply();
             if (layout) updateGameAspectRatio();
-            else queueGraphics();
+            else if (!"automaticUpdates".equals(key)) queueGraphics();
           });
       content.addView(control);
     }
@@ -1786,6 +1976,19 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
           content.addView(text(ctx, "La prosperidad todavía no está disponible.", 15, MUTED));
         } else {
           dataRow("Prosperidad", s.prosperity + " / 100");
+          section("PISTAS CERCANAS");
+          List<RecruitmentHints.Hint> hints = RecruitmentHints.nearby(s);
+          for (RecruitmentHints.Hint hint : hints) {
+            dataRow(
+                hint.recruit.name + " · +" + hint.recruit.points,
+                "Ver pista ›",
+                atlas != null ? atlas.mon(hint.recruit.type, lastRam, profile) : null,
+                () -> showRecruitHint(hint));
+            content.addView(text(ctx, hint.location + " · " + hint.proximity, 12, MUTED));
+          }
+          if (hints.isEmpty())
+            content.addView(
+                text(ctx, "No hay pistas registradas cerca. Explora otra región.", 14, MUTED));
           section("DIGIMON RECLUTADOS · " + s.recruits.size() + " / " + s.recruitable);
           for (GameData.Recruit recruit : s.recruits)
             spriteRow(recruit.type, recruit.name, "+" + recruit.points);
@@ -1946,6 +2149,10 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
         StringBuilder list =
             new StringBuilder(
                 s.prosperityAvailable ? "Prosperidad " + s.prosperity : "Prosperidad pendiente");
+        list.append(" zone=").append(s.zoneId);
+        for (GameData.Exit exit : s.exits) list.append(" exit=").append(exit.name);
+        for (GameData.Recruit recruit : s.pendingRecruits)
+          list.append(" pending=").append(recruit.type);
         for (GameData.Recruit recruit : s.recruits) list.append(' ').append(recruit.type);
         value = list.toString();
       } else {

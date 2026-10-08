@@ -25,6 +25,8 @@ public final class NativeCore {
 
   public static native void option(String key, String value);
 
+  public static native long stateBytes();
+
   public static native boolean saveState(String path);
 
   public static native boolean loadState(String path);

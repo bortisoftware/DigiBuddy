@@ -64,9 +64,11 @@ public final class GameData {
     public int type, hp, mp, maxHp, maxMp, offense, defense, speed, brains;
     public int age, weight, happiness, discipline, tiredness, care, battles, conditions;
     public int money, hour, minute, x, y, mapId, inventorySize;
+    public int zoneId = -1;
     public int prosperity, recruitable;
     public boolean prosperityAvailable;
     public final List<Recruit> recruits = new ArrayList<>();
+    public final List<Recruit> pendingRecruits = new ArrayList<>();
     public byte[] collision;
     public final List<Enemy> enemies = new ArrayList<>();
     public final List<Exit> exits = new ArrayList<>();
@@ -236,6 +238,7 @@ public final class GameData {
     if (s.mapId >= 0 && s.mapId < 255) {
       int entry = profile.at("MAP_ENTRIES") + s.mapId * 16;
       int nameId = u8(entry + 15);
+      s.zoneId = nameId < DataNames.ZONES.length ? nameId : -1;
       s.map = nameId < DataNames.ZONES.length ? DataNames.ZONES[nameId] : "";
       if (s.map.isEmpty()) s.map = "Zona " + s.mapId;
     } else {
@@ -267,8 +270,11 @@ public final class GameData {
       if (stage < 3 || stage > 5) continue;
       s.recruitable++;
       int trigger = 200 + type;
-      if ((u8(triggers + trigger / 8) & (1 << (trigger % 8))) == 0) continue;
       int points = type == 11 || type == 39 || type == 53 ? 1 : stage - 2;
+      if ((u8(triggers + trigger / 8) & (1 << (trigger % 8))) == 0) {
+        s.pendingRecruits.add(new Recruit(type, points, digimon(type)));
+        continue;
+      }
       s.recruits.add(new Recruit(type, points, digimon(type)));
       s.prosperity += points;
     }

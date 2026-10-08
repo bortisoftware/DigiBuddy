@@ -35,7 +35,7 @@ Requiere **Android 8.0 o posterior y ARM64**. Otros dispositivos de doble pantal
 
 ## Instalación
 
-Descarga la [APK de DigiBuddy 0.3.2](https://github.com/bortisoftware/DigiBuddy/releases/download/v0.3.2/DigiBuddy-0.3.2.apk) desde [Releases](https://github.com/bortisoftware/DigiBuddy/releases).
+Descarga la [APK de DigiBuddy 0.3.3](https://github.com/bortisoftware/DigiBuddy/releases/download/v0.3.3/DigiBuddy-0.3.3.apk) desde [Releases](https://github.com/bortisoftware/DigiBuddy/releases).
 
 1. Instala la APK en tu consola. Si Android lo solicita, permite la instalación desde el navegador o gestor de archivos que utilices.
 2. Abre DigiBuddy: el asistente te pedirá seleccionar tu BIOS de PlayStation y el juego.
@@ -50,7 +50,7 @@ Descarga la [APK de DigiBuddy 0.3.2](https://github.com/bortisoftware/DigiBuddy/
 - **Compañero:** estadísticas, vida, energía y necesidades de tu Digimon.
 - **Bolsa:** objetos e iconos; toca un objeto para confirmar su uso en el juego.
 - **Mapa:** tu posición, salidas a otras zonas, WC, objetos recogibles y enemigos con sus retratos. Toca un enemigo para consultar sus estadísticas. El color indica una estimación de dificultad.
-- **Prosperidad:** consulta el progreso del pueblo.
+- **Prosperidad:** progreso del pueblo y pistas de Digimon pendientes de reclutar cerca de tu zona. Toca un retrato para ver su ubicación, pista y requisitos conocidos.
 - **Evolución:** requisitos y rutas disponibles. Puedes activar una evolución válida con confirmación; deshacerla vuelve a la forma anterior con animación sin retroceder la partida.
 - **Trucos:** catálogo de ocho ayudas, con confirmación antes de aplicarlas. Deshacer un truco restaura su respaldo y descarta el progreso posterior.
 
@@ -63,13 +63,17 @@ Descarga la [APK de DigiBuddy 0.3.2](https://github.com/bortisoftware/DigiBuddy/
 
 Las mejoras gráficas afectan principalmente al 3D; los fondos y vídeos conservan su detalle original. El rendimiento depende del dispositivo y los ajustes.
 
+## Actualizaciones
+
+DigiBuddy avisa si hay una nueva APK en las releases oficiales de GitHub. Puedes abrir su descarga desde el aviso o comprobar manualmente en Ajustes. La consulta automática se puede desactivar; el juego funciona sin conexión.
+
 ## Partidas y guardados
 
 - **Continuar última sesión:** recupera el estado del emulador más reciente, si existe.
 - **Cargar partida del juego:** arranca el juego normalmente para cargar desde su menú original lo guardado en la tarjeta de memoria.
 - **Nueva partida:** abre el juego desde el inicio, sin borrar la tarjeta ni los estados anteriores.
 
-Puedes guardar y cargar estados desde Ajustes y exportar la tarjeta de memoria. Para cargar desde el menú original, recuerda guardar también dentro del propio juego.
+Puedes guardar, cargar, importar y exportar estados desde Ajustes, además de exportar la tarjeta de memoria. Los estados importados deben corresponder al mismo juego y núcleo; se guardan como una copia adicional. Para cargar desde el menú original, recuerda guardar también dentro del propio juego.
 
 ## Juego compatible
 

@@ -22,3 +22,5 @@
 Cerrar las fuentes correspondientes y opciones de construcción de los núcleos según [CORE_PROVENANCE.md](CORE_PROVENANCE.md), y disponer de una copia de seguridad independiente y recuperable de la firma definitiva. La firma de publicación es distinta de la utilizada en las APK de desarrollo.
 
 La revisión reduce riesgos concretos; no certifica ausencia absoluta de errores o vulnerabilidades.
+
+Para la 0.3.3 se comprobaron la selección de pistas con capturas de memoria locales, los filtros de reclutados, regiones y requisitos, las comparaciones de versión y la selección de estados importados. Las pistas se abrieron correctamente en la Thor, confirmado por el usuario. La comprobación manual de actualizaciones recibió la release pública de GitHub sin errores.
