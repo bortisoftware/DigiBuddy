@@ -158,10 +158,11 @@ final class SpriteAtlas {
   }
 
   Bitmap menu(int tab) {
+    if (tab == 2) return null;
     int id = 100 + tab;
     if (cache.containsKey(id)) return cache.get(id);
-    int u = tab == 1 ? 0 : tab == 2 ? 40 : tab == 3 ? 0 : tab == 5 ? 40 : 0,
-        v = tab == 3 ? 212 : tab == 2 ? 232 : 192;
+    int u = tab == 5 ? 40 : 0,
+        v = tab == 3 ? 212 : 192;
     Bitmap image = sprite(u, v, 20, 20, ((tab == 1 || tab == 3 ? 508 : 509) << 6) | 16, 896, 256);
     cache.put(id, image);
     return image;

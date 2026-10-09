@@ -76,15 +76,23 @@ final class RetroSkin {
         rect(c, 6, 3, 10, 5);
         p.setColor(0xffcc6b4a);
         rect(c, 6, 10, 10, 13);
-      } else if (kind == 2) {
-        rect(c, 1, 2, 15, 14);
-        p.setColor(0xff8dc78b);
-        rect(c, 2, 3, 14, 13);
-        p.setColor(0xff6ba9cb);
-        rect(c, 3, 3, 6, 9);
-        rect(c, 6, 7, 11, 10);
-        p.setColor(GOLD);
-        rect(c, 10, 4, 13, 7);
+        } else if (kind == 2) {
+          rect(c, 1, 3, 6, 15);
+          rect(c, 6, 1, 11, 13);
+          rect(c, 11, 3, 15, 15);
+          p.setColor(0xfff0f4e4);
+          rect(c, 2, 4, 5, 14);
+          rect(c, 7, 2, 10, 12);
+          rect(c, 12, 4, 14, 14);
+          p.setColor(0xff55a66b);
+          rect(c, 3, 10, 5, 12);
+          rect(c, 4, 8, 9, 10);
+          rect(c, 8, 7, 10, 9);
+          p.setColor(0xffcc4b4a);
+          rect(c, 10, 4, 14, 7);
+          rect(c, 11, 7, 13, 9);
+          p.setColor(0xfff0f4e4);
+          rect(c, 11, 5, 13, 6);
       } else if (kind == 3) {
         rect(c, 10, 1, 13, 4);
         rect(c, 8, 3, 11, 6);
