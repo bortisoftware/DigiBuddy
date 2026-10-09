@@ -39,6 +39,7 @@ public final class GameData {
 
   public static final class Enemy {
     public int type, x, y, hp, maxHp, mp, maxMp, offense, defense, speed, brains, difficulty;
+    public int recruitType;
     public String name;
   }
 
@@ -71,6 +72,7 @@ public final class GameData {
     public final List<Recruit> pendingRecruits = new ArrayList<>();
     public byte[] collision;
     public final List<Enemy> enemies = new ArrayList<>();
+    public final List<Enemy> recruitMarkers = new ArrayList<>();
     public final List<Exit> exits = new ArrayList<>();
     public final List<Marker> markers = new ArrayList<>();
     public final List<Item> items = new ArrayList<>();
@@ -249,9 +251,9 @@ public final class GameData {
     s.y = player != null ? player[1] : (byte) u8(profile.at("TAMER_PREVIOUS_TILE_Y"));
     s.collision = new byte[10000];
     System.arraycopy(ram, profile.at("MAP_COLLISION_DATA"), s.collision, 0, 10000);
+    prosperity(s);
     mapEntities(s);
     mapObjects(s);
-    prosperity(s);
     evolution(s);
     s.valid = true;
     s.message = "Estás en: " + s.map;
@@ -354,6 +356,7 @@ public final class GameData {
             }
         if (exit.maxX >= 0) s.exits.add(exit);
       }
+    addScriptExits(s);
     if (!profile.addresses.containsKey("ENTITY_TABLE")) return;
     for (int id = 2; id < 10; id++) {
       int raw = i32(profile.at("ENTITY_TABLE") + id * 4);
@@ -363,6 +366,27 @@ public final class GameData {
       // NPC types extend beyond the 65 raisable partners (e.g. Goburimon is 80).
       // The same species can be either a civilian or an enemy in different scripts.
       int type = i32(entity), max = s16(entity + 72), hp = s16(entity + 76);
+      if (type < 1 || type >= DataNames.DIGIMON.length) continue;
+      int[] pos = tile(entity);
+      if (pos == null) continue;
+      int recruitType = 0;
+      for (Recruit recruit : s.pendingRecruits)
+        if ((type >= 128 || type == 3)
+            && recruit.name.equals(digimon(type))
+            && RecruitmentHints.atLocation(s, recruit.type) != null) {
+          recruitType = recruit.type;
+          break;
+        }
+      if (recruitType > 0) {
+        Enemy marker = new Enemy();
+        marker.type = type;
+        marker.recruitType = recruitType;
+        marker.name = digimon(type);
+        marker.x = pos[0];
+        marker.y = pos[1];
+        s.recruitMarkers.add(marker);
+        continue;
+      }
       if (type < 1
           || type >= 180
           || level(type) < 3
@@ -372,8 +396,6 @@ public final class GameData {
           || hp <= 0
           || hp > max) continue;
       if (!EncounterClassifier.hostile(ram, profile, entity)) continue;
-      int[] pos = tile(entity);
-      if (pos == null) continue;
       Enemy enemy = new Enemy();
       enemy.type = type;
       enemy.name = digimon(type);
@@ -401,6 +423,32 @@ public final class GameData {
       double ratio = rival / Math.max(1, own);
       enemy.difficulty = ratio < 0.70 ? 0 : ratio > 1.25 ? 2 : 1;
       s.enemies.add(enemy);
+    }
+  }
+
+  private void addScriptExits(Snapshot snapshot) {
+    for (int trigger = 51; trigger < 110; trigger++) {
+      boolean present = false;
+      for (byte value : snapshot.collision)
+        if ((value & 255) == trigger) {
+          present = true;
+          break;
+        }
+      if (!present) continue;
+      int target = EncounterClassifier.exitTarget(ram, profile, trigger);
+      if (target < 0 || target == snapshot.mapId) continue;
+      Exit exit = new Exit();
+      exit.trigger = trigger;
+      exit.target = target;
+      exit.name = zone(target);
+      for (int index = 0; index < snapshot.collision.length; index++)
+        if ((snapshot.collision[index] & 255) == trigger) {
+          exit.minX = Math.min(exit.minX, index % 100);
+          exit.maxX = Math.max(exit.maxX, index % 100);
+          exit.minY = Math.min(exit.minY, index / 100);
+          exit.maxY = Math.max(exit.maxY, index / 100);
+        }
+      snapshot.exits.add(exit);
     }
   }
 

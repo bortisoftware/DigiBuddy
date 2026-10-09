@@ -60,6 +60,27 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
   private volatile File cheatBackup;
   private Button playButton;
   private Dialog panelDialog;
+  private ControllerBindings controllerBindings;
+  private android.hardware.input.InputManager inputManager;
+  private final android.hardware.input.InputManager.InputDeviceListener inputDeviceListener =
+      new android.hardware.input.InputManager.InputDeviceListener() {
+        public void onInputDeviceAdded(int id) {}
+
+        public void onInputDeviceChanged(int id) {
+          clearControllerInputs();
+        }
+
+        public void onInputDeviceRemoved(int id) {
+          clearControllerInputs();
+        }
+      };
+  private ControllerView controllerView;
+  private TextView controllerStatus;
+  private TextView captureStatus;
+  private Dialog captureDialog;
+  private int captureTarget = -1;
+  private String mappingDevice = "builtin", pendingSource;
+  private Button replaceBinding;
   private FrameLayout root;
   private GameData.Profile profile;
   private boolean gameOnSecondary, importing;
@@ -104,6 +125,9 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
     getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     fullscreen(getWindow().getDecorView());
     prefs = getSharedPreferences("digimap", MODE_PRIVATE);
+    controllerBindings = new ControllerBindings(prefs);
+    inputManager = (android.hardware.input.InputManager) getSystemService(INPUT_SERVICE);
+    if (inputManager != null) inputManager.registerInputDeviceListener(inputDeviceListener, ui);
     releaseUpdates = new ReleaseUpdates();
     WeakReference<MainActivity> activity = new WeakReference<>(this);
     Handler mainHandler = ui;
@@ -1026,6 +1050,7 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
     boolean pausedBefore = session.paused;
     session.paused = true;
     session.physicalButtons = session.touchButtons = 0;
+    controllerBindings.clear();
     Dialog dialog =
         new Dialog(panel.ctx) {
           @Override
@@ -1039,6 +1064,22 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
           }
         };
     panelDialog = dialog;
+    configurePanelDialog(dialog);
+    dialog.setOnDismissListener(
+        d -> {
+          cancelControllerCapture();
+          controllerView = null;
+          controllerStatus = null;
+          pendingSource = null;
+          controllerBindings.clear();
+          session.physicalButtons = 0;
+          session.paused = pausedBefore;
+          if (panelDialog == dialog) panelDialog = null;
+        });
+    return dialog;
+  }
+
+  private void configurePanelDialog(Dialog dialog) {
     dialog.requestWindowFeature(android.view.Window.FEATURE_NO_TITLE);
     android.view.Window window = dialog.getWindow();
     window.setType(WindowManager.LayoutParams.TYPE_APPLICATION_ATTACHED_DIALOG);
@@ -1050,12 +1091,6 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
         WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_DIM_BEHIND);
     window.setBackgroundDrawable(new android.graphics.drawable.ColorDrawable(Color.TRANSPARENT));
     dialog.setCanceledOnTouchOutside(false);
-    dialog.setOnDismissListener(
-        d -> {
-          session.paused = pausedBefore;
-          if (panelDialog == dialog) panelDialog = null;
-        });
-    return dialog;
   }
 
   private void showPanelDialog(Dialog dialog, View content) {
@@ -1184,6 +1219,11 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
   }
 
   private void showEnemy(GameData.Enemy enemy) {
+    if (enemy.recruitType > 0) {
+      RecruitmentHints.Hint hint = RecruitmentHints.atLocation(snapshot, enemy.recruitType);
+      if (hint != null) showRecruitHint(hint);
+      return;
+    }
     if (panel == null || session.actionBusy || (panelDialog != null && panelDialog.isShowing()))
       return;
     Dialog dialog = createPanelDialog();
@@ -1272,73 +1312,216 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
 
   @Override
   public boolean dispatchKeyEvent(KeyEvent event) {
-    int id = key(event.getKeyCode());
+    if (controllerView != null && panelDialog != null && panelDialog.isShowing()) {
+      if (event.getKeyCode() == KeyEvent.KEYCODE_BACK) {
+        if (event.getAction() == KeyEvent.ACTION_UP) {
+          if (captureDialog != null) cancelControllerCapture();
+          else panelDialog.dismiss();
+        }
+        return true;
+      }
+      if (captureTarget >= 0
+          && event.getAction() == KeyEvent.ACTION_DOWN
+          && event.getRepeatCount() == 0
+          && isControllerKey(event))
+        captureControllerInput(event.getDevice(), ControllerBindings.keySource(event.getKeyCode()));
+      return true;
+    }
+    int id =
+        controllerBindings.binding(
+            ControllerBindings.device(event.getDevice()),
+            ControllerBindings.keySource(event.getKeyCode()));
     if (event.getKeyCode() == KeyEvent.KEYCODE_BACK) {
       if (event.getAction() == KeyEvent.ACTION_UP) onBackPressed();
       return true;
     }
     if (id >= 0) {
       if (session.actionBusy || (panelDialog != null && panelDialog.isShowing())) return true;
-      int mask = 1 << id;
-      if (event.getAction() == KeyEvent.ACTION_DOWN) session.physicalButtons |= mask;
-      else if (event.getAction() == KeyEvent.ACTION_UP) session.physicalButtons &= ~mask;
+      session.physicalButtons = controllerBindings.key(event);
       return true;
     }
     if ((event.getSource() & android.view.InputDevice.SOURCE_GAMEPAD)
         == android.view.InputDevice.SOURCE_GAMEPAD) return true;
+    if (isControllerKey(event)) return true;
     return super.dispatchKeyEvent(event);
   }
 
-  private static int key(int code) {
-    switch (code) {
-      case KeyEvent.KEYCODE_BUTTON_A:
-        return 0;
-      case KeyEvent.KEYCODE_BUTTON_X:
-        return 1;
-      case KeyEvent.KEYCODE_BUTTON_SELECT:
-        return 2;
-      case KeyEvent.KEYCODE_BUTTON_START:
-        return 3;
-      case KeyEvent.KEYCODE_DPAD_UP:
-        return 4;
-      case KeyEvent.KEYCODE_DPAD_DOWN:
-        return 5;
-      case KeyEvent.KEYCODE_DPAD_LEFT:
-        return 6;
-      case KeyEvent.KEYCODE_DPAD_RIGHT:
-        return 7;
-      case KeyEvent.KEYCODE_BUTTON_B:
-        return 8;
-      case KeyEvent.KEYCODE_BUTTON_Y:
-        return 9;
-      case KeyEvent.KEYCODE_BUTTON_L1:
-        return 10;
-      case KeyEvent.KEYCODE_BUTTON_R1:
-        return 11;
-      case KeyEvent.KEYCODE_BUTTON_L2:
-        return 12;
-      case KeyEvent.KEYCODE_BUTTON_R2:
-        return 13;
-      default:
-        return -1;
+  private static boolean isControllerKey(KeyEvent event) {
+    return KeyEvent.isGamepadButton(event.getKeyCode())
+        || event.getKeyCode() >= KeyEvent.KEYCODE_DPAD_UP
+            && event.getKeyCode() <= KeyEvent.KEYCODE_DPAD_RIGHT;
+  }
+
+  private void clearControllerInputs() {
+    if (controllerBindings != null) controllerBindings.clear();
+    session.physicalButtons = 0;
+  }
+
+  private void showControllerMapping() {
+    if (panel == null || session.actionBusy || panelDialog != null) return;
+    Dialog dialog = createPanelDialog();
+    LinearLayout box = new LinearLayout(panel.ctx);
+    box.setOrientation(LinearLayout.VERTICAL);
+    box.setPadding(dp(16), dp(14), dp(16), dp(14));
+    box.setBackground(card(RetroSkin.PAPER, 0));
+    box.addView(text(panel.ctx, "Remapear botones", 18, RetroSkin.INK));
+    List<android.view.InputDevice> devices = new ArrayList<>();
+    List<String> names = new ArrayList<>();
+    for (int id : android.view.InputDevice.getDeviceIds()) {
+      android.view.InputDevice device = android.view.InputDevice.getDevice(id);
+      if (device != null
+          && !device.isVirtual()
+          && ((device.getSources() & android.view.InputDevice.SOURCE_GAMEPAD)
+                  == android.view.InputDevice.SOURCE_GAMEPAD
+              || (device.getSources() & android.view.InputDevice.SOURCE_JOYSTICK)
+                  == android.view.InputDevice.SOURCE_JOYSTICK
+              || (device.getSources() & android.view.InputDevice.SOURCE_DPAD)
+                  == android.view.InputDevice.SOURCE_DPAD)) {
+        devices.add(device);
+        names.add(device.getName());
+      }
     }
+    mappingDevice = devices.isEmpty() ? "builtin" : ControllerBindings.device(devices.get(0));
+    if (!devices.isEmpty()) {
+      Spinner devicePicker = new Spinner(panel.ctx);
+      devicePicker.setAdapter(
+          new ArrayAdapter<>(panel.ctx, android.R.layout.simple_spinner_dropdown_item, names));
+      devicePicker.setOnItemSelectedListener(
+          new AdapterView.OnItemSelectedListener() {
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+              mappingDevice = ControllerBindings.device(devices.get(position));
+              cancelControllerCapture();
+            }
+
+            public void onNothingSelected(AdapterView<?> parent) {}
+          });
+      box.addView(devicePicker);
+    }
+    controllerStatus =
+        text(
+            panel.ctx,
+            "Toca un botón del mando y pulsa el botón físico que quieras usar.",
+            13,
+            MUTED);
+    controllerView = new ControllerView(panel.ctx, this::showControllerCapture);
+    box.addView(controllerView);
+    box.addView(controllerStatus);
+    box.addView(
+        button(
+            panel.ctx,
+            "Restaurar controles de este mando",
+            () -> {
+              controllerBindings.reset(mappingDevice);
+              cancelControllerCapture();
+              controllerStatus.setText("Controles predeterminados restaurados.");
+            }));
+    ScrollView scroll = new ScrollView(panel.ctx);
+    scroll.addView(box);
+    LinearLayout layout = new LinearLayout(panel.ctx);
+    layout.setOrientation(LinearLayout.VERTICAL);
+    layout.setBackground(card(RetroSkin.PAPER, 0));
+    layout.addView(scroll, new LinearLayout.LayoutParams(-1, 0, 1));
+    layout.addView(
+        button(panel.ctx, "Cerrar", dialog::dismiss), new LinearLayout.LayoutParams(-1, dp(48)));
+    showPanelDialog(dialog, layout);
+    if (dialog.isShowing())
+      dialog
+          .getWindow()
+          .setLayout(
+              Math.min(panel.getWidth() - dp(30), dp(460)),
+              Math.min(panel.getHeight() - dp(30), dp(560)));
+  }
+
+  private void cancelControllerCapture() {
+    Dialog popup = captureDialog;
+    captureDialog = null;
+    if (popup != null) popup.dismiss();
+    captureStatus = null;
+    replaceBinding = null;
+    captureTarget = -1;
+    pendingSource = null;
+    if (controllerView != null) controllerView.selected(-1);
+    if (replaceBinding != null) replaceBinding.setVisibility(View.GONE);
+    if (controllerStatus != null)
+      controllerStatus.setText("Toca un botón del mando para cambiar su asignación.");
+  }
+
+  private void showControllerCapture(int target) {
+    cancelControllerCapture();
+    captureTarget = target;
+    controllerView.selected(target);
+    Dialog popup = new Dialog(panel.ctx);
+    captureDialog = popup;
+    configurePanelDialog(popup);
+    popup.setOnDismissListener(
+        d -> {
+          if (captureDialog == popup) cancelControllerCapture();
+        });
+    LinearLayout box = new LinearLayout(panel.ctx);
+    box.setOrientation(LinearLayout.VERTICAL);
+    box.setPadding(dp(20), dp(18), dp(20), dp(18));
+    box.setBackground(card(RetroSkin.PAPER, 0));
+    box.addView(
+        text(panel.ctx, "Asignar «" + ControllerBindings.LABELS[target] + "»", 20, RetroSkin.INK));
+    captureStatus =
+        text(
+            panel.ctx,
+            "Actual: "
+                + controllerBindings.description(mappingDevice, target)
+                + "\n\nPulsa el botón físico o mueve la dirección que quieras usar.",
+            15,
+            MUTED);
+    captureStatus.setPadding(0, dp(16), 0, dp(18));
+    box.addView(captureStatus);
+    LinearLayout actions = new LinearLayout(panel.ctx);
+    actions.addView(
+        button(panel.ctx, "Cancelar", this::cancelControllerCapture),
+        new LinearLayout.LayoutParams(0, dp(48), 1));
+    replaceBinding = button(panel.ctx, "Reasignar", this::applyControllerCapture);
+    replaceBinding.setVisibility(View.GONE);
+    actions.addView(replaceBinding, new LinearLayout.LayoutParams(0, dp(48), 1));
+    box.addView(actions);
+    showPanelDialog(popup, box);
+  }
+
+  private void captureControllerInput(android.view.InputDevice device, String source) {
+    if (captureTarget < 0 || pendingSource != null) return;
+    if (!mappingDevice.equals(ControllerBindings.device(device))) {
+      captureStatus.setText("Ese botón pertenece a otro dispositivo. Usa el mando seleccionado.");
+      return;
+    }
+    pendingSource = source;
+    int previous = controllerBindings.binding(mappingDevice, source);
+    if (previous >= 0 && previous != captureTarget) {
+      captureStatus.setText(
+          "Este botón ya controla «"
+              + ControllerBindings.LABELS[previous]
+              + "». ¿Reasignarlo a «"
+              + ControllerBindings.LABELS[captureTarget]
+              + "»?");
+      replaceBinding.setVisibility(View.VISIBLE);
+    } else applyControllerCapture();
+  }
+
+  private void applyControllerCapture() {
+    if (pendingSource == null || captureTarget < 0) return;
+    String label = ControllerBindings.LABELS[captureTarget];
+    controllerBindings.assign(mappingDevice, pendingSource, captureTarget);
+    cancelControllerCapture();
+    controllerStatus.setText("«" + label + "» guardado para este mando.");
   }
 
   @Override
   public boolean onGenericMotionEvent(MotionEvent event) {
     if ((event.getSource() & android.view.InputDevice.SOURCE_JOYSTICK)
         == android.view.InputDevice.SOURCE_JOYSTICK) {
-      float x = event.getAxisValue(MotionEvent.AXIS_HAT_X),
-          y = event.getAxisValue(MotionEvent.AXIS_HAT_Y);
-      if (Math.abs(x) < 0.3) x = event.getAxisValue(MotionEvent.AXIS_X);
-      if (Math.abs(y) < 0.3) y = event.getAxisValue(MotionEvent.AXIS_Y);
+      if (controllerView != null) {
+        String source = ControllerBindings.captureAxis(event);
+        if (source != null) captureControllerInput(event.getDevice(), source);
+        return true;
+      }
       if (session.actionBusy || (panelDialog != null && panelDialog.isShowing())) return true;
-      int mask = 0;
-      if (y < -.4) mask |= 1 << 4;
-      if (y > .4) mask |= 1 << 5;
-      if (x < -.4) mask |= 1 << 6;
-      if (x > .4) mask |= 1 << 7;
-      session.physicalButtons = (session.physicalButtons & ~0xf0) | mask;
+      session.physicalButtons = controllerBindings.motion(event);
       return true;
     }
     return super.onGenericMotionEvent(event);
@@ -1413,6 +1596,7 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
   protected void onPause() {
     session.suspended = true;
     session.physicalButtons = 0;
+    if (controllerBindings != null) controllerBindings.clear();
     session.touchButtons = 0;
     super.onPause();
   }
@@ -1420,6 +1604,7 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
   @Override
   protected void onDestroy() {
     destroyed = true;
+    if (inputManager != null) inputManager.unregisterInputDeviceListener(inputDeviceListener);
     if (cardExporter != null) cardExporter.close();
     if (fileImporter != null) fileImporter.close();
     if (releaseUpdates != null) releaseUpdates.close();
@@ -1597,6 +1782,8 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
     }
 
     void settings() {
+      content.addView(
+          button(ctx, "Controles · Remapear botones", MainActivity.this::showControllerMapping));
       toggle("Buscar actualizaciones al abrir", "automaticUpdates", true, false);
       content.addView(button(ctx, "Buscar actualizaciones ahora", () -> checkUpdates(true)));
       TextView graphicsTitle = text(ctx, "Gráficos y sonido", 16, ACCENT);

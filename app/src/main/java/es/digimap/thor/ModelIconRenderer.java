@@ -339,7 +339,8 @@ final class ModelIconRenderer {
         maxY = maxX;
     for (Face f : faces)
       for (double[] v : f.vertex) {
-        double x = .866 * v[0] + .5 * v[2], z = -.5 * v[0] + .866 * v[2], y = .94 * v[1] - .34 * z;
+        // The models face negative Z; an eye-level front view keeps their faces visible.
+        double x = -v[0], z = -v[2], y = v[1];
         v[0] = x;
         v[1] = y;
         v[2] = z;

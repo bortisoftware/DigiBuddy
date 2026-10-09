@@ -37,7 +37,7 @@ public final class MapView extends View {
     float radius = 24 * getResources().getDisplayMetrics().density;
     float best = radius * radius;
     GameData.Enemy selected = null;
-    for (GameData.Enemy enemy : s.enemies) {
+    for (GameData.Enemy enemy : mapDigimon()) {
       float dx = x - (left + (enemy.x - minX + .5f) * cell);
       float dy = y - (top + (enemy.y - minY + .5f) * cell);
       float distance = dx * dx + dy * dy;
@@ -47,6 +47,12 @@ public final class MapView extends View {
       }
     }
     return selected;
+  }
+
+  private java.util.List<GameData.Enemy> mapDigimon() {
+    java.util.List<GameData.Enemy> markers = new java.util.ArrayList<>(s.enemies);
+    markers.addAll(s.recruitMarkers);
+    return markers;
   }
 
   @Override
@@ -114,7 +120,7 @@ public final class MapView extends View {
           maxY = Math.max(maxY, y);
         }
     // Include every marker before fitting the map; NPCs can stand outside walkable cells.
-    for (GameData.Enemy foe : s.enemies) {
+    for (GameData.Enemy foe : mapDigimon()) {
       minX = Math.min(minX, foe.x);
       maxX = Math.max(maxX, foe.x);
       minY = Math.min(minY, foe.y);
@@ -205,11 +211,19 @@ public final class MapView extends View {
         }
       }
     }
-    for (GameData.Enemy foe : s.enemies) {
+    for (GameData.Enemy foe : mapDigimon()) {
       float x = left + (foe.x - minX + .5f) * cell, y = top + (foe.y - minY + .5f) * cell;
-      Bitmap image = atlas == null ? null : atlas.enemy(foe.type, ram, profile);
+      Bitmap image =
+          atlas == null
+              ? null
+              : foe.recruitType > 0
+                  ? atlas.mon(foe.recruitType, ram, profile)
+                  : atlas.enemy(foe.type, ram, profile);
       float radius = image == null ? 7 * d : 16 * d;
-      p.setColor(foe.difficulty == 0 ? 0xff42c569 : foe.difficulty == 1 ? 0xffffc34a : 0xffb43b58);
+      p.setColor(
+          foe.recruitType > 0
+              ? 0xff447bb7
+              : foe.difficulty == 0 ? 0xff42c569 : foe.difficulty == 1 ? 0xffffc34a : 0xffb43b58);
       c.drawCircle(x, y, radius, p);
       if (image != null) {
         p.setColor(0xfff0f4e4);
@@ -219,6 +233,15 @@ public final class MapView extends View {
       } else {
         p.setColor(0xff913d40);
         c.drawCircle(x, y, 4 * d, p);
+      }
+      if (foe.recruitType > 0) {
+        p.setColor(0xffffd25f);
+        c.drawCircle(x + 12 * d, y - 12 * d, 7 * d, p);
+        p.setColor(0xff273951);
+        p.setTextAlign(Paint.Align.CENTER);
+        p.setTextSize(12 * d);
+        c.drawText("!", x + 12 * d, y - 8 * d, p);
+        p.setTextAlign(Paint.Align.LEFT);
       }
     }
     float x = left + (s.x - minX + .5f) * cell, y = top + (s.y - minY + .5f) * cell;

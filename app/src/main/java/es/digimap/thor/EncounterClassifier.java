@@ -1,8 +1,8 @@
 package es.digimap.thor;
 
 /**
- * Conservative, read-only inspection of the NPC's current interaction script. Dialogue, selections,
- * unsupported routines and malformed scripts are never guessed to be combat.
+ * Bounded, read-only inspection of current interaction scripts. Unknown branches are never guessed
+ * to be combat or map transitions.
  */
 final class EncounterClassifier {
   private final byte[] ram;
@@ -20,6 +20,16 @@ final class EncounterClassifier {
   static boolean hostile(byte[] ram, GameData.Profile profile, int npc) {
     // Automatic contact begins a script; it does not by itself mean aggression.
     if (u8(ram, npc + 102) != 1) return false;
+    EncounterClassifier script = currentScript(ram, profile);
+    return script != null && script.section(u8(ram, npc + 101)) == -2;
+  }
+
+  static int exitTarget(byte[] ram, GameData.Profile profile, int trigger) {
+    EncounterClassifier script = currentScript(ram, profile);
+    return script == null ? -1 : script.section(trigger);
+  }
+
+  private static EncounterClassifier currentScript(byte[] ram, GameData.Profile profile) {
     String[] keys = {
       "SCRIPT_DATA_PTR",
       "SCRIPT_HEADER_PTR",
@@ -27,7 +37,7 @@ final class EncounterClassifier {
       "CURRENT_SCRIPT_ID",
       "SCRIPT_STATE_PTR"
     };
-    for (String key : keys) if (!profile.addresses.containsKey(key)) return false;
+    for (String key : keys) if (!profile.addresses.containsKey(key)) return null;
     int base = pointer(ram, profile.at("SCRIPT_DATA_PTR"), 8192);
     int header = pointer(ram, profile.at("SCRIPT_HEADER_PTR"), 8192);
     int state = pointer(ram, profile.at("SCRIPT_STATE_PTR"), 668);
@@ -37,17 +47,17 @@ final class EncounterClassifier {
         || state < 0
         || script < 1
         || script > 2046
-        || u16(ram, profile.at("ACTIVE_MAP_SCRIPT")) != script) return false;
+        || u16(ram, profile.at("ACTIVE_MAP_SCRIPT")) != script) return null;
     long start = i32(ram, header + script * 4) & 0xffffffffL;
     long end = i32(ram, header + (script + 1) * 4) & 0xffffffffL;
     long length = end - start;
-    if (length < 6 || length > 8192) return false;
-    return new EncounterClassifier(ram, base, (int) length, state).section(u8(ram, npc + 101));
+    if (length < 6 || length > 8192) return null;
+    return new EncounterClassifier(ram, base, (int) length, state);
   }
 
-  private boolean section(int id) {
+  private int section(int id) {
     int header = word(0), pc = -1;
-    if (header < 6 || header > size || (header & 1) != 0) return false;
+    if (header < 6 || header > size || (header & 1) != 0) return -1;
     for (int at = 2; at + 3 < header; at += 4) {
       int key = word(at);
       if (key == 65535) break;
@@ -56,23 +66,23 @@ final class EncounterClassifier {
         break;
       }
     }
-    if (pc < header || pc >= size) return false;
+    if (pc < header || pc >= size) return -1;
     int[] returns = new int[16];
     int depth = 0;
     // A bound handles loops without allocating a graph or scanning text as opcodes.
     for (int instructions = 0; instructions < 512 && pc >= header && pc < size; instructions++) {
       int op = byteAt(pc);
       if (op == 0x1c || op == 0x1d) {
-        if (pc + 4 > size) return false;
+        if (pc + 4 > size) return -1;
         int trigger = word(pc + 2);
-        if (trigger < 0 || trigger >= 800) return false;
+        if (trigger < 0 || trigger >= 800) return -1;
         if (op == 0x1c) triggers[trigger / 8] |= 1 << (trigger % 8);
         else triggers[trigger / 8] &= ~(1 << (trigger % 8));
         pc += 4;
         continue;
       }
       if (op >= 0x1e && op <= 0x20) {
-        if (pc + 4 > size) return false;
+        if (pc + 4 > size) return -1;
         int index = byteAt(pc + 2), value = byteAt(pc + 3);
         pstats[index] =
             (byte)
@@ -82,7 +92,17 @@ final class EncounterClassifier {
         pc += 4;
         continue;
       }
-      if (op == 0x66) return pc + 1 < size;
+      if (op == 0x66) return pc + 1 < size ? -2 : -1;
+      if (op == 0x4b) {
+        if (pc + 4 > size) return -1;
+        int target = byteAt(pc + 1);
+        return target < 255 ? target : -1;
+      }
+      if (op == 0x58) {
+        if (pc + 2 > size || byteAt(pc + 1) >= 255) return -1;
+        int target = pstats[byteAt(pc + 1)] & 255;
+        return target < 255 ? target : -1;
+      }
       if (op == 0xfe
           || op == 0xff
           || op == 0x10
@@ -90,18 +110,18 @@ final class EncounterClassifier {
           || op == 0x17
           || op == 0x49
           || op == 0x64
-          || op == 0xfb) return false;
+          || op == 0xfb) return -1;
       if (op == 0x13 || op == 0x16) {
-        if (pc + 4 > size) return false;
+        if (pc + 4 > size) return -1;
         if (op == 0x13) {
-          if (depth == returns.length) return false;
+          if (depth == returns.length) return -1;
           returns[depth++] = pc + 4;
         }
         pc = word(pc + 2);
         continue;
       }
       if (op == 0x15) {
-        if (depth == 0) return false;
+        if (depth == 0) return -1;
         pc = returns[--depth];
         continue;
       }
@@ -120,14 +140,14 @@ final class EncounterClassifier {
             break;
           }
         }
-        if (!ended) return false;
+        if (!ended) return -1;
         continue;
       }
       int length = fixedLength(op);
-      if (length == 0 || pc > size - length) return false;
+      if (length == 0 || pc > size - length) return -1;
       pc += length;
     }
-    return false;
+    return -1;
   }
 
   private int condition(int pc) {

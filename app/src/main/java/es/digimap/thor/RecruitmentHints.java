@@ -119,6 +119,16 @@ final class RecruitmentHints {
     return selected;
   }
 
+  static Hint atLocation(GameData.Snapshot snapshot, int type) {
+    if (!snapshot.prosperityAvailable) return null;
+    GameData.Recruit recruit = pending(snapshot, type);
+    if (recruit == null) return null;
+    for (Entry entry : ENTRIES)
+      if (entry.type == type && entry.zone == snapshot.zoneId)
+        return new Hint(recruit, entry, 0, requirements(snapshot, entry));
+    return null;
+  }
+
   private static GameData.Recruit pending(GameData.Snapshot snapshot, int type) {
     for (GameData.Recruit recruit : snapshot.pendingRecruits)
       if (recruit.type == type) return recruit;

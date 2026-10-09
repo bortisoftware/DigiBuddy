@@ -35,7 +35,7 @@ Requiere **Android 8.0 o posterior y ARM64**. Otros dispositivos de doble pantal
 
 ## Instalación
 
-Descarga la [APK de DigiBuddy 0.3.3](https://github.com/bortisoftware/DigiBuddy/releases/download/v0.3.3/DigiBuddy-0.3.3.apk) desde [Releases](https://github.com/bortisoftware/DigiBuddy/releases).
+Descarga la [APK de DigiBuddy 0.3.4](https://github.com/bortisoftware/DigiBuddy/releases/download/v0.3.4/DigiBuddy-0.3.4.apk) desde [Releases](https://github.com/bortisoftware/DigiBuddy/releases).
 
 1. Instala la APK en tu consola. Si Android lo solicita, permite la instalación desde el navegador o gestor de archivos que utilices.
 2. Abre DigiBuddy: el asistente te pedirá seleccionar tu BIOS de PlayStation y el juego.
@@ -49,7 +49,7 @@ Descarga la [APK de DigiBuddy 0.3.3](https://github.com/bortisoftware/DigiBuddy/
 
 - **Compañero:** estadísticas, vida, energía y necesidades de tu Digimon.
 - **Bolsa:** objetos e iconos; toca un objeto para confirmar su uso en el juego.
-- **Mapa:** tu posición, salidas a otras zonas, WC, objetos recogibles y enemigos con sus retratos. Toca un enemigo para consultar sus estadísticas. El color indica una estimación de dificultad.
+- **Mapa:** tu posición, salidas a otras zonas, WC, objetos recogibles y enemigos con retratos de frente. Toca un enemigo para consultar sus estadísticas. El color indica una estimación de dificultad. Los reclutables detectados en la zona llevan un distintivo «!» y abren su pista al tocarlos.
 - **Prosperidad:** progreso del pueblo y pistas de Digimon pendientes de reclutar cerca de tu zona. Toca un retrato para ver su ubicación, pista y requisitos conocidos.
 - **Evolución:** requisitos y rutas disponibles. Puedes activar una evolución válida con confirmación; deshacerla vuelve a la forma anterior con animación sin retroceder la partida.
 - **Trucos:** catálogo de ocho ayudas, con confirmación antes de aplicarlas. Deshacer un truco restaura su respaldo y descarta el progreso posterior.
@@ -57,6 +57,7 @@ Descarga la [APK de DigiBuddy 0.3.3](https://github.com/bortisoftware/DigiBuddy/
 ### El juego · pantalla superior
 
 - Controles físicos y sonido.
+- **Ajustes → Controles · Remapear botones:** toca un botón del mando PlayStation y pulsa el botón físico o dirección que quieras asignarle. Las asignaciones se guardan por mando; puedes cancelar o restaurar los controles predeterminados. El juego se pausa durante la configuración.
 - Formato original **4:3** o imagen estirada para llenar la pantalla.
 - Resolución interna hasta **8×**, filtros y PGXP con SwanStation OpenGL ES.
 - Alternativas por software y PCSX ReARMed.
