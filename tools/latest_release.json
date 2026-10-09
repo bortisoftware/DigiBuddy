@@ -1,0 +1,14 @@
+{
+  "tag_name": "v0.3.4",
+  "html_url": "https://github.com/bortisoftware/DigiBuddy/releases/tag/v0.3.4",
+  "draft": false,
+  "prerelease": false,
+  "assets": [
+    {
+      "name": "DigiBuddy-0.3.4.apk",
+      "browser_download_url": "https://github.com/bortisoftware/DigiBuddy/releases/download/v0.3.4/DigiBuddy-0.3.4.apk",
+      "state": "uploaded",
+      "size": 9054745
+    }
+  ]
+}
