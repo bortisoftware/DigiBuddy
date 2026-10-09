@@ -1127,13 +1127,11 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
                       MainActivity owner = activity.get();
                       if (owner == null || owner.destroyed) return;
                       if (result.failed) {
-                        if (manual)
-                          owner.showMessage(
-                              "No se pudo comprobar. Revisa tu conexión y prueba más tarde.");
+                        if (manual) owner.showMessage(result.errorMessage);
                         return;
                       }
                       if (result.version.isEmpty()) {
-                        if (manual) owner.showMessage("Tienes la última versión publicada.");
+                        if (manual) owner.showMessage("No hay actualizaciones nuevas.");
                         return;
                       }
                       boolean alreadyShown =
@@ -1631,6 +1629,9 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
     final FrameLayout mapArea;
     final int[] navTabs = {0, 1, 2, 3, 4, 7};
     int tab = 0, lastSpriteType = -1;
+    boolean graphicsExpanded;
+    private LinearLayout graphicsSection;
+    private Button graphicsHeader;
     String previous = "";
     long noticeUntil = 0;
     final ArrayList<Button> navigation = new ArrayList<>();
@@ -1763,7 +1764,6 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
         body.setCompoundDrawables(null, device, null, null);
         body.setCompoundDrawablePadding(dp(15));
       } else body.setCompoundDrawables(null, null, null, null);
-      header.setVisibility(tab == 2 ? View.GONE : View.VISIBLE);
       summary.setVisibility(tab == 0 ? View.VISIBLE : View.GONE);
       portrait.setVisibility(tab == 0 ? View.VISIBLE : View.GONE);
       status.setVisibility(tab == 0 ? View.VISIBLE : View.GONE);
@@ -1786,54 +1786,17 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
           button(ctx, "Controles · Remapear botones", MainActivity.this::showControllerMapping));
       toggle("Buscar actualizaciones al abrir", "automaticUpdates", true, false);
       content.addView(button(ctx, "Buscar actualizaciones ahora", () -> checkUpdates(true)));
-      TextView graphicsTitle = text(ctx, "Gráficos y sonido", 16, ACCENT);
-      graphicsTitle.setPadding(0, dp(8), 0, dp(4));
-      content.addView(graphicsTitle);
-      choice(
-          "Motor gráfico (detén la partida para cambiar)",
-          "engine",
-          new String[] {
-            "SwanStation · OpenGL ES", "SwanStation · software", "PCSX ReARMed · compatibilidad"
-          },
-          new String[] {"swan-gl", "swan-sw", "pcsx"},
-          "swan-gl",
-          true);
-      String engine = prefs.getString("engine", "swan-gl");
-      if (engine.equals("swan-gl")) {
-        choice(
-            "Resolución interna",
-            "resolution",
-            new String[] {"1× · PSX original", "2×", "3×", "4×", "5×", "6×", "8×"},
-            new String[] {"1", "2", "3", "4", "5", "6", "8"},
-            "4",
-            false);
-        choice(
-            "Filtro de texturas",
-            "textureFilter",
-            new String[] {"Nearest · original", "Bilinear", "Bilinear sin bordes"},
-            new String[] {"Nearest", "Bilinear", "BilinearBinAlpha"},
-            "Nearest",
-            false);
-        toggle("PGXP · estabilizar geometría 3D", "pgxp", false, false);
-        toggle("PGXP · corregir perspectiva de texturas", "pgxpTexture", true, false);
-        toggle("Color de 24 bits", "trueColor", false, false);
-        toggle("Suavizar escalado de pantalla", "smoothScaling", false, false);
-      } else if (engine.equals("pcsx")) {
-        toggle("Resolución interna 2× (3D)", "resolution2x", true, false);
-        toggle("Ajuste de texturas para 2×", "textureFix", true, false);
-        toggle("Dithering original de PSX", "dithering", true, false);
-        toggle("Interpolación de sonido cúbica", "audioCubic", true, false);
-      }
-      toggle("Llenar pantalla (desactiva para formato 4:3)", "stretch", true, true);
-      content.addView(
-          text(
+      graphicsSection = new LinearLayout(ctx);
+      graphicsSection.setOrientation(VERTICAL);
+      graphicsSettings(graphicsSection);
+      graphicsSection.setVisibility(graphicsExpanded ? View.VISIBLE : View.GONE);
+      graphicsHeader =
+          button(
               ctx,
-              engine.equals("swan-sw")
-                  ? "Modo por software: resolución nativa, útil para comprobar compatibilidad.\n"
-                  : "Más resolución mejora los modelos 3D; los fondos y vídeos 2D conservan su"
-                      + " detalle original. PGXP puede cambiar algunos efectos.\n",
-              11,
-              MUTED));
+              graphicsExpanded ? "Gráficos y sonido ▾" : "Gráficos y sonido ▸",
+              this::toggleGraphicsSection);
+      content.addView(graphicsHeader);
+      content.addView(graphicsSection);
       content.addView(button(ctx, "1 · Importar BIOS", () -> pick(1)));
       content.addView(button(ctx, "2 · Importar juego", () -> pick(2)));
       LinearLayout play = new LinearLayout(ctx);
@@ -1940,7 +1903,69 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
               }));
     }
 
+    private void toggleGraphicsSection() {
+      graphicsExpanded = !graphicsExpanded;
+      graphicsSection.setVisibility(graphicsExpanded ? View.VISIBLE : View.GONE);
+      graphicsHeader.setText(graphicsExpanded ? "Gráficos y sonido ▾" : "Gráficos y sonido ▸");
+    }
+
+    private void graphicsSettings(LinearLayout graphics) {
+      choice(
+          graphics,
+          "Motor gráfico (detén la partida para cambiar)",
+          "engine",
+          new String[] {
+            "SwanStation · OpenGL ES", "SwanStation · software", "PCSX ReARMed · compatibilidad"
+          },
+          new String[] {"swan-gl", "swan-sw", "pcsx"},
+          "swan-gl",
+          true);
+      String engine = prefs.getString("engine", "swan-gl");
+      if (engine.equals("swan-gl")) {
+        choice(
+            graphics,
+            "Resolución interna",
+            "resolution",
+            new String[] {"1× · PSX original", "2×", "3×", "4×", "5×", "6×", "8×"},
+            new String[] {"1", "2", "3", "4", "5", "6", "8"},
+            "4",
+            false);
+        choice(
+            graphics,
+            "Filtro de texturas",
+            "textureFilter",
+            new String[] {"Nearest · original", "Bilinear", "Bilinear sin bordes"},
+            new String[] {"Nearest", "Bilinear", "BilinearBinAlpha"},
+            "Nearest",
+            false);
+        toggle(graphics, "PGXP · estabilizar geometría 3D", "pgxp", false, false);
+        toggle(graphics, "PGXP · corregir perspectiva de texturas", "pgxpTexture", true, false);
+        toggle(graphics, "Color de 24 bits", "trueColor", false, false);
+        toggle(graphics, "Suavizar escalado de pantalla", "smoothScaling", false, false);
+      } else if (engine.equals("pcsx")) {
+        toggle(graphics, "Resolución interna 2× (3D)", "resolution2x", true, false);
+        toggle(graphics, "Ajuste de texturas para 2×", "textureFix", true, false);
+        toggle(graphics, "Dithering original de PSX", "dithering", true, false);
+        toggle(graphics, "Interpolación de sonido cúbica", "audioCubic", true, false);
+      }
+      toggle(graphics, "Llenar pantalla (desactiva para formato 4:3)", "stretch", true, true);
+      graphics.addView(
+          text(
+              ctx,
+              engine.equals("swan-sw")
+                  ? "Modo por software: resolución nativa, útil para comprobar compatibilidad.\n"
+                  : "Más resolución mejora los modelos 3D; los fondos y vídeos 2D conservan su"
+                      + " detalle original. PGXP puede cambiar algunos efectos.\n",
+              11,
+              MUTED));
+    }
+
     void toggle(String label, String key, boolean initial, boolean layout) {
+      toggle(content, label, key, initial, layout);
+    }
+
+    private void toggle(
+        LinearLayout destination, String label, String key, boolean initial, boolean layout) {
       Switch control = new Switch(ctx);
       control.setText(label);
       control.setTextColor(RetroSkin.INK);
@@ -1954,17 +1979,18 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
             if (layout) updateGameAspectRatio();
             else if (!"automaticUpdates".equals(key)) queueGraphics();
           });
-      content.addView(control);
+      destination.addView(control);
     }
 
-    void choice(
+    private void choice(
+        LinearLayout destination,
         String label,
         String key,
         String[] labels,
         String[] values,
         String initial,
         boolean restart) {
-      content.addView(text(ctx, label, 12, MUTED));
+      destination.addView(text(ctx, label, 12, MUTED));
       Spinner selector = new Spinner(ctx);
       selector.setAdapter(
           new ArrayAdapter<String>(ctx, android.R.layout.simple_spinner_dropdown_item, labels));
@@ -1993,7 +2019,7 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
               if (restart) select(6);
             }
           });
-      content.addView(selector);
+      destination.addView(selector);
     }
 
     void updateSprites(GameData.Snapshot s) {
@@ -2275,8 +2301,7 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
                 + prefs.getString("serial", "—")
                 + "\n"
                 + importStatus
-                + "\n\n"
-                + "La tarjeta se guarda cada 5 segundos. Guarda también desde el menú del juego.\n";
+                + "\n";
       else if (!session.running && tab == 0) {
         String[] steps = {
           "Bienvenida",

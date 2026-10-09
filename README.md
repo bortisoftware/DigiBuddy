@@ -9,6 +9,8 @@
 
 DigiBuddy es un emulador de **Digimon World de PlayStation** para consolas Android de doble pantalla. Juega en la pantalla superior y consulta tu compañero, bolsa, mapa, prosperidad y evoluciones en un panel táctil que sigue tu partida en tiempo real.
 
+🎥 [Vídeo de presentación: cómo funciona DigiBuddy](https://www.youtube.com/watch?v=glKcUstdL5Q)
+
 ## Capturas
 
 Capturas reales en Anbernic RG DS.
@@ -35,7 +37,7 @@ Requiere **Android 8.0 o posterior y ARM64**. Otros dispositivos de doble pantal
 
 ## Instalación
 
-Descarga la [APK de DigiBuddy 0.3.4](https://github.com/bortisoftware/DigiBuddy/releases/download/v0.3.4/DigiBuddy-0.3.4.apk) desde [Releases](https://github.com/bortisoftware/DigiBuddy/releases).
+Descarga la [APK de DigiBuddy 0.3.5](https://github.com/bortisoftware/DigiBuddy/releases/download/v0.3.5/DigiBuddy-0.3.5.apk) desde [Releases](https://github.com/bortisoftware/DigiBuddy/releases).
 
 1. Instala la APK en tu consola. Si Android lo solicita, permite la instalación desde el navegador o gestor de archivos que utilices.
 2. Abre DigiBuddy: el asistente te pedirá seleccionar tu BIOS de PlayStation y el juego.
@@ -67,6 +69,8 @@ Las mejoras gráficas afectan principalmente al 3D; los fondos y vídeos conserv
 ## Actualizaciones
 
 DigiBuddy avisa si hay una nueva APK en las releases oficiales de GitHub. Puedes abrir su descarga desde el aviso o comprobar manualmente en Ajustes. La consulta automática se puede desactivar; el juego funciona sin conexión.
+
+Los ajustes de gráficos y sonido se agrupan en un desplegable. Play y Ajustes permanecen accesibles en todas las pestañas, incluido el mapa.
 
 ## Partidas y guardados
 
