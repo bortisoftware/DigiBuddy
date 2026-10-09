@@ -8,7 +8,8 @@
       "name": "DigiBuddy-0.3.6.apk",
       "browser_download_url": "https://github.com/bortisoftware/DigiBuddy/releases/download/v0.3.6/DigiBuddy-0.3.6.apk",
       "state": "uploaded",
-      "size": 9054745
+      "size": 9054745,
+      "digest": "sha256:b32c945cb1685210ebaa11a9a6951169dc366f023893c1bf156f976b7edafcd7"
     }
   ]
 }

@@ -49,6 +49,9 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
   private ReleaseUpdates releaseUpdates;
   private ReleaseUpdates.Result availableUpdate;
   private boolean updateNoticeShown;
+  private ApkDownloader apkDownloader;
+  private Uri pendingInstall;
+  private boolean awaitingInstallPermission;
   private SharedPreferences prefs;
   private DisplayManager displays;
   private Presentation secondary;
@@ -1163,8 +1166,8 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
     box.addView(
         text(
             panel.ctx,
-            "Puedes descargar la nueva APK desde la release oficial de GitHub. Android comprobará"
-                + " su firma al actualizar. Tu partida permanece en la app.",
+            "La APK se descargará aquí y se comprobará antes de abrir el instalador de Android."
+                + " Guarda tu progreso antes de actualizar. Tus archivos permanecen en la app.",
             14,
             MUTED));
     box.addView(
@@ -1173,11 +1176,7 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
             "Actualizar",
             () -> {
               dialog.dismiss();
-              try {
-                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(update.page)));
-              } catch (android.content.ActivityNotFoundException exception) {
-                showMessage("No hay un navegador disponible para abrir GitHub.");
-              }
+              downloadUpdate(update);
             }));
     box.addView(
         button(
@@ -1187,6 +1186,120 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
               dialog.dismiss();
             }));
     showPanelDialog(dialog, box);
+  }
+
+  private void downloadUpdate(ReleaseUpdates.Result update) {
+    if (apkDownloader != null || panel == null) return;
+    Dialog dialog = createPanelDialog();
+    LinearLayout box = new LinearLayout(panel.ctx);
+    box.setOrientation(LinearLayout.VERTICAL);
+    box.setPadding(dp(20), dp(18), dp(20), dp(18));
+    box.setBackground(card(RetroSkin.PAPER, 0));
+    TextView progress =
+        text(panel.ctx, "Descargando DigiBuddy " + update.version + "…", 18, RetroSkin.INK);
+    box.addView(progress);
+    box.addView(
+        button(
+            panel.ctx,
+            "Cancelar",
+            () -> {
+              if (apkDownloader != null) apkDownloader.close();
+              apkDownloader = null;
+              dialog.dismiss();
+            }));
+    showPanelDialog(dialog, box);
+    ApkDownloader downloader = new ApkDownloader(this);
+    apkDownloader = downloader;
+    WeakReference<MainActivity> activity = new WeakReference<>(this);
+    Handler handler = ui;
+    downloader.download(
+        update,
+        new ApkDownloader.Callback() {
+          @Override
+          public void progress(int percent) {
+            handler.post(
+                () -> {
+                  MainActivity owner = activity.get();
+                  if (owner != null && !owner.destroyed && owner.apkDownloader == downloader)
+                    progress.setText(
+                        percent == 100 ? "Comprobando APK…" : "Descargando… " + percent + "%");
+                });
+          }
+
+          @Override
+          public void completed(Uri apk) {
+            handler.post(
+                () -> {
+                  MainActivity owner = activity.get();
+                  if (owner == null || owner.destroyed || owner.apkDownloader != downloader) return;
+                  downloader.close();
+                  owner.apkDownloader = null;
+                  dialog.dismiss();
+                  if (apk == null) {
+                    owner.showMessage("No se pudo descargar o verificar la APK. Prueba de nuevo.");
+                    return;
+                  }
+                  owner.pendingInstall = apk;
+                  owner.installDownloadedUpdate();
+                });
+          }
+        });
+  }
+
+  private void installDownloadedUpdate() {
+    if (pendingInstall == null || session.suspended || panel == null) return;
+    if (!getPackageManager().canRequestPackageInstalls()) {
+      Dialog dialog = createPanelDialog();
+      LinearLayout box = new LinearLayout(panel.ctx);
+      box.setOrientation(LinearLayout.VERTICAL);
+      box.setPadding(dp(20), dp(18), dp(20), dp(18));
+      box.setBackground(card(RetroSkin.PAPER, 0));
+      box.addView(text(panel.ctx, "Permitir instalación desde DigiBuddy", 19, RetroSkin.INK));
+      box.addView(
+          text(
+              panel.ctx,
+              "La APK está verificada. Android necesita que permitas instalar actualizaciones desde"
+                  + " DigiBuddy. Activa el permiso y vuelve atrás.",
+              14,
+              MUTED));
+      box.addView(
+          button(
+              panel.ctx,
+              "Abrir permiso",
+              () -> {
+                dialog.dismiss();
+                try {
+                  awaitingInstallPermission = true;
+                  startActivity(
+                      new Intent(
+                          android.provider.Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES,
+                          Uri.parse("package:" + getPackageName())));
+                } catch (RuntimeException failure) {
+                  awaitingInstallPermission = false;
+                  showMessage("No se pudo abrir el permiso de instalación.");
+                }
+              }));
+      box.addView(
+          button(
+              panel.ctx,
+              "Cancelar",
+              () -> {
+                pendingInstall = null;
+                dialog.dismiss();
+              }));
+      showPanelDialog(dialog, box);
+      return;
+    }
+    try {
+      Intent installer = new Intent(Intent.ACTION_VIEW);
+      installer.setDataAndType(pendingInstall, "application/vnd.android.package-archive");
+      installer.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+      installer.setClipData(android.content.ClipData.newRawUri("DigiBuddy APK", pendingInstall));
+      startActivity(installer);
+      pendingInstall = null;
+    } catch (RuntimeException failure) {
+      showMessage("No se pudo abrir el instalador de Android.");
+    }
   }
 
   private void showRecruitHint(RecruitmentHints.Hint hint) {
@@ -1586,7 +1699,22 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
   protected void onResume() {
     super.onResume();
     session.suspended = false;
+    if (awaitingInstallPermission) {
+      awaitingInstallPermission = false;
+      if (getPackageManager().canRequestPackageInstalls()) installDownloadedUpdate();
+      else {
+        pendingInstall = null;
+        showMessage("Instalación cancelada: permiso no concedido.");
+      }
+    }
     checkUpdates(false);
+    ui.post(
+        () -> {
+          if (!destroyed
+              && pendingInstall != null
+              && !awaitingInstallPermission
+              && (panelDialog == null || !panelDialog.isShowing())) installDownloadedUpdate();
+        });
     fullscreen(getWindow().getDecorView());
   }
 
@@ -1606,6 +1734,7 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
     if (cardExporter != null) cardExporter.close();
     if (fileImporter != null) fileImporter.close();
     if (releaseUpdates != null) releaseUpdates.close();
+    if (apkDownloader != null) apkDownloader.close();
     if (stateTransfer != null) stateTransfer.close();
     atlasGeneration++;
     if (atlas != null) atlas.close();

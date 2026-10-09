@@ -62,6 +62,8 @@ El comprobador aplica una lista de archivos permitidos y busca formatos privados
 
 ## Pistas y actualizaciones
 
+ApkDownloader descarga la APK en la caché privada con conexiones y tamaño acotados. Verifica el hash publicado y la identidad y firma del paquete antes de ofrecerlo al instalador. UpdateApkProvider permite compartir únicamente la APK verificada mediante un permiso temporal de lectura. El panel muestra progreso y cancelación; al conceder el permiso de instalación, el flujo continúa al volver a la app. Android solicita la confirmación final. Si se cierra la Activity durante la descarga, esta se cancela y puede reintentarse.
+
 RecruitmentHints filtra los reclutamientos pendientes leídos del perfil validado. Prioriza la zona actual, los nombres de las salidas presentes y, después, la misma región. Devuelve hasta cuatro pistas sin duplicar especies. Los requisitos detectables se muestran separados; las pistas no garantizan que un NPC esté presente ni interpretan todas las etapas de las misiones. El catálogo usa nombres de zona estables, sin depender del idioma del disco.
 
 Referencias de hechos de juego: [guía de reclutamiento de HeroesAndCons](https://gamefaqs.gamespot.com/ps/913684-digimon-world/faqs/73895), [guía de Neve](https://gamefaqs.gamespot.com/ps/913684-digimon-world/faqs/71504) y [ubicaciones de Wikimon](https://wikimon.net/Digimon_World_Guide). Las pistas están redactadas para la app; no se incorpora una copia de esas guías.

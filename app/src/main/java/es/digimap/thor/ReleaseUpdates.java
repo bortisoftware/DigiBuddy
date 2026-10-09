@@ -19,6 +19,8 @@ final class ReleaseUpdates implements AutoCloseable {
     final String version, page;
     final boolean failed;
     final String errorMessage;
+    final String downloadUrl, sha256;
+    final long size;
 
     Result(String version, String page, boolean failed) {
       this(
@@ -29,10 +31,24 @@ final class ReleaseUpdates implements AutoCloseable {
     }
 
     Result(String version, String page, boolean failed, String errorMessage) {
+      this(version, page, failed, errorMessage, "", "", 0);
+    }
+
+    Result(
+        String version,
+        String page,
+        boolean failed,
+        String errorMessage,
+        String downloadUrl,
+        String sha256,
+        long size) {
       this.version = version;
       this.page = page;
       this.failed = failed;
       this.errorMessage = errorMessage;
+      this.downloadUrl = downloadUrl;
+      this.sha256 = sha256;
+      this.size = size;
     }
   }
 
@@ -66,7 +82,7 @@ final class ReleaseUpdates implements AutoCloseable {
             String message =
                 failure.status == 403 || failure.status == 429
                     ? "GitHub ha limitado temporalmente las consultas. Prueba más tarde o abre las"
-                          + " releases."
+                        + " releases."
                     : "El servicio de actualizaciones no está disponible ahora. Prueba más tarde.";
             result = new Result("", "", true, message);
           } catch (Exception exception) {
@@ -141,7 +157,12 @@ final class ReleaseUpdates implements AutoCloseable {
           && expectedUrl.equals(asset.optString("browser_download_url"))
           && "uploaded".equals(asset.optString("state"))
           && size > 0
-          && size <= 67108864) return new Result(version, page, false);
+          && size <= 67108864) {
+        String digest = asset.optString("digest");
+        if (!digest.matches("sha256:[0-9a-f]{64}"))
+          throw new IllegalArgumentException("Missing APK digest");
+        return new Result(version, page, false, "", expectedUrl, digest.substring(7), size);
+      }
     }
     return new Result("", "", false);
   }
