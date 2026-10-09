@@ -5,7 +5,7 @@ ROOT=Path(__file__).resolve().parents[1]
 DOCS={".gitignore",".gitattributes","LICENSE","README.md","DESIGN.md","CORE_PROVENANCE.md",
       "THIRD_PARTY_NOTICES.md","ICON.md","SECURITY.md","REVIEW.md"}
 ICONS={"app/src/main/res/drawable-nodpi/jijimon_foreground.png",
-       "docs/banner.png", "docs/screenshots/game.png", "docs/screenshots/companion.png", "docs/screenshots/startup.png"}
+       "docs/banner.png", "docs/video-preview.png", "docs/screenshots/game.png", "docs/screenshots/companion.png", "docs/screenshots/startup.png"}
 TEXT_SUFFIX={".java",".cpp",".h",".py",".xml",".json",".txt",".md",""}
 FORBIDDEN={".iso",".bin",".cue",".chd",".img",".ccd",".sub",".mcr",".state",".sav",".srm",
            ".keystore",".jks",".p12",".key",".pem",".apk",".aab",".so",".dll",".exe",".zip",".7z",".rar"}
