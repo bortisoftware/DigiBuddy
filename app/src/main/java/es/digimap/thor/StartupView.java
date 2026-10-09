@@ -40,8 +40,25 @@ final class StartupView extends ScrollView {
     setBackgroundColor(0xff4267a0);
   }
 
-  void update(int step, boolean busy, String progress, String compatibility, boolean canResume) {
-    String identity = step + "|" + busy + "|" + progress + "|" + compatibility + "|" + canResume;
+  void update(
+      int step,
+      boolean busy,
+      String progress,
+      String compatibility,
+      boolean canResume,
+      String savedDate) {
+    String identity =
+        step
+            + "|"
+            + busy
+            + "|"
+            + progress
+            + "|"
+            + compatibility
+            + "|"
+            + canResume
+            + "|"
+            + savedDate;
     if (identity.equals(rendered)) return;
     rendered = identity;
     home = step == StartupFlow.HOME;
@@ -95,8 +112,8 @@ final class StartupView extends ScrollView {
       action(card, "Terminar configuración", actions::finish, !busy);
     } else {
       action(card, "Continuar última sesión", actions::resume, canResume && !busy);
-      if (canResume) label(card, "Vuelve al punto exacto donde dejaste la sesión.", 12);
-      action(card, "Cargar partida del juego", actions::loadGameCard, !busy);
+      if (canResume) label(card, "Estado del " + savedDate + " · vuelve a ese punto exacto.", 12);
+      action(card, "Cargar partida del juego", actions::loadGameCard, !busy, !canResume);
       label(
           card,
           "Abre el juego desde el inicio y elige Cargar en su menú. Usa tu tarjeta de memoria.",
@@ -107,8 +124,8 @@ final class StartupView extends ScrollView {
             "Todavía no hay una sesión guardada. Empieza una partida; podrás cargar tu tarjeta"
                 + " desde el menú del juego.",
             13);
-      action(card, "Nueva partida", actions::newGame, !busy);
-      action(card, "Ajustes", actions::settings, !busy);
+      action(card, "Nueva partida", actions::newGame, !busy, false);
+      action(card, "Ajustes", actions::settings, !busy, false);
     }
     if (!progress.isEmpty()) label(card, progress, 13);
   }
@@ -124,12 +141,18 @@ final class StartupView extends ScrollView {
   }
 
   private void action(LinearLayout parent, String title, Runnable action, boolean enabled) {
+    action(parent, title, action, enabled, true);
+  }
+
+  private void action(
+      LinearLayout parent, String title, Runnable action, boolean enabled, boolean primary) {
     Button button = new Button(getContext());
     button.setText(title);
     button.setAllCaps(false);
     button.setTextColor(RetroSkin.INK);
     button.setBackground(
-        new RetroSkin.Frame(RetroSkin.GOLD, getResources().getDisplayMetrics().density));
+        new RetroSkin.Frame(
+            primary ? RetroSkin.GOLD : 0xffe1e8d6, getResources().getDisplayMetrics().density));
     button.setEnabled(enabled);
     button.setAlpha(enabled ? 1f : .45f);
     button.setOnClickListener(view -> action.run());

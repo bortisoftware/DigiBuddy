@@ -62,6 +62,10 @@ El comprobador aplica una lista de archivos permitidos y busca formatos privados
 
 ## Pistas y actualizaciones
 
+El panel agrupa Ajustes en seis desplegables. Las ventanas de objetos y evoluciones conservan botones visibles y desplazan únicamente los detalles. El mapa ofrece un selector si varios Digimon coinciden en el área de toque; un arrastre no activa la consulta. Los estados manuales muestran fecha y requieren confirmar la carga antes de sustituir una sesión. Sus archivos permanecen asociados al juego y al núcleo.
+
+ItemDescriptions contiene descripciones propias en español de los 128 IDs de objetos de referencia. Se contrastaron con las tablas de descripciones y las funciones de objetos y alimentos de la descompilación del juego; no se incorpora código ni archivos del disco. Los efectos corresponden al juego de referencia y pueden variar con parches que cambien sus mecánicas.
+
 ApkDownloader descarga la APK en la caché privada con conexiones y tamaño acotados. Verifica el hash publicado y la identidad y firma del paquete antes de ofrecerlo al instalador. UpdateApkProvider permite compartir únicamente la APK verificada mediante un permiso temporal de lectura. El panel muestra progreso y cancelación; al conceder el permiso de instalación, el flujo continúa al volver a la app. Android solicita la confirmación final. Si se cierra la Activity durante la descarga, esta se cancela y puede reintentarse.
 
 RecruitmentHints filtra los reclutamientos pendientes leídos del perfil validado. Prioriza la zona actual, los nombres de las salidas presentes y, después, la misma región. Devuelve hasta cuatro pistas sin duplicar especies. Los requisitos detectables se muestran separados; las pistas no garantizan que un NPC esté presente ni interpretan todas las etapas de las misiones. El catálogo usa nombres de zona estables, sin depender del idioma del disco.

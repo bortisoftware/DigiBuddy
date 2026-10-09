@@ -483,22 +483,55 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
 
   private void updateStartupViews() {
     File folder = startupSaveFolder();
-    boolean canResume =
-        folder != null
-            && StartupFlow.latestState(folder, prefs.getString("engine", "swan-gl")) != null;
+    File latest = StartupFlow.latestState(folder, prefs.getString("engine", "swan-gl"));
+    boolean canResume = latest != null;
     for (StartupView view : startupViews) {
       view.setVisibility(session.running ? View.GONE : View.VISIBLE);
       if (!session.running)
-        view.update(startupStep(), importing, importStatus, startupCompatibility(), canResume);
+        view.update(
+            startupStep(),
+            importing,
+            importStatus,
+            startupCompatibility(),
+            canResume,
+            canResume ? savedDate(latest) : "");
     }
   }
 
   private void confirmNewGame() {
     confirmAction(
         "Nueva partida",
-        "Abrirás el juego desde el inicio. Tus estados y tu tarjeta guardados se conservarán.",
+        "Abrirás el juego desde el inicio. Perderás el progreso de la sesión que no hayas guardado."
+            + " Tus estados y tu tarjeta guardados se conservarán.",
         "Abrir juego",
-        this::startGame);
+        this::restartFromBeginning);
+  }
+
+  private void restartFromBeginning() {
+    if (!session.running) {
+      startGame();
+      return;
+    }
+    session.stop();
+    ui.postDelayed(
+        new Runnable() {
+          private int retries;
+
+          @Override
+          public void run() {
+            if (destroyed) return;
+            if (!session.running) {
+              startGame();
+              return;
+            }
+            if (++retries >= 50) {
+              showMessage("La sesión tarda en detenerse. Vuelve a intentarlo.");
+              return;
+            }
+            ui.postDelayed(this, 100);
+          }
+        },
+        100);
   }
 
   private static void fullscreen(View view) {
@@ -515,12 +548,17 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
     return (int) (n * getResources().getDisplayMetrics().density + 0.5f);
   }
 
+  private static String savedDate(File state) {
+    return new java.text.SimpleDateFormat("dd/MM/yyyy · HH:mm", Locale.getDefault())
+        .format(new java.util.Date(state.lastModified()));
+  }
+
   private TextView text(Context ctx, String content, int sp, int color) {
     TextView v = new TextView(ctx);
     v.setText(content);
     v.setTextSize(sp);
     v.setTextColor(color == Color.WHITE ? RetroSkin.INK : color);
-    v.setTypeface(android.graphics.Typeface.create("monospace", android.graphics.Typeface.BOLD));
+    v.setTypeface(android.graphics.Typeface.create("monospace", android.graphics.Typeface.NORMAL));
     return v;
   }
 
@@ -540,7 +578,7 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
     b.setFocusable(false);
     b.setFocusableInTouchMode(false);
     b.setGravity(Gravity.CENTER);
-    b.setMinHeight(dp(44));
+    b.setMinHeight(dp(48));
     b.setMinimumWidth(0);
     b.setPadding(dp(10), dp(8), dp(10), dp(8));
     b.setBackground(
@@ -806,7 +844,19 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
       showMessage("Todavía no hay una sesión guardada para este juego y emulador.");
       return;
     }
-    if (!session.running) startGame();
+    if (session.running) {
+      confirmAction(
+          "Continuar estado del " + savedDate(latest),
+          "Se sustituirá la sesión actual. Perderás el progreso que no hayas guardado.",
+          "Continuar",
+          () -> restoreSession(latest));
+      return;
+    }
+    startGame();
+    restoreSession(latest);
+  }
+
+  private void restoreSession(File latest) {
     if (!session.running || session.saveFolder == null) return;
     session.command(
         () -> {
@@ -865,20 +915,95 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
       return;
     }
     String reason = ItemUse.unavailable(session.ram, profile, item.slot, item.id);
-    if (reason != null) {
-      showMessage(reason);
-      return;
-    }
     GameData.Profile current = profile;
-    confirmAction(
-        "Usar " + item.name,
-        "Se usará una unidad con su efecto normal dentro del juego.",
-        "Usar",
+    showDetailsDialog(
+        item.name,
+        atlas != null ? atlas.item(item.id, lastRam, profile) : null,
+        "En la bolsa: "
+            + item.count
+            + "\n\n"
+            + ItemDescriptions.effect(item.id)
+            + "\n\n"
+            + (reason == null ? "Se usará una unidad dentro del juego." : reason),
+        "Usar 1",
+        reason == null,
         () -> {
           if (session.useItem(current, item.slot, item.id))
             showMessage("Usando " + item.name + "…");
           else showMessage("Espera a que termine la acción actual.");
         });
+  }
+
+  private void showEvolutionDetails(GameData.Evolution evolution) {
+    showDetailsDialog(
+        evolution.name,
+        atlas != null ? atlas.mon(evolution.type, lastRam, profile) : null,
+        (evolution.candidate ? "Requisitos cumplidos" : "Requisitos pendientes")
+            + "\n\n"
+            + evolution.details
+            + "\nLa evolución natural también depende del reloj y de los eventos del juego.",
+        "Evolucionar…",
+        evolution.candidate,
+        () -> confirmEvolution(evolution));
+  }
+
+  private void showDetailsDialog(
+      String title,
+      android.graphics.Bitmap sprite,
+      String description,
+      String positive,
+      boolean enabled,
+      Runnable action) {
+    if (panel == null || session.actionBusy || (panelDialog != null && panelDialog.isShowing()))
+      return;
+    Dialog dialog = createPanelDialog();
+    LinearLayout box = new LinearLayout(panel.ctx);
+    box.setOrientation(LinearLayout.VERTICAL);
+    box.setPadding(dp(16), dp(14), dp(16), dp(14));
+    box.setBackground(card(RetroSkin.PAPER, 0));
+    TextView heading = text(panel.ctx, title, 18, RetroSkin.INK);
+    heading.setTypeface(null, android.graphics.Typeface.BOLD);
+    if (sprite != null) {
+      android.graphics.drawable.BitmapDrawable icon =
+          new android.graphics.drawable.BitmapDrawable(getResources(), sprite);
+      icon.setFilterBitmap(false);
+      icon.setBounds(0, 0, dp(36), dp(36));
+      heading.setCompoundDrawables(icon, null, null, null);
+      heading.setCompoundDrawablePadding(dp(10));
+    }
+    box.addView(heading);
+    ScrollView details = new ScrollView(panel.ctx);
+    TextView explanation = text(panel.ctx, description, 14, RetroSkin.INK);
+    explanation.setPadding(0, dp(12), 0, dp(12));
+    details.addView(explanation);
+    int available = Math.max(dp(64), panel.getHeight() - dp(190));
+    explanation.measure(
+        View.MeasureSpec.makeMeasureSpec(
+            Math.max(dp(120), Math.min(panel.getWidth() - dp(62), dp(388))),
+            View.MeasureSpec.EXACTLY),
+        View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+    box.addView(
+        details,
+        new LinearLayout.LayoutParams(-1, Math.min(available, explanation.getMeasuredHeight())));
+    LinearLayout buttons = new LinearLayout(panel.ctx);
+    buttons.addView(
+        button(panel.ctx, "Cerrar", dialog::dismiss), new LinearLayout.LayoutParams(0, dp(48), 1));
+    Button apply =
+        button(
+            panel.ctx,
+            positive,
+            () -> {
+              dialog.dismiss();
+              action.run();
+            });
+    apply.setEnabled(enabled);
+    apply.setAlpha(enabled ? 1f : .45f);
+    apply.setBackground(card(RetroSkin.GOLD, 0));
+    LinearLayout.LayoutParams size = new LinearLayout.LayoutParams(0, dp(48), 1);
+    size.leftMargin = dp(8);
+    buttons.addView(apply, size);
+    box.addView(buttons);
+    showPanelDialog(dialog, box);
   }
 
   private void confirmEvolution(GameData.Evolution evo) {
@@ -1329,6 +1454,60 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
     showPanelDialog(dialog, box);
   }
 
+  private void showMapDigimon(List<GameData.Enemy> enemies) {
+    if (enemies.size() == 1) {
+      showEnemy(enemies.get(0));
+      return;
+    }
+    if (panel == null || session.actionBusy || (panelDialog != null && panelDialog.isShowing()))
+      return;
+    Dialog dialog = createPanelDialog();
+    LinearLayout box = new LinearLayout(panel.ctx);
+    box.setOrientation(LinearLayout.VERTICAL);
+    box.setPadding(dp(16), dp(14), dp(16), dp(14));
+    box.setBackground(card(RetroSkin.PAPER, 0));
+    box.addView(text(panel.ctx, "¿Qué Digimon quieres consultar?", 17, RetroSkin.INK));
+    ScrollView scroll = new ScrollView(panel.ctx);
+    LinearLayout choices = new LinearLayout(panel.ctx);
+    choices.setOrientation(LinearLayout.VERTICAL);
+    for (GameData.Enemy enemy : enemies) {
+      String detail =
+          enemy.recruitType > 0
+              ? "Reclutable"
+              : enemy.difficulty == 0 ? "Fácil" : enemy.difficulty == 1 ? "Igualado" : "Difícil";
+      Button choice =
+          button(
+              panel.ctx,
+              enemy.name + " · " + detail,
+              () -> {
+                dialog.dismiss();
+                showEnemy(enemy);
+              });
+      android.graphics.Bitmap sprite =
+          atlas == null
+              ? null
+              : enemy.recruitType > 0
+                  ? atlas.mon(enemy.recruitType, lastRam, profile)
+                  : atlas.enemy(enemy.type, lastRam, profile);
+      if (sprite != null) {
+        android.graphics.drawable.BitmapDrawable icon =
+            new android.graphics.drawable.BitmapDrawable(getResources(), sprite);
+        icon.setFilterBitmap(false);
+        icon.setBounds(0, 0, dp(32), dp(32));
+        choice.setCompoundDrawables(icon, null, null, null);
+        choice.setCompoundDrawablePadding(dp(8));
+      }
+      choices.addView(choice, new LinearLayout.LayoutParams(-1, dp(48)));
+    }
+    scroll.addView(choices);
+    box.addView(
+        scroll,
+        new LinearLayout.LayoutParams(
+            -1, Math.min(dp(48) * enemies.size(), Math.max(dp(48), panel.getHeight() - dp(170)))));
+    box.addView(button(panel.ctx, "Cerrar", dialog::dismiss));
+    showPanelDialog(dialog, box);
+  }
+
   private void showEnemy(GameData.Enemy enemy) {
     if (enemy.recruitType > 0) {
       RecruitmentHints.Hint hint = RecruitmentHints.atLocation(snapshot, enemy.recruitType);
@@ -1384,8 +1563,8 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
             panel.ctx,
             "Combate estimado: "
                 + (enemy.difficulty == 0
-                    ? "favorable"
-                    : enemy.difficulty == 1 ? "ajustado" : "difícil"),
+                    ? "fácil"
+                    : enemy.difficulty == 1 ? "igualado" : "difícil"),
             14,
             MUTED);
     risk.setPadding(0, dp(12), 0, dp(16));
@@ -1758,9 +1937,7 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
     final FrameLayout mapArea;
     final int[] navTabs = {0, 1, 2, 3, 4, 7};
     int tab = 0, lastSpriteType = -1;
-    boolean graphicsExpanded;
-    private LinearLayout graphicsSection;
-    private Button graphicsHeader;
+    private final java.util.Set<String> expandedSettings = new java.util.HashSet<>();
     String previous = "";
     long noticeUntil = 0;
     final ArrayList<Button> navigation = new ArrayList<>();
@@ -1800,10 +1977,10 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
                 else resumeGame();
               });
       playButton = play;
-      header.addView(play, new LinearLayout.LayoutParams(dp(48), dp(44)));
+      header.addView(play, new LinearLayout.LayoutParams(dp(48), dp(48)));
       Button gear = button(ctx, "Ajustes", () -> select(6));
       gear.setTextSize(11);
-      LinearLayout.LayoutParams gearSize = new LinearLayout.LayoutParams(dp(80), dp(44));
+      LinearLayout.LayoutParams gearSize = new LinearLayout.LayoutParams(dp(80), dp(48));
       gearSize.leftMargin = dp(8);
       header.addView(gear, gearSize);
       addView(header);
@@ -1844,7 +2021,7 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
       body.setTextIsSelectable(true);
       body.setLineSpacing(dp(7), 1);
       map = new MapView(ctx);
-      map.onEnemy(MainActivity.this::showEnemy);
+      map.onEnemy(MainActivity.this::showMapDigimon);
       mapArea = new FrameLayout(ctx);
       mapArea.setPadding(dp(5), dp(5), dp(5), dp(5));
       mapArea.setBackground(card(RetroSkin.PAPER, 0));
@@ -1854,7 +2031,7 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
       String[] names = {"Compañero", "Bolsa", "Mapa", "Prosperidad", "Evolución", "Trucos"};
       for (int rowIndex = 0; rowIndex < 2; rowIndex++) {
         LinearLayout row = new LinearLayout(ctx);
-        LinearLayout.LayoutParams rowSize = new LinearLayout.LayoutParams(-1, dp(46));
+        LinearLayout.LayoutParams rowSize = new LinearLayout.LayoutParams(-1, dp(48));
         rowSize.topMargin = dp(7);
         addView(row, rowSize);
         for (int col = 0; col < 3; col++) {
@@ -1918,83 +2095,53 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
     }
 
     void settings() {
-      content.addView(
-          button(ctx, "Controles · Remapear botones", MainActivity.this::showControllerMapping));
-      toggle("Buscar actualizaciones al abrir", "automaticUpdates", true, false);
-      content.addView(button(ctx, "Buscar actualizaciones ahora", () -> checkUpdates(true)));
-      graphicsSection = new LinearLayout(ctx);
-      graphicsSection.setOrientation(VERTICAL);
-      graphicsSettings(graphicsSection);
-      graphicsSection.setVisibility(graphicsExpanded ? View.VISIBLE : View.GONE);
-      graphicsHeader =
-          button(
-              ctx,
-              graphicsExpanded ? "Gráficos y sonido ▾" : "Gráficos y sonido ▸",
-              this::toggleGraphicsSection);
-      content.addView(graphicsHeader);
-      content.addView(graphicsSection);
-      content.addView(button(ctx, "1 · Importar BIOS", () -> pick(1)));
-      content.addView(button(ctx, "2 · Importar juego", () -> pick(2)));
-      LinearLayout play = new LinearLayout(ctx);
-      play.addView(
-          button(ctx, "Nueva partida", MainActivity.this::confirmNewGame),
-          new LinearLayout.LayoutParams(0, -2, 1));
-      play.addView(
-          button(ctx, "Pausa / continuar", MainActivity.this::togglePause),
-          new LinearLayout.LayoutParams(0, -2, 1));
-      content.addView(play);
-      content.addView(button(ctx, "Continuar última sesión", MainActivity.this::resumeGame));
-      content.addView(button(ctx, "Cargar partida del juego", MainActivity.this::startGame));
-      LinearLayout saves = new LinearLayout(ctx);
+      content.removeView(body);
+      LinearLayout saves = settingsGroup("Partidas");
+      saves.addView(text(ctx, "Estado del emulador · punto exacto de la sesión", 13, MUTED));
+      File state = quickState();
       saves.addView(
-          button(
-              ctx,
-              "Guardar estado",
-              () ->
-                  session.command(
-                      () -> {
-                        boolean ok =
-                            NativeCore.saveState(
-                                new File(
-                                        session.saveFolder,
-                                        prefs.getString("engine", "swan-gl") + "-quick.state")
-                                    .getAbsolutePath());
-                        ui.post(() -> showMessage(ok ? "Estado guardado" : "No se pudo guardar"));
-                      })),
-          new LinearLayout.LayoutParams(0, -2, 1));
-      saves.addView(
-          button(
-              ctx,
-              "Cargar estado",
-              () ->
-                  session.command(
-                      () -> {
-                        boolean ok =
-                            NativeCore.loadState(
-                                new File(
-                                        session.saveFolder,
-                                        prefs.getString("engine", "swan-gl") + "-quick.state")
-                                    .getAbsolutePath());
-                        session.ram = NativeCore.memory();
-                        ui.post(
-                            () ->
-                                showMessage(
-                                    ok
-                                        ? "Estado cargado"
-                                        : "No hay un estado compatible guardado"));
-                      })),
-          new LinearLayout.LayoutParams(0, -2, 1));
-      content.addView(saves);
-      content.addView(button(ctx, "Exportar estado actual", () -> chooseState(true)));
-      content.addView(button(ctx, "Importar estado", () -> chooseState(false)));
-      content.addView(
           text(
               ctx,
-              "Los estados requieren el mismo juego y núcleo. Importar conserva tus estados"
-                  + " anteriores; elige «Continuar última sesión» para cargar el importado.",
+              state != null && state.isFile()
+                  ? "Último estado manual: " + savedDate(state)
+                  : "No hay un estado manual guardado.",
               12,
               MUTED));
-      LinearLayout screens = new LinearLayout(ctx);
+      saves.addView(button(ctx, "Guardar estado", this::saveQuickState));
+      saves.addView(button(ctx, "Cargar estado…", this::confirmLoadQuickState));
+      saves.addView(button(ctx, "Continuar última sesión", MainActivity.this::resumeGame));
+      saves.addView(button(ctx, "Exportar estado actual", () -> chooseState(true)));
+      saves.addView(button(ctx, "Importar estado", () -> chooseState(false)));
+      saves.addView(
+          text(
+              ctx,
+              "Los estados necesitan el mismo juego y núcleo. Importar conserva los anteriores.",
+              12,
+              MUTED));
+      saves.addView(text(ctx, "Tarjeta de memoria · guardado desde el juego", 13, MUTED));
+      saves.addView(
+          button(
+              ctx,
+              "Cargar desde el menú del juego",
+              () -> {
+                if (!session.running) {
+                  startGame();
+                  return;
+                }
+                confirmAction(
+                    "Abrir el menú del juego",
+                    "Se reiniciará el juego para cargar desde su tarjeta de memoria. Perderás el"
+                        + " progreso de la sesión que no hayas guardado.",
+                    "Abrir menú",
+                    MainActivity.this::restartFromBeginning);
+              }));
+      saves.addView(button(ctx, "Exportar tarjeta de memoria", this::exportMemoryCard));
+      saves.addView(button(ctx, "Nueva partida", MainActivity.this::confirmNewGame));
+      saves.addView(button(ctx, "Detener y guardar tarjeta", this::stopGame));
+      graphicsSettings(settingsGroup("Gráficos y sonido"));
+      settingsGroup("Controles")
+          .addView(button(ctx, "Remapear botones", MainActivity.this::showControllerMapping));
+      LinearLayout screens = settingsGroup("Pantallas");
       screens.addView(
           button(
               ctx,
@@ -2003,46 +2150,145 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
                 gameOnSecondary = !gameOnSecondary;
                 prefs.edit().putBoolean("gameOnSecondary", gameOnSecondary).apply();
                 rebuildScreens();
-              }),
-          new LinearLayout.LayoutParams(0, -2, 1));
-      screens.addView(
-          button(ctx, "Pantallas", MainActivity.this::chooseDisplay),
-          new LinearLayout.LayoutParams(0, -2, 1));
-      content.addView(screens);
-      content.addView(
-          button(
-              ctx,
-              "Detener y guardar tarjeta",
-              () -> {
-                if (session.actionBusy) {
-                  showMessage("Espera a que termine la acción actual.");
-                  return;
-                }
-                session.stop();
-                snapshot = new GameData.Snapshot();
-                lastRam = null;
-                session.ram = null;
               }));
-      content.addView(
-          button(
+      screens.addView(button(ctx, "Elegir pantalla secundaria", MainActivity.this::chooseDisplay));
+      LinearLayout files = settingsGroup("Archivos");
+      files.addView(
+          text(
               ctx,
-              "Exportar tarjeta de memoria",
-              () -> {
-                if (session.saveFolder == null) {
-                  showMessage("Inicia una partida primero.");
-                  return;
-                }
-                Intent out = new Intent(Intent.ACTION_CREATE_DOCUMENT);
-                out.setType("application/octet-stream");
-                out.putExtra(Intent.EXTRA_TITLE, "digibuddy-memory-card.mcr");
-                startActivityForResult(out, 3);
-              }));
+              "BIOS: "
+                  + (prefs.getString("bios", "").isEmpty() ? "pendiente" : "importada")
+                  + "\nJuego: "
+                  + prefs.getString("discName", "pendiente"),
+              13,
+              MUTED));
+      files.addView(button(ctx, "Cambiar BIOS", () -> pick(1)));
+      files.addView(button(ctx, "Cambiar juego", () -> pick(2)));
+      LinearLayout updates = settingsGroup("Actualizaciones");
+      try {
+        updates.addView(
+            text(
+                ctx,
+                "DigiBuddy " + getPackageManager().getPackageInfo(getPackageName(), 0).versionName,
+                14,
+                RetroSkin.INK));
+      } catch (android.content.pm.PackageManager.NameNotFoundException ignored) {
+      }
+      toggle(updates, "Buscar al abrir la app", "automaticUpdates", true, false);
+      updates.addView(button(ctx, "Buscar actualizaciones ahora", () -> checkUpdates(true)));
     }
 
-    private void toggleGraphicsSection() {
-      graphicsExpanded = !graphicsExpanded;
-      graphicsSection.setVisibility(graphicsExpanded ? View.VISIBLE : View.GONE);
-      graphicsHeader.setText(graphicsExpanded ? "Gráficos y sonido ▾" : "Gráficos y sonido ▸");
+    private LinearLayout settingsGroup(String name) {
+      LinearLayout group = new LinearLayout(ctx);
+      group.setOrientation(VERTICAL);
+      group.setPadding(dp(8), dp(4), dp(8), dp(12));
+      group.setVisibility(expandedSettings.contains(name) ? View.VISIBLE : View.GONE);
+      Button heading =
+          button(ctx, name + (expandedSettings.contains(name) ? " ▾" : " ▸"), () -> {});
+      heading.setGravity(Gravity.CENTER_VERTICAL | Gravity.LEFT);
+      heading.setOnClickListener(
+          view -> {
+            boolean expand = group.getVisibility() != View.VISIBLE;
+            if (expand) expandedSettings.add(name);
+            else expandedSettings.remove(name);
+            group.setVisibility(expand ? View.VISIBLE : View.GONE);
+            heading.setText(name + (expand ? " ▾" : " ▸"));
+          });
+      LinearLayout.LayoutParams size = new LinearLayout.LayoutParams(-1, dp(48));
+      size.bottomMargin = dp(6);
+      content.addView(heading, size);
+      content.addView(group);
+      return group;
+    }
+
+    private File quickState() {
+      File folder = session.saveFolder != null ? session.saveFolder : startupSaveFolder();
+      return folder == null
+          ? null
+          : new File(folder, prefs.getString("engine", "swan-gl") + "-quick.state");
+    }
+
+    private void saveQuickState() {
+      File state = quickState();
+      if (!session.running || state == null) {
+        showMessage("Inicia una partida primero.");
+        return;
+      }
+      session.command(
+          () -> {
+            boolean ok = NativeCore.saveState(state.getAbsolutePath());
+            ui.post(
+                () -> {
+                  showMessage(ok ? "Estado guardado · " + savedDate(state) : "No se pudo guardar");
+                  if (tab == 6) {
+                    content.removeAllViews();
+                    settings();
+                  }
+                });
+          });
+    }
+
+    private void confirmLoadQuickState() {
+      File state = quickState();
+      if (!session.running) {
+        showMessage("Inicia la partida antes de cargar un estado manual.");
+        return;
+      }
+      if (state == null || !state.isFile() || state.length() == 0) {
+        showMessage("No hay un estado manual compatible guardado.");
+        return;
+      }
+      long timestamp = state.lastModified();
+      confirmAction(
+          "Cargar estado del " + savedDate(state),
+          "Volverás a ese punto. Perderás el progreso de la sesión actual que no hayas guardado. La"
+              + " tarjeta de memoria es un guardado distinto.",
+          "Cargar estado",
+          () ->
+              session.command(
+                  () -> {
+                    boolean ok =
+                        state.isFile()
+                            && state.lastModified() == timestamp
+                            && NativeCore.loadState(state.getAbsolutePath());
+                    session.ram = NativeCore.memory();
+                    ui.post(
+                        () ->
+                            showMessage(
+                                ok
+                                    ? "Estado cargado"
+                                    : "El estado cambió o no es compatible. Selecciónalo de"
+                                        + " nuevo."));
+                  }));
+    }
+
+    private void stopGame() {
+      if (session.actionBusy) {
+        showMessage("Espera a que termine la acción actual.");
+        return;
+      }
+      confirmAction(
+          "Detener la partida",
+          "Se guardará la tarjeta de memoria. Para conservar el punto exacto de esta sesión, guarda"
+              + " antes un estado.",
+          "Detener",
+          () -> {
+            session.stop();
+            snapshot = new GameData.Snapshot();
+            lastRam = null;
+            session.ram = null;
+          });
+    }
+
+    private void exportMemoryCard() {
+      if (session.saveFolder == null) {
+        showMessage("Inicia una partida primero.");
+        return;
+      }
+      Intent out = new Intent(Intent.ACTION_CREATE_DOCUMENT);
+      out.setType("application/octet-stream");
+      out.putExtra(Intent.EXTRA_TITLE, "digibuddy-memory-card.mcr");
+      startActivityForResult(out, 3);
     }
 
     private void graphicsSettings(LinearLayout graphics) {
@@ -2107,6 +2353,7 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
       control.setTextColor(RetroSkin.INK);
       control.setFocusable(false);
       control.setTextSize(13);
+      control.setMinHeight(dp(48));
       control.setPadding(0, dp(6), 0, dp(6));
       control.setChecked(prefs.getBoolean(key, initial));
       control.setOnCheckedChangeListener(
@@ -2234,6 +2481,7 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
     void dataRow(String label, String value, android.graphics.Bitmap sprite, Runnable action) {
       LinearLayout row = new LinearLayout(ctx);
       if (action != null) {
+        row.setMinimumHeight(dp(48));
         row.setFocusable(false);
         row.setContentDescription(label + " · " + value);
         row.setOnClickListener(v -> action.run());
@@ -2254,6 +2502,8 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
       TextView name = text(ctx, label, 14, Color.WHITE);
       row.addView(name, new LinearLayout.LayoutParams(0, -2, 1));
       TextView amount = text(ctx, value, 16, ACCENT);
+      amount.setMaxWidth(dp(160));
+      if (value.length() > 12) amount.setTextSize(13);
       amount.setTypeface(null, android.graphics.Typeface.BOLD);
       row.addView(amount);
       LinearLayout.LayoutParams size = new LinearLayout.LayoutParams(-1, -2);
@@ -2262,15 +2512,15 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
     }
 
     void metricGrid(String[] labels, int[] values) {
-      for (int i = 0; i < labels.length; i += 2) {
+      for (int i = 0; i < labels.length; i += 4) {
         LinearLayout row = new LinearLayout(ctx);
-        for (int j = i; j < Math.min(i + 2, labels.length); j++) {
+        for (int j = i; j < Math.min(i + 4, labels.length); j++) {
           LinearLayout tile = new LinearLayout(ctx);
           tile.setOrientation(VERTICAL);
-          tile.setPadding(dp(13), dp(10), dp(13), dp(10));
+          tile.setPadding(dp(6), dp(6), dp(6), dp(6));
           tile.setBackground(card(Color.rgb(25, 40, 50), 9));
-          tile.addView(text(ctx, labels[j], 12, MUTED));
-          TextView number = text(ctx, Integer.toString(values[j]), 23, Color.WHITE);
+          tile.addView(text(ctx, labels[j], 11, MUTED));
+          TextView number = text(ctx, Integer.toString(values[j]), 20, Color.WHITE);
           number.setTypeface(null, android.graphics.Typeface.BOLD);
           tile.addView(number);
           LinearLayout.LayoutParams size = new LinearLayout.LayoutParams(0, -2, 1);
@@ -2287,6 +2537,21 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
       int y = previous.isEmpty() ? 0 : scroll.getScrollY();
       content.removeAllViews();
       if (tab == 0) {
+        String[] labels = {
+          "Sueño", "Cansancio", "Hambre", "Necesita baño", "Tristeza", "Herida", "Enfermedad"
+        };
+        StringBuilder needs = new StringBuilder();
+        for (int i = 0; i < labels.length; i++)
+          if ((s.conditions & (1 << i)) != 0) {
+            if (needs.length() > 0) needs.append(" · ");
+            needs.append(labels[i]);
+          }
+        if (needs.length() > 0) {
+          TextView attention = text(ctx, "Necesita atención · " + needs, 14, RetroSkin.INK);
+          attention.setPadding(dp(8), dp(8), dp(8), dp(8));
+          attention.setBackground(card(RetroSkin.GOLD, 0));
+          content.addView(attention);
+        } else content.addView(text(ctx, "✓ Todo bien", 13, MUTED));
         section("ESTADÍSTICAS");
         metricGrid(
             new String[] {"Ataque", "Defensa", "Velocidad", "Inteligencia"},
@@ -2297,23 +2562,19 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
         dataRow("Cansancio", Integer.toString(s.tiredness));
         dataRow("Errores de cuidado", Integer.toString(s.care));
         dataRow("Combates", Integer.toString(s.battles));
-        String[] labels = {
-          "Sueño", "Cansancio", "Hambre", "Necesita baño", "Tristeza", "Herida", "Enfermedad"
-        };
-        StringBuilder needs = new StringBuilder();
-        for (int i = 0; i < labels.length; i++)
-          if ((s.conditions & (1 << i)) != 0) {
-            if (needs.length() > 0) needs.append(" · ");
-            needs.append(labels[i]);
-          }
-        dataRow("Necesidades", needs.length() > 0 ? needs.toString() : "Todo bien");
         dataRow("Bits", Integer.toString(s.money));
       } else if (tab == 1) {
         section("BOLSA · " + s.items.size() + " / " + s.inventorySize + " HUECOS");
         for (GameData.Item item : s.items) {
           android.graphics.Bitmap icon =
               atlas != null ? atlas.item(item.id, lastRam, profile) : null;
+          String reason = ItemUse.unavailable(lastRam, profile, item.slot, item.id);
           dataRow(item.name, "× " + item.count + "  ›", icon, () -> confirmItem(item));
+          if (reason != null) {
+            TextView hint = text(ctx, reason, 12, MUTED);
+            hint.setPadding(dp(10), 0, dp(10), dp(8));
+            content.addView(hint);
+          }
         }
         if (s.items.isEmpty())
           content.addView(text(ctx, "Todavía no hay objetos en la bolsa.", 15, MUTED));
@@ -2350,18 +2611,14 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
         for (GameData.Evolution evo : s.evolutions) {
           dataRow(
               evo.name,
-              evo.candidate ? "Evolucionar  ›" : evo.score + " / 4",
+              evo.candidate ? "Disponible ›" : "Ver requisitos ›",
               atlas != null ? atlas.mon(evo.type, lastRam, profile) : null,
-              () -> confirmEvolution(evo));
-          TextView detail = text(ctx, evo.details, 13, MUTED);
-          detail.setLineSpacing(dp(3), 1);
-          detail.setPadding(dp(10), 0, dp(10), dp(10));
-          content.addView(detail);
+              () -> showEvolutionDetails(evo));
         }
         content.addView(
             text(
                 ctx,
-                "Toca una ruta disponible para elegirla. La evolución directa adelanta el reloj"
+                "Toca una evolución para ver sus requisitos. La evolución directa adelanta el reloj"
                     + " y conserva la secuencia original del juego.",
                 12,
                 MUTED));
@@ -2490,7 +2747,11 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
             new StringBuilder(
                 "Bolsa · " + s.items.size() + " / " + s.inventorySize + " huecos\n\n");
         for (GameData.Item item : s.items)
-          list.append(item.name).append("    × ").append(item.count).append('\n');
+          list.append(item.name)
+              .append("    × ")
+              .append(item.count)
+              .append(ItemUse.unavailable(lastRam, profile, item.slot, item.id))
+              .append('\n');
         if (s.items.isEmpty()) list.append("Sin objetos");
         value = list.toString();
       } else if (tab == 3) {

@@ -13,7 +13,7 @@ DigiBuddy es un emulador de **Digimon World de PlayStation** para consolas Andro
 
 ## Capturas
 
-Capturas reales en Anbernic RG DS.
+Capturas reales en Anbernic RG DS; la interfaz puede variar según la versión.
 
 | Pantalla superior · juego | Pantalla inferior · compañero |
 | --- | --- |
@@ -37,7 +37,7 @@ Requiere **Android 8.0 o posterior y ARM64**. Otros dispositivos de doble pantal
 
 ## Instalación
 
-Descarga la [APK de DigiBuddy 0.3.8](https://github.com/bortisoftware/DigiBuddy/releases/download/v0.3.8/DigiBuddy-0.3.8.apk) desde [Releases](https://github.com/bortisoftware/DigiBuddy/releases).
+Descarga la [APK de DigiBuddy 0.3.9](https://github.com/bortisoftware/DigiBuddy/releases/download/v0.3.9/DigiBuddy-0.3.9.apk) desde [Releases](https://github.com/bortisoftware/DigiBuddy/releases).
 
 1. Instala la APK en tu consola. Si Android lo solicita, permite la instalación desde el navegador o gestor de archivos que utilices.
 2. Abre DigiBuddy: el asistente te pedirá seleccionar tu BIOS de PlayStation y el juego.
@@ -50,10 +50,10 @@ Descarga la [APK de DigiBuddy 0.3.8](https://github.com/bortisoftware/DigiBuddy/
 ### El compañero · pantalla inferior
 
 - **Compañero:** estadísticas, vida, energía y necesidades de tu Digimon.
-- **Bolsa:** objetos e iconos; toca un objeto para confirmar su uso en el juego.
-- **Mapa:** tu posición, salidas a otras zonas, WC, objetos recogibles y enemigos con retratos de frente. Toca un enemigo para consultar sus estadísticas. El color indica una estimación de dificultad. Los reclutables detectados en la zona llevan un distintivo «!» y abren su pista al tocarlos.
+- **Bolsa:** objetos e iconos; toca un objeto para ver cantidad, efecto y disponibilidad antes de confirmar su uso.
+- **Mapa:** tu posición, salidas a otras zonas, WC, objetos recogibles y enemigos con retratos de frente. Toca un enemigo para consultar sus estadísticas y la dificultad estimada; si hay varios sprites juntos, elige cuál consultar. El color indica una estimación de dificultad. Los reclutables detectados en la zona llevan un distintivo «!» y abren su pista al tocarlos.
 - **Prosperidad:** progreso del pueblo y pistas de Digimon pendientes de reclutar cerca de tu zona. Toca un retrato para ver su ubicación, pista y requisitos conocidos.
-- **Evolución:** requisitos y rutas disponibles. Puedes activar una evolución válida con confirmación; deshacerla vuelve a la forma anterior con animación sin retroceder la partida.
+- **Evolución:** rutas compactas; toca una para ver los requisitos cumplidos y pendientes. Puedes activar una evolución válida con confirmación; deshacerla vuelve a la forma anterior con animación sin retroceder la partida.
 - **Trucos:** catálogo de ocho ayudas, con confirmación antes de aplicarlas. Deshacer un truco restaura su respaldo y descarta el progreso posterior.
 
 ### El juego · pantalla superior
@@ -70,7 +70,7 @@ Las mejoras gráficas afectan principalmente al 3D; los fondos y vídeos conserv
 
 DigiBuddy avisa si hay una nueva APK en las releases oficiales de GitHub. Al pulsar Actualizar, descarga y verifica la APK dentro de la app y abre el instalador de Android. La primera vez tendrás que permitir instalaciones desde DigiBuddy. Guarda tu progreso antes de instalar. También puedes comprobar manualmente en Ajustes. La consulta automática se puede desactivar; el juego funciona sin conexión.
 
-Los ajustes de gráficos y sonido se agrupan en un desplegable. Play y Ajustes permanecen accesibles en todas las pestañas, incluido el mapa.
+Ajustes se organiza en seis desplegables: Partidas, Gráficos y sonido, Controles, Pantallas, Archivos y Actualizaciones. Play y Ajustes permanecen accesibles en todas las pestañas, incluido el mapa.
 
 ## Partidas y guardados
 
@@ -78,7 +78,7 @@ Los ajustes de gráficos y sonido se agrupan en un desplegable. Play y Ajustes p
 - **Cargar partida del juego:** arranca el juego normalmente para cargar desde su menú original lo guardado en la tarjeta de memoria.
 - **Nueva partida:** abre el juego desde el inicio, sin borrar la tarjeta ni los estados anteriores.
 
-Puedes guardar, cargar, importar y exportar estados desde Ajustes, además de exportar la tarjeta de memoria. Los estados importados deben corresponder al mismo juego y núcleo; se guardan como una copia adicional. Para cargar desde el menú original, recuerda guardar también dentro del propio juego.
+Puedes guardar, cargar, importar y exportar estados desde Ajustes → Partidas, además de exportar la tarjeta de memoria. Los estados muestran su fecha y cargar uno durante una sesión requiere confirmación. Los estados importados deben corresponder al mismo juego y núcleo; se guardan como una copia adicional. Para cargar desde el menú original, recuerda guardar también dentro del propio juego.
 
 ## Juego compatible
 

@@ -20,7 +20,7 @@ public final class MapView extends View {
   private GameData.Profile profile;
 
   interface EnemyListener {
-    void selected(GameData.Enemy enemy);
+    void selected(java.util.List<GameData.Enemy> enemies);
   }
 
   private EnemyListener listener;
@@ -32,19 +32,15 @@ public final class MapView extends View {
     setFocusable(false);
   }
 
-  private GameData.Enemy enemyAt(float x, float y) {
-    if (s == null || !s.valid || cell <= 0) return null;
+  private java.util.List<GameData.Enemy> enemiesAt(float x, float y) {
+    java.util.List<GameData.Enemy> selected = new java.util.ArrayList<>();
+    if (s == null || !s.valid || cell <= 0) return selected;
     float radius = 24 * getResources().getDisplayMetrics().density;
-    float best = radius * radius;
-    GameData.Enemy selected = null;
     for (GameData.Enemy enemy : mapDigimon()) {
       float dx = x - (left + (enemy.x - minX + .5f) * cell);
       float dy = y - (top + (enemy.y - minY + .5f) * cell);
       float distance = dx * dx + dy * dy;
-      if (distance < best) {
-        best = distance;
-        selected = enemy;
-      }
+      if (distance < radius * radius) selected.add(enemy);
     }
     return selected;
   }
@@ -61,15 +57,15 @@ public final class MapView extends View {
       case MotionEvent.ACTION_DOWN:
         touchX = event.getX();
         touchY = event.getY();
-        touchingEnemy = enemyAt(touchX, touchY) != null;
+        touchingEnemy = !enemiesAt(touchX, touchY).isEmpty();
         return touchingEnemy;
       case MotionEvent.ACTION_UP:
         if (!touchingEnemy) return false;
         touchingEnemy = false;
         float slop = 12 * getResources().getDisplayMetrics().density;
         if (Math.abs(event.getX() - touchX) <= slop && Math.abs(event.getY() - touchY) <= slop) {
-          GameData.Enemy enemy = enemyAt(event.getX(), event.getY());
-          if (enemy != null && listener != null) listener.selected(enemy);
+          java.util.List<GameData.Enemy> enemies = enemiesAt(event.getX(), event.getY());
+          if (!enemies.isEmpty() && listener != null) listener.selected(enemies);
           performClick();
         }
         return true;
