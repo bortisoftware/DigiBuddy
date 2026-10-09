@@ -9,7 +9,7 @@
 
 DigiBuddy es un emulador de **Digimon World de PlayStation** para consolas Android de doble pantalla. Juega en la pantalla superior y consulta tu compañero, bolsa, mapa, prosperidad y evoluciones en un panel táctil que sigue tu partida en tiempo real.
 
-🎥 [Vídeo de presentación: cómo funciona DigiBuddy](https://www.youtube.com/watch?v=glKcUstdL5Q)
+[![Ver el vídeo de presentación de DigiBuddy en YouTube](https://i.ytimg.com/vi/glKcUstdL5Q/hqdefault.jpg)](https://www.youtube.com/watch?v=glKcUstdL5Q)
 
 ## Capturas
 
