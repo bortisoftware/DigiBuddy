@@ -37,7 +37,7 @@ Requiere **Android 8.0 o posterior y ARM64**. Otros dispositivos de doble pantal
 
 ## Instalación
 
-Descarga la [APK de DigiBuddy 0.3.7](https://github.com/bortisoftware/DigiBuddy/releases/download/v0.3.7/DigiBuddy-0.3.7.apk) desde [Releases](https://github.com/bortisoftware/DigiBuddy/releases).
+Descarga la [APK de DigiBuddy 0.3.8](https://github.com/bortisoftware/DigiBuddy/releases/download/v0.3.8/DigiBuddy-0.3.8.apk) desde [Releases](https://github.com/bortisoftware/DigiBuddy/releases).
 
 1. Instala la APK en tu consola. Si Android lo solicita, permite la instalación desde el navegador o gestor de archivos que utilices.
 2. Abre DigiBuddy: el asistente te pedirá seleccionar tu BIOS de PlayStation y el juego.

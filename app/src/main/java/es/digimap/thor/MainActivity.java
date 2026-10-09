@@ -1860,8 +1860,15 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
         for (int col = 0; col < 3; col++) {
           final int index = rowIndex * 3 + col, selected = navTabs[index];
           Button item = button(ctx, names[index], () -> select(selected));
-          RetroSkin.Icon icon = new RetroSkin.Icon(index);
-          icon.setBounds(0, 0, dp(20), dp(20));
+          android.graphics.drawable.Drawable icon =
+              index == 2
+                  ? ctx.getDrawable(
+                      getResources().getIdentifier("map_icon", "drawable", getPackageName()))
+                  : new RetroSkin.Icon(index);
+          if (icon instanceof android.graphics.drawable.BitmapDrawable)
+            ((android.graphics.drawable.BitmapDrawable) icon).setFilterBitmap(false);
+          int iconSize = dp(index == 2 ? 24 : 20);
+          icon.setBounds(0, 0, iconSize, iconSize);
           item.setCompoundDrawables(icon, null, null, null);
           item.setCompoundDrawablePadding(dp(5));
           item.setTextSize(11);
