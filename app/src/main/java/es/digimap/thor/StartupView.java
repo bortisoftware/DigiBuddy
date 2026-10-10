@@ -10,6 +10,8 @@ import android.widget.TextView;
 
 final class StartupView extends ScrollView {
   interface Actions {
+    void chooseLanguage(String language);
+
     void next();
 
     void importBios();
@@ -30,10 +32,12 @@ final class StartupView extends ScrollView {
   private final Actions actions;
   private String rendered = "";
   private boolean home;
+  private String chosenLanguage;
 
   StartupView(Context context, Actions actions) {
     super(context);
     this.actions = actions;
+    chosenLanguage = AppLanguage.systemLanguage(context.getResources().getConfiguration());
     setFillViewport(true);
     setVerticalScrollBarEnabled(false);
     setHorizontalScrollBarEnabled(false);
@@ -48,7 +52,9 @@ final class StartupView extends ScrollView {
       boolean canResume,
       String savedDate) {
     String identity =
-        step
+        AppLanguage.locale().getLanguage()
+            + "|"
+            + step
             + "|"
             + busy
             + "|"
@@ -83,51 +89,109 @@ final class StartupView extends ScrollView {
     mascot.setScaleType(ImageView.ScaleType.FIT_CENTER);
     card.addView(mascot, new LinearLayout.LayoutParams(dp(home ? 40 : 64), dp(home ? 40 : 64)));
     label(card, "DIGIBUDDY", home ? 22 : 26);
-    if (step != StartupFlow.HOME) label(card, "Bienvenida  ·  BIOS  ·  Juego  ·  Listo", 12);
-    if (step == StartupFlow.WELCOME) {
-      label(card, "Tu aventura empieza aquí", 20);
+    if (step >= StartupFlow.WELCOME && step != StartupFlow.HOME)
+      label(card, AppLanguage.text("text_welcome_bios_game_ready"), 12);
+    if (step == StartupFlow.LANGUAGE) {
+      label(card, AppLanguage.text("language_welcome"), 20);
+      android.widget.RadioGroup languages = new android.widget.RadioGroup(getContext());
+      languages.setOrientation(LinearLayout.HORIZONTAL);
+      languages.setGravity(Gravity.CENTER);
+      android.widget.RadioButton spanish = languageOption("Español", 1);
+      android.widget.RadioButton english = languageOption("English", 2);
+      languages.addView(spanish);
+      languages.addView(english);
+      languages.check("es".equals(chosenLanguage) ? 1 : 2);
+      languages.setOnCheckedChangeListener(
+          (group, checked) -> chosenLanguage = checked == 1 ? "es" : "en");
+      card.addView(languages);
+      label(card, AppLanguage.text("language_game_note"), 13);
+      action(
+          card,
+          AppLanguage.text("language_continue"),
+          () -> actions.chooseLanguage(chosenLanguage),
+          !busy);
+    } else if (step == StartupFlow.WELCOME) {
+      label(card, AppLanguage.text("text_your_adventure_starts_here"), 20);
       label(
           card,
-          "Añade tu BIOS de PlayStation y tu copia de Digimon World. DigiBuddy no incluye estos"
-              + " archivos.",
+          AppLanguage.text(
+              "text_add_your_playstation_bios_and_your_copy_of_digimon_world_digibuddy_does_not_include_t"),
           15);
-      action(card, "Comenzar", actions::next, !busy);
+      action(card, AppLanguage.text("text_get_started"), actions::next, !busy);
     } else if (step == StartupFlow.BIOS) {
-      label(card, "1 · Añade la BIOS", 20);
-      label(card, "Selecciona tu archivo de BIOS de PlayStation de 512 KiB.", 15);
-      action(card, busy ? "Importando…" : "Seleccionar BIOS", actions::importBios, !busy);
+      label(card, AppLanguage.text("text_1_add_your_bios"), 20);
+      label(card, AppLanguage.text("text_select_your_512_kib_playstation_bios_file"), 15);
+      action(
+          card,
+          busy ? AppLanguage.text("text_importing_2") : AppLanguage.text("text_select_bios"),
+          actions::importBios,
+          !busy);
     } else if (step == StartupFlow.GAME) {
-      label(card, "BIOS preparada ✓", 14);
-      label(card, "2 · Añade Digimon World", 20);
+      label(card, AppLanguage.text("text_bios_ready"), 14);
+      label(card, AppLanguage.text("text_2_add_digimon_world"), 20);
       label(
           card,
-          "Selecciona el disco .iso, .bin, .img o .chd. La compatibilidad del panel depende de la"
-              + " edición.",
+          AppLanguage.text(
+              "text_select_the_iso_bin_img_or_chd_disc_companion_panel_compatibility_depends_on_the_editi"),
           15);
-      action(card, busy ? "Importando…" : "Seleccionar juego", actions::importGame, !busy);
+      action(
+          card,
+          busy ? AppLanguage.text("text_importing_2") : AppLanguage.text("text_select_game"),
+          actions::importGame,
+          !busy);
     } else if (step == StartupFlow.READY) {
-      label(card, "BIOS y juego preparados ✓", 20);
+      label(card, AppLanguage.text("text_bios_and_game_ready"), 20);
       label(card, compatibility, 14);
-      label(card, "Arriba verás el juego. Abajo tendrás compañero, bolsa, mapa y evoluciones.", 15);
-      action(card, "Terminar configuración", actions::finish, !busy);
-    } else {
-      action(card, "Continuar última sesión", actions::resume, canResume && !busy);
-      if (canResume) label(card, "Estado del " + savedDate + " · vuelve a ese punto exacto.", 12);
-      action(card, "Cargar partida del juego", actions::loadGameCard, !busy, !canResume);
       label(
           card,
-          "Abre el juego desde el inicio y elige Cargar en su menú. Usa tu tarjeta de memoria.",
+          AppLanguage.text(
+              "text_the_game_appears_above_your_partner_bag_map_and_evolutions_appear_below"),
+          15);
+      action(card, AppLanguage.text("text_finish_setup"), actions::finish, !busy);
+    } else {
+      action(
+          card,
+          AppLanguage.text("text_continue_latest_session"),
+          actions::resume,
+          canResume && !busy);
+      if (canResume)
+        label(
+            card,
+            AppLanguage.text("text_state_from")
+                + savedDate
+                + AppLanguage.text("text_returns_to_that_exact_point"),
+            12);
+      action(
+          card,
+          AppLanguage.text("text_load_in_game_save"),
+          actions::loadGameCard,
+          !busy,
+          !canResume);
+      label(
+          card,
+          AppLanguage.text(
+              "text_starts_the_game_from_the_beginning_choose_load_in_its_menu_to_use_your_memory_card"),
           12);
       if (!canResume)
         label(
             card,
-            "Todavía no hay una sesión guardada. Empieza una partida; podrás cargar tu tarjeta"
-                + " desde el menú del juego.",
+            AppLanguage.text(
+                "text_there_is_no_saved_session_yet_start_a_game_you_can_load_your_memory_card_from_the_in"),
             13);
-      action(card, "Nueva partida", actions::newGame, !busy, false);
-      action(card, "Ajustes", actions::settings, !busy, false);
+      action(card, AppLanguage.text("text_new_game"), actions::newGame, !busy, false);
+      action(card, AppLanguage.text("text_settings"), actions::settings, !busy, false);
     }
     if (!progress.isEmpty()) label(card, progress, 13);
+  }
+
+  private android.widget.RadioButton languageOption(String name, int identifier) {
+    android.widget.RadioButton button = new android.widget.RadioButton(getContext());
+    button.setId(identifier);
+    button.setText(name);
+    button.setTextColor(RetroSkin.INK);
+    button.setMinHeight(dp(48));
+    button.setPadding(dp(12), dp(4), dp(12), dp(4));
+    return button;
   }
 
   private void label(LinearLayout parent, String value, int size) {

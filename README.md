@@ -1,3 +1,5 @@
+[Español](README.md) | [English](README.en.md)
+
 ![DigiBuddy: Digimon World en doble pantalla](docs/banner.png)
 
 <p align="center">
@@ -37,13 +39,19 @@ Requiere **Android 8.0 o posterior y ARM64**. Otros dispositivos de doble pantal
 
 ## Instalación
 
-Descarga la [APK de DigiBuddy 0.3.9](https://github.com/bortisoftware/DigiBuddy/releases/download/v0.3.9/DigiBuddy-0.3.9.apk) desde [Releases](https://github.com/bortisoftware/DigiBuddy/releases).
+Descarga la APK desde [Releases](https://github.com/bortisoftware/DigiBuddy/releases/latest).
 
 1. Instala la APK en tu consola. Si Android lo solicita, permite la instalación desde el navegador o gestor de archivos que utilices.
-2. Abre DigiBuddy: el asistente te pedirá seleccionar tu BIOS de PlayStation y el juego.
+2. Abre DigiBuddy: elige Español o English, con el idioma del sistema preseleccionado. El asistente te pedirá seleccionar tu BIOS de PlayStation y el juego.
 3. Inicia una nueva partida o elige cargar desde el menú original del juego.
 
 **No se incluyen BIOS ni juegos. Cada usuario debe aportar sus propios archivos.**
+
+## Idiomas
+
+La interfaz, los objetos, las pistas y los mensajes están disponibles en **español e inglés**. Cambia la elección en **Ajustes → Idioma de la app**: Español o English. El idioma del sistema solo preselecciona la opción en la primera ejecución. La elección se conserva y cambiarla no reinicia la partida.
+
+El idioma del juego depende de la ROM; el selector traduce el panel de DigiBuddy.
 
 ## Funciones
 
@@ -70,7 +78,7 @@ Las mejoras gráficas afectan principalmente al 3D; los fondos y vídeos conserv
 
 DigiBuddy avisa si hay una nueva APK en las releases oficiales de GitHub. Al pulsar Actualizar, descarga y verifica la APK dentro de la app y abre el instalador de Android. La primera vez tendrás que permitir instalaciones desde DigiBuddy. Guarda tu progreso antes de instalar. También puedes comprobar manualmente en Ajustes. La consulta automática se puede desactivar; el juego funciona sin conexión.
 
-Ajustes se organiza en seis desplegables: Partidas, Gráficos y sonido, Controles, Pantallas, Archivos y Actualizaciones. Play y Ajustes permanecen accesibles en todas las pestañas, incluido el mapa.
+Ajustes se organiza en desplegables: Idioma de la app, Partidas, Gráficos y sonido, Controles, Pantallas, Archivos y Actualizaciones. Play y Ajustes permanecen accesibles en todas las pestañas, incluido el mapa.
 
 ## Partidas y guardados
 
@@ -82,7 +90,9 @@ Puedes guardar, cargar, importar y exportar estados desde Ajustes → Partidas, 
 
 ## Juego compatible
 
-El panel está validado para **Digimon World japonés (SLPS-01797), con el parche de traducción al español de referencia**. Otras ediciones pueden ejecutarse en el emulador, pero sus datos y las acciones del panel no están garantizados.
+El panel reconoce **Digimon World USA (SLUS-01032)** y **la edición japonesa (SLPS-01797) con el parche de traducción al español de referencia**. Las huellas de memoria verifican la versión antes de leer datos o aplicar acciones. Otras ediciones y parches pueden ejecutarse en el emulador, pero el panel requiere un perfil compatible.
+
+En la edición USA, el uso de objetos desde el panel confirma con ✕; en la edición japonesa, con ○. Los guardados y estados se separan por imagen de disco: cambiar de edición no transfiere automáticamente la partida.
 
 <details>
 <summary>Cómo identificar la edición probada</summary>

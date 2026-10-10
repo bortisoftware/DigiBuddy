@@ -148,6 +148,23 @@
       "HAS_IMMORTAL_HOUR": 1264808,
       "EVO_GAINS_DATA": 1225424
     },
-    "signatures": []
+    "signatures": [
+      {
+        "offset": 1226348,
+        "length": 64,
+        "sha256": "3582b059f683c984167b20905c18f67c2d709a76f9395552f56adf3f78c0ec36"
+      },
+      {
+        "offset": 1232584,
+        "length": 32,
+        "sha256": "86006dc1f09268f57ae5f475d3066825fe842106b9c85382bc74442832ac64ff"
+      },
+      {
+        "offset": 1206768,
+        "length": 32,
+        "sha256": "5b6b48098adb3f991abb4a276c307126e2f68e9d9b3c32126acb94d6b48abbfd"
+      }
+    ],
+    "referenceExecutableSha256": "341817d3b2091c4c3e83c74ec71157ef6ccf664f27edf855406d8a8dfbadbe66"
   }
 ]

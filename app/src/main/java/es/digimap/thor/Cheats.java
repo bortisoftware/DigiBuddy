@@ -5,24 +5,24 @@ import java.util.ArrayList;
 /** Data-only writes to a fingerprinted game's RAM, on the emulation thread. */
 final class Cheats {
   static final String[] LABELS = {
-    "Curar PV y PM",
-    "999.999 bits",
-    "Estadísticas al máximo",
-    "Felicidad y disciplina al 100",
-    "Cansancio a cero",
-    "Errores de cuidado a cero",
-    "Objetos actuales ×99",
-    "Aprender todas las técnicas"
+    "@text_restore_hp_and_mp",
+    "@text_999_999_bits",
+    "@text_maximize_stats",
+    "@text_happiness_and_discipline_to_100",
+    "@text_clear_fatigue",
+    "@text_clear_care_mistakes",
+    "@text_current_items_99",
+    "@text_learn_all_techniques"
   };
   static final String[] DESCRIPTIONS = {
-    "Restaura los PV y PM de tu compañero.",
-    "Fija tu dinero en 999.999 bits.",
-    "Fija PV y PM en 9.999 y las otras estadísticas en 999.",
-    "Fija felicidad y disciplina en 100.",
-    "Elimina el cansancio de tu compañero.",
-    "Pone a cero los errores de cuidado acumulados.",
-    "Pone 99 unidades de cada objeto que ya llevas en la bolsa.",
-    "Tu compañero aprende las 56 técnicas."
+    "@text_restores_your_partner_s_hp_and_mp",
+    "@text_sets_your_money_to_999_999_bits",
+    "@text_sets_hp_and_mp_to_9_999_and_the_other_stats_to_999",
+    "@text_sets_happiness_and_discipline_to_100",
+    "@text_clears_your_partner_s_fatigue",
+    "@text_clears_accumulated_care_mistakes",
+    "@text_sets_every_item_already_in_your_bag_to_99_units",
+    "@text_your_partner_learns_all_56_techniques"
   };
 
   static int[][] plan(int id, GameData.Profile p, GameData.Snapshot s) {

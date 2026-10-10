@@ -34,3 +34,13 @@ En 0.3.7 se añade descarga directa en la caché privada, con cancelación, lím
 El usuario confirmó en la Thor el flujo de descarga y permiso/instalador sin navegador. Después de la prueba se verificó por ADB la versión oficial 0.3.7, código 12, instalada sobre la variante de prueba sin desinstalar.
 
 En 0.3.9 el usuario confirmó en la Thor los seis desplegables, las cuatro estadísticas juntas y la fecha y confirmación al cargar un estado. También confirmó la apertura de los detalles de objetos y evoluciones; durante esa prueba se detectó y completó el catálogo de efectos, incluido Digiseta. Un auxiliar privado comprobó los 128 IDs, los límites del catálogo, los efectos adversos y la selección de sprites solapados sin activación al arrastrar. Los cambios de interfaz no modifican los núcleos ni el formato de guardado.
+
+## Validación 0.4.0
+
+- Compilación y firma de release, sin cambiar los núcleos nativos.
+- Cobertura de recursos Español/English y cambio repetido de catálogos; nombres y efectos de los 128 objetos.
+- Selector de idiomas comprobado en una Thor: ambas opciones visibles y cambio efectivo.
+- ROM USA ejecutada en una sesión aislada: huellas válidas, Agumon y estadísticas coherentes, mapa con salidas y guardado de estado.
+- Con inventario y estadísticas de prueba en esa sesión: consumo de objeto mediante el menú nativo con ✕, evolución Agumon→Greymon y reversión nativa a Agumon sin cargar estado.
+- Esta comprobación no cubre todas las zonas y eventos de la aventura.
+- BIOS, ROM, estados, herramientas de prueba y claves de firma quedan excluidos del repositorio y de los paquetes publicados.

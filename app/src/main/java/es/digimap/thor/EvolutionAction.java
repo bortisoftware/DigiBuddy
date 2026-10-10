@@ -37,43 +37,46 @@ final class EvolutionAction {
     if (reason != null) return reason;
     GameData.Snapshot snapshot = GameData.decode(ram, profile);
     if (snapshot.type != source)
-      return "Tu compañero ha cambiado. Selecciona la evolución de nuevo.";
+      return AppLanguage.text("text_your_partner_has_changed_select_the_evolution_again");
     for (GameData.Evolution evolution : snapshot.evolutions) {
       if (evolution.type == target
           && evolution.candidate
           && nativeTargetMatches(ram, profile, target)) return null;
     }
-    return "Todavía no cumples los requisitos de esta evolución.";
+    return AppLanguage.text("text_you_do_not_yet_meet_this_evolution_s_requirements");
   }
 
   static String reverseUnavailable(byte[] ram, GameData.Profile profile, EvolutionHistory history) {
     String reason = contextUnavailable(ram, profile);
     if (reason != null) return reason;
-    if (history == null) return "Todavía no hay una evolución registrada que deshacer.";
+    if (history == null) return AppLanguage.text("text_there_is_no_recorded_evolution_to_undo_yet");
     GameData.Snapshot snapshot = GameData.decode(ram, profile);
     if (!profile.id.equals(history.profileId)
         || snapshot.type != history.target
         || generation(ram, profile) != history.lifeGeneration
         || birthDay(ram, profile) != history.birthDay)
-      return "La evolución registrada no corresponde a tu compañero actual.";
+      return AppLanguage.text("text_the_recorded_evolution_does_not_match_your_current_partner");
     if (!hasNaturalPath(ram, profile, history.source, history.target)
         || !nativeTargetMatches(ram, profile, history.source))
-      return "No se ha podido verificar la forma anterior de tu compañero.";
+      return AppLanguage.text("text_could_not_verify_your_partner_s_previous_form");
     return null;
   }
 
   private static String contextUnavailable(byte[] ram, GameData.Profile profile) {
-    if (profile == null || !"jp".equals(profile.id) || profile.signatureHashes.isEmpty())
-      return "La evolución directa aún no está validada para esta versión.";
+    if (profile == null
+        || (!"jp".equals(profile.id) && !"us".equals(profile.id))
+        || profile.signatureHashes.isEmpty())
+      return AppLanguage.text("text_direct_evolution_has_not_been_validated_for_this_version_yet");
     for (String key : REQUIRED_KEYS)
-      if (!profile.addresses.containsKey(key)) return "Faltan datos para la evolución directa.";
+      if (!profile.addresses.containsKey(key))
+        return AppLanguage.text("text_data_for_direct_evolution_is_missing");
     GameData.Snapshot snapshot = GameData.decode(ram, profile);
-    if (!snapshot.valid) return "Entra en una partida reconocida primero.";
+    if (!snapshot.valid) return AppLanguage.text("text_enter_a_recognized_game_session_first");
     if (generation(ram, profile) > 99
         || unsignedByte(ram, profile.at("YEAR")) >= 100
         || signedShort(ram, profile.at("DAY")) < 0
         || signedShort(ram, profile.at("DAY")) >= 30)
-      return "Los datos del compañero no corresponden a una partida reconocida.";
+      return AppLanguage.text("text_the_partner_data_does_not_match_a_recognized_game_session");
     if (unsignedByte(ram, profile.at("GAME_STATE")) != 0
         || unsignedByte(ram, profile.at("TAMER_STATE")) != 0
         || unsignedByte(ram, profile.at("PARTNER_STATE")) != 1
@@ -82,18 +85,19 @@ final class EvolutionAction {
         || integer(ram, profile.at("INVENTORY_OPEN")) != 0
         || integer(ram, profile.at("TAMER_ITEM") + 8) != 255
         || signedShort(ram, profile.at("EVOLUTION_TARGET")) != -1)
-      return "Cierra los menús y espera a recuperar el control del personaje.";
+      return AppLanguage.text(
+          "text_close_the_menus_and_wait_until_you_regain_control_of_the_character");
     for (int box = 0; box < 6; box++)
       if (unsignedByte(ram, profile.at("UI_BOX_DATA") + box * 36 + 18) != 0)
-        return "Cierra el diálogo del juego antes de evolucionar.";
+        return AppLanguage.text("text_close_the_in_game_dialogue_before_evolving");
     if ((snapshot.conditions & ((1 << 0) | (1 << 5) | (1 << 6))) != 0)
-      return "Despierta y cura a tu compañero antes de evolucionar.";
+      return AppLanguage.text("text_wake_up_and_heal_your_partner_before_evolving");
     return null;
   }
 
   static EvolutionHistory history(byte[] ram, GameData.Profile profile, int source, int target) {
     if (ram == null || ram.length != RAM_SIZE || profile == null)
-      throw new IllegalArgumentException("No se pudo identificar al compañero.");
+      throw new IllegalArgumentException(AppLanguage.text("text_could_not_identify_your_partner"));
     return new EvolutionHistory(
         profile.id, source, target, generation(ram, profile), birthDay(ram, profile));
   }

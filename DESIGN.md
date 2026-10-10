@@ -79,3 +79,9 @@ StateTransfer importa estados del tamaño exacto solicitado al núcleo activo en
 ControllerBindings conserva las asignaciones en preferencias privadas por descriptor del dispositivo, independiente de su ID temporal. Mantiene las pulsaciones de teclas y ejes por separado para que soltar una dirección no cancele un botón sostenido. El diálogo de remapeo pausa la sesión, consume los controles, pide confirmación si el origen ya tiene otra función y limpia las pulsaciones al cerrarse. Los dispositivos virtuales de Android no se ofrecen como mandos físicos.
 
 El mapa añade las transiciones de scripts que puede resolver con el estado actual, además de los diez triggers de salida directa. La inspección acota instrucciones, llamadas y punteros y no ejecuta ni modifica scripts del juego. Los retratos de modelos usan una cámara frontal sin inclinación. Los marcadores de reclutamiento combinan NPC presentes, especie pendiente y ubicación conocida; los diálogos o condiciones no interpretados pueden impedir mostrar alguno.
+
+## Idiomas y perfiles regionales
+
+La interfaz resuelve recursos de `values` (inglés) y `values-es` mediante `AppLanguage`. La primera ejecución guarda una elección explícita entre Español e English. El sistema solo preselecciona la opción inicial. Al cambiar idioma se reconstruye el panel auxiliar conservando la sesión y la superficie del emulador. Los catálogos conservan claves de recursos y se resuelven al mostrarlos.
+
+El perfil USA SLUS-01032 requiere tres huellas de datos constantes del ejecutable. Los perfiles sin huellas no habilitan acciones de memoria. La confirmación de objetos utiliza el botón original de la región: ✕ en USA y ○ en Japón.

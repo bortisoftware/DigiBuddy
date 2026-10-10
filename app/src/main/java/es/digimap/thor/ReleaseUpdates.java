@@ -27,7 +27,7 @@ final class ReleaseUpdates implements AutoCloseable {
           version,
           page,
           failed,
-          "No se pudo comprobar. Prueba más tarde o abre las releases de GitHub.");
+          AppLanguage.text("text_could_not_check_try_later_or_open_the_github_releases"));
     }
 
     Result(String version, String page, boolean failed, String errorMessage) {
@@ -81,9 +81,10 @@ final class ReleaseUpdates implements AutoCloseable {
           } catch (UpdateFailure failure) {
             String message =
                 failure.status == 403 || failure.status == 429
-                    ? "GitHub ha limitado temporalmente las consultas. Prueba más tarde o abre las"
-                        + " releases."
-                    : "El servicio de actualizaciones no está disponible ahora. Prueba más tarde.";
+                    ? AppLanguage.text(
+                        "text_github_has_temporarily_limited_requests_try_later_or_open_the_releases")
+                    : AppLanguage.text(
+                        "text_the_update_service_is_unavailable_right_now_try_later");
             result = new Result("", "", true, message);
           } catch (Exception exception) {
             result = new Result("", "", true);

@@ -13,7 +13,7 @@ public final class DiscIdentity {
   private static final Pattern SERIAL =
       Pattern.compile("(SLPS|SLUS|SLES|SCPS|SCUS|SCES)_[0-9]{3}\\.[0-9]{2}");
   public int sectorSize, payloadOffset;
-  public String serial = "Desconocida";
+  public String serial = AppLanguage.text("text_unknown");
 
   public static DiscIdentity read(File file) throws IOException {
     DiscIdentity id = new DiscIdentity();

@@ -115,7 +115,7 @@ final class ControllerBindings {
       for (boolean positive : new boolean[] {false, true})
         if (binding(device, axisSource(axis, positive)) == target)
           return sourceLabel(axisSource(axis, positive));
-    return "sin asignar";
+    return AppLanguage.text("text_unassigned");
   }
 
   private static String sourceLabel(String source) {
@@ -129,7 +129,7 @@ final class ControllerBindings {
             + parts[2];
     } catch (NumberFormatException ignored) {
     }
-    return "sin asignar";
+    return AppLanguage.text("text_unassigned");
   }
 
   int key(KeyEvent event) {

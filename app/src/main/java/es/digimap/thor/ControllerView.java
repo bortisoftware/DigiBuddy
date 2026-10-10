@@ -17,14 +17,27 @@ final class ControllerView extends View {
   private int selected = -1;
   // Coordinates share the same controller space for drawing and hit testing.
   private static final float[][] POSITIONS = {
-    {330, 145}, {290, 105}, {165, 120}, {225, 120}, {80, 72}, {80, 148}, {42, 110}, {118, 110},
-    {370, 105}, {330, 65}, {65, 20}, {335, 20}, {130, 20}, {270, 20}
+    {330, 145},
+    {290, 105},
+    {165, 120},
+    {225, 120},
+    {80, 72},
+    {80, 148},
+    {42, 110},
+    {118, 110},
+    {370, 105},
+    {330, 65},
+    {65, 20},
+    {335, 20},
+    {130, 20},
+    {270, 20}
   };
 
   ControllerView(Context context, Selection selection) {
     super(context);
     this.selection = selection;
-    setContentDescription("Mando PlayStation: toca el botón que quieres remapear");
+    setContentDescription(
+        AppLanguage.text("text_playstation_controller_tap_the_button_you_want_to_remap"));
   }
 
   void selected(int target) {

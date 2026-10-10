@@ -61,7 +61,9 @@ public final class GameData {
 
   public static final class Snapshot {
     public boolean valid;
-    public String message = "Esperando una partida activa…", name = "", map = "";
+    public String message = AppLanguage.text("text_waiting_for_an_active_game"),
+        name = "",
+        map = "";
     public int type, hp, mp, maxHp, maxMp, offense, defense, speed, brains;
     public int age, weight, happiness, discipline, tiredness, care, battles, conditions;
     public int money, hour, minute, x, y, mapId, inventorySize;
@@ -113,8 +115,8 @@ public final class GameData {
 
   private String digimon(int type) {
     return type >= 0 && type < DataNames.DIGIMON.length
-        ? DataNames.DIGIMON[type]
-        : "Digimon " + type;
+        ? AppLanguage.catalogText(DataNames.DIGIMON[type])
+        : AppLanguage.text("text_digimon") + type;
   }
 
   private int level(int type) {
@@ -126,22 +128,25 @@ public final class GameData {
     if (ram == null || ram.length != 2097152 || profile == null) {
       empty.message =
           ram == null
-              ? "Preparando la partida…"
+              ? AppLanguage.text("text_preparing_the_game")
               : profile == null
-                  ? "Esperando una partida compatible para activar el panel…"
-                  : "Esperando la memoria del juego…";
+                  ? AppLanguage.text(
+                      "text_waiting_for_a_compatible_game_to_enable_the_companion_panel")
+                  : AppLanguage.text("text_waiting_for_game_memory");
       return empty;
     }
     try {
       return new GameData(ram, profile).read();
     } catch (RuntimeException ex) {
-      empty.message = "Los datos aún no son coherentes. Esperando una partida activa…";
+      empty.message =
+          AppLanguage.text("text_the_data_is_not_consistent_yet_waiting_for_an_active_game");
       return empty;
     }
   }
 
   public static boolean signatureMatches(byte[] ram, Profile profile) {
     if (ram == null || ram.length != 2097152 || profile == null) return false;
+    if (profile.signatureHashes.isEmpty()) return false;
     if (profile.signatureHashes.size() != profile.signatureOffsets.size()
         || profile.signatureLengths.size() != profile.signatureOffsets.size()) return false;
     try {
@@ -164,7 +169,9 @@ public final class GameData {
   private Snapshot read() {
     Snapshot s = new Snapshot();
     if (!signatureMatches(ram, profile)) {
-      s.message = "Esperando el código del juego o perfil incompatible con este parche.";
+      s.message =
+          AppLanguage.text(
+              "text_waiting_for_the_game_code_or_this_patch_does_not_match_the_profile");
       return s;
     }
     int entity = profile.at("PARTNER_ENTITY"),
@@ -181,9 +188,11 @@ public final class GameData {
         || s.maxMp < 0
         || s.maxMp > 9999
         || (s.inventorySize != 10 && s.inventorySize != 20 && s.inventorySize != 30)) return s;
-    // Stable table structure checks also protect the experimental USA profile.
+    // A matching fingerprint must also have a coherent live table layout.
     if (level(1) != 1 || level(3) != 3 || i32(profile.at("DIGIMON_DATA") + 20) != 17) {
-      s.message = "La estructura de datos no coincide con el perfil. Panel desactivado.";
+      s.message =
+          AppLanguage.text(
+              "text_the_data_layout_does_not_match_the_profile_companion_panel_disabled");
       return s;
     }
     s.name = digimon(s.type);
@@ -223,14 +232,16 @@ public final class GameData {
       int type = u8(inv + slot), count = u8(inv + 30 + slot);
       if (type == 255 || count == 0) continue;
       if (type > 127 || count > 99) return new Snapshot();
-      String name = DataNames.ITEMS[type];
-      s.items.add(new Item(type, count, slot, name.isEmpty() ? "Objeto " + type : name));
+      String name = AppLanguage.catalogText(DataNames.ITEMS[type]);
+      s.items.add(
+          new Item(
+              type, count, slot, name.isEmpty() ? AppLanguage.text("text_item") + type : name));
     }
     for (int move = 0; move < 58; move++) {
       if (move == 48 || move == 57) continue;
       if ((u8(entity + 88 + move / 8) & (1 << (move % 8))) != 0) {
-        String name = DataNames.TECHNIQUES[move];
-        s.moves.add(name.isEmpty() ? "Técnica " + move : name);
+        String name = AppLanguage.catalogText(DataNames.TECHNIQUES[move]);
+        s.moves.add(name.isEmpty() ? AppLanguage.text("text_technique") + move : name);
       }
     }
     s.mapId =
@@ -241,10 +252,11 @@ public final class GameData {
       int entry = profile.at("MAP_ENTRIES") + s.mapId * 16;
       int nameId = u8(entry + 15);
       s.zoneId = nameId < DataNames.ZONES.length ? nameId : -1;
-      s.map = nameId < DataNames.ZONES.length ? DataNames.ZONES[nameId] : "";
-      if (s.map.isEmpty()) s.map = "Zona " + s.mapId;
+      s.map =
+          nameId < DataNames.ZONES.length ? AppLanguage.catalogText(DataNames.ZONES[nameId]) : "";
+      if (s.map.isEmpty()) s.map = AppLanguage.text("text_area") + s.mapId;
     } else {
-      s.map = "Ubicación no disponible";
+      s.map = AppLanguage.text("text_location_unavailable");
     }
     int[] player = tile(profile.at("TAMER_ENTITY"));
     s.x = player != null ? player[0] : (byte) u8(profile.at("TAMER_PREVIOUS_TILE_X"));
@@ -256,7 +268,7 @@ public final class GameData {
     mapObjects(s);
     evolution(s);
     s.valid = true;
-    s.message = "Estás en: " + s.map;
+    s.message = AppLanguage.text("text_you_are_in") + s.map;
     return s;
   }
 
@@ -332,9 +344,11 @@ public final class GameData {
   }
 
   private String zone(int map) {
-    if (map < 0 || map >= 255) return "Zona " + map;
+    if (map < 0 || map >= 255) return AppLanguage.text("text_area") + map;
     int name = u8(profile.at("MAP_ENTRIES") + map * 16 + 15);
-    return name < DataNames.ZONES.length ? DataNames.ZONES[name] : "Zona " + map;
+    return name < DataNames.ZONES.length
+        ? AppLanguage.catalogText(DataNames.ZONES[name])
+        : AppLanguage.text("text_area") + map;
   }
 
   private void mapEntities(Snapshot s) {
@@ -466,7 +480,14 @@ public final class GameData {
       boolean careOK = (flags & 16) != 0 ? s.care <= care : s.care >= care;
       boolean weightOK = Math.abs(s.weight - weight) <= 5;
       int[] values = {s.maxHp / 10, s.maxMp / 10, s.offense, s.defense, s.speed, s.brains};
-      String[] labels = {"PV", "PM", "Ataque", "Defensa", "Velocidad", "Inteligencia"};
+      String[] labels = {
+        AppLanguage.text("text_hp"),
+        AppLanguage.text("text_mp"),
+        AppLanguage.text("text_offense"),
+        AppLanguage.text("text_defense"),
+        AppLanguage.text("text_speed"),
+        AppLanguage.text("text_brains")
+      };
       boolean statsOK = true;
       StringBuilder detail = new StringBuilder();
       if (level(target) == 3) {
@@ -475,7 +496,7 @@ public final class GameData {
         statsOK = s16(req + 2 + highest * 2) == 1;
         detail
             .append(mark(statsOK))
-            .append(" Estadística dominante: ")
+            .append(AppLanguage.text("text_dominant_stat"))
             .append(labels[highest])
             .append('\n');
       } else {
@@ -496,7 +517,12 @@ public final class GameData {
       boolean bonus = false;
       if (s16(req) != -1 && s.type == s16(req)) bonus = true;
       int[] bonusValues = {s.discipline, s.happiness, s.battles, s.moves.size()};
-      String[] bonusLabels = {"Disciplina", "Felicidad", "Combates", "Técnicas"};
+      String[] bonusLabels = {
+        AppLanguage.text("text_discipline"),
+        AppLanguage.text("text_happiness"),
+        AppLanguage.text("text_battles"),
+        AppLanguage.text("text_techniques")
+      };
       StringBuilder bonusDetail = new StringBuilder();
       for (int j = 0; j < 4; j++) {
         int threshold = s16(req + 18 + j * 2);
@@ -512,31 +538,34 @@ public final class GameData {
       }
       detail
           .append(mark(careOK))
-          .append(" Errores de cuidado ")
+          .append(AppLanguage.text("text_care_mistakes"))
           .append((flags & 16) != 0 ? "≤ " : "≥ ")
           .append(care)
-          .append(" (actual: ")
+          .append(AppLanguage.text("text_current"))
           .append(s.care)
           .append(")\n");
       detail
           .append(mark(weightOK))
-          .append(" Peso ")
+          .append(AppLanguage.text("text_weight"))
           .append(weight - 5)
           .append("–")
           .append(weight + 5)
-          .append(" (actual: ")
+          .append(AppLanguage.text("text_current"))
           .append(s.weight)
           .append(")\n");
       detail
           .append(mark(bonus))
-          .append(" Bonus: ")
-          .append(bonusDetail.length() == 0 ? "afinidad de especie" : bonusDetail)
+          .append(AppLanguage.text("text_bonus"))
+          .append(
+              bonusDetail.length() == 0 ? AppLanguage.text("text_species_affinity") : bonusDetail)
           .append('\n');
       e.score = (careOK ? 1 : 0) + (weightOK ? 1 : 0) + (statsOK ? 1 : 0) + (bonus ? 1 : 0);
       e.candidate = e.score >= 3;
       if (level(s.type) == 1) {
         e.candidate = level(target) == 2;
-        detail = new StringBuilder("Evolución de bebé condicionada por el reloj del juego.\n");
+        detail =
+            new StringBuilder(
+                AppLanguage.text("text_baby_evolution_also_depends_on_the_in_game_clock"));
       }
       e.details = detail.toString();
       s.evolutions.add(e);

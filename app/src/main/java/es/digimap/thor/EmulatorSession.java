@@ -39,7 +39,7 @@ public final class EmulatorSession {
     saveFolder = new File(saves);
     if (!saveFolder.isDirectory() && !saveFolder.mkdirs()) {
       CORE_OWNED.set(false);
-      error = "No se pudo crear la carpeta de guardados";
+      error = AppLanguage.text("text_could_not_create_the_save_folder");
       return false;
     }
     error = null;
@@ -65,11 +65,11 @@ public final class EmulatorSession {
       int rate = (int) Math.round(NativeCore.sampleRate());
       double fps = NativeCore.fps();
       if (rate < 8000 || rate > 192000 || !Double.isFinite(fps) || fps < 1 || fps > 240)
-        throw new Exception("Frecuencia de audio o vídeo no válida");
+        throw new Exception(AppLanguage.text("text_invalid_audio_or_video_rate"));
       int minimum =
           AudioTrack.getMinBufferSize(
               rate, AudioFormat.CHANNEL_OUT_STEREO, AudioFormat.ENCODING_PCM_16BIT);
-      if (minimum < 0) throw new Exception("Audio no disponible");
+      if (minimum < 0) throw new Exception(AppLanguage.text("text_audio_unavailable"));
       audio =
           new AudioTrack.Builder()
               .setAudioAttributes(
@@ -144,11 +144,13 @@ public final class EmulatorSession {
         else if (wait < -frameNanos * 4) next = System.nanoTime();
       }
     } catch (InterruptedException ex) {
-      if (!stopRequested) error = "La sesión fue interrumpida";
+      if (!stopRequested) error = AppLanguage.text("text_the_session_was_interrupted");
       Thread.currentThread().interrupt();
     } catch (Exception ex) {
       android.util.Log.w("DigiBuddy", "Core session failed: " + ex.getClass().getSimpleName());
-      error = "No se pudo continuar la sesión del emulador. Reinicia la sesión desde Ajustes.";
+      error =
+          AppLanguage.text(
+              "text_could_not_continue_the_emulator_session_restart_the_session_from_settings");
     } finally {
       try {
         if (coreStarted) saveCard();
@@ -202,7 +204,7 @@ public final class EmulatorSession {
   private void saveCard() {
     if (saveFolder != null
         && !NativeCore.saveCard(new File(saveFolder, "memory-card.mcr").getAbsolutePath()))
-      saveWarning = "No se pudo guardar la tarjeta de memoria";
+      saveWarning = AppLanguage.text("text_could_not_save_the_memory_card");
   }
 
   public synchronized boolean command(Runnable action) {
@@ -222,7 +224,8 @@ public final class EmulatorSession {
             ItemUse action = new ItemUse(NativeCore.memory(), profile, slot, item);
             File checkpoint = new File(saveFolder, "item-use-pending.state");
             if (!NativeCore.saveState(checkpoint.getAbsolutePath()))
-              throw new IllegalArgumentException("No se pudo guardar la copia previa al objeto.");
+              throw new IllegalArgumentException(
+                  AppLanguage.text("text_could_not_save_the_backup_before_using_the_item"));
             itemCheckpoint = checkpoint;
             pauseAfterItem = paused;
             itemUse = action;
@@ -267,20 +270,22 @@ public final class EmulatorSession {
       EvolutionAction action;
       if (reversing) {
         if (previous == null || previous.target != source || previous.source != target)
-          throw new IllegalArgumentException("La evolución registrada ha cambiado.");
+          throw new IllegalArgumentException(
+              AppLanguage.text("text_the_recorded_evolution_has_changed"));
         action = EvolutionAction.reverse(memory, profile, previous);
       } else {
         action = new EvolutionAction(memory, profile, source, target);
       }
       if (!NativeCore.saveState(checkpoint.getAbsolutePath()))
-        throw new IllegalArgumentException("No se pudo guardar la copia previa. Acción cancelada.");
+        throw new IllegalArgumentException(
+            AppLanguage.text("text_could_not_save_the_backup_action_cancelled"));
       saved = true;
       if (!reversing) {
         EvolutionAction.history(memory, profile, source, target).save(saveFolder, engine);
         historyChanged = true;
       }
       if (!writeEvolutionFields(action.writes()))
-        throw new IllegalArgumentException("No se pudo iniciar la evolución.");
+        throw new IllegalArgumentException(AppLanguage.text("text_could_not_start_the_evolution"));
       evolutionCheckpoint = checkpoint;
       evolutionEngine = engine;
       previousEvolution = previous;
@@ -290,11 +295,11 @@ public final class EmulatorSession {
     } catch (IOException | IllegalArgumentException failure) {
       String message =
           failure instanceof IOException
-              ? "No se pudo guardar el historial. Acción cancelada."
+              ? AppLanguage.text("text_could_not_save_the_history_action_cancelled")
               : failure.getMessage();
       if (saved) {
         if (NativeCore.loadState(checkpoint.getAbsolutePath())) checkpoint.delete();
-        else message += " No se pudo restaurar la copia previa.";
+        else message += AppLanguage.text("text_could_not_restore_the_backup");
       }
       if (historyChanged) restoreEvolutionHistory(previous, engine);
       ram = NativeCore.memory();
@@ -313,7 +318,7 @@ public final class EmulatorSession {
       if (previous == null) EvolutionHistory.clear(saveFolder, engine);
       else previous.save(saveFolder, engine);
     } catch (IOException failure) {
-      saveWarning = "No se pudo actualizar el historial de evolución.";
+      saveWarning = AppLanguage.text("text_could_not_update_the_evolution_history");
     }
   }
 
@@ -323,8 +328,8 @@ public final class EmulatorSession {
     if (completed) {
       if (evolution.reversing) {
         restoreEvolutionHistory(null, evolutionEngine);
-        message = "Tu compañero ha vuelto a su forma anterior.";
-      } else message = "Evolución completada.";
+        message = AppLanguage.text("text_your_partner_has_returned_to_its_previous_form");
+      } else message = AppLanguage.text("text_evolution_complete");
       evolutionCheckpoint.delete();
     } else {
       boolean restored = NativeCore.loadState(evolutionCheckpoint.getAbsolutePath());
@@ -332,8 +337,10 @@ public final class EmulatorSession {
       restoreEvolutionHistory(previousEvolution, evolutionEngine);
       message =
           restored
-              ? "La secuencia no terminó. Se ha recuperado el estado de antes de esta acción."
-              : "La secuencia no terminó y no se pudo recuperar la copia de esta acción.";
+              ? AppLanguage.text(
+                  "text_the_sequence_did_not_finish_the_state_before_this_action_has_been_restored")
+              : AppLanguage.text(
+                  "text_the_sequence_did_not_finish_and_its_backup_could_not_be_restored");
     }
     evolution = null;
     previousEvolution = null;
@@ -349,9 +356,9 @@ public final class EmulatorSession {
     if (itemUse.failed() && !itemUse.accepted()) {
       if (NativeCore.loadState(itemCheckpoint.getAbsolutePath())) {
         itemCheckpoint.delete();
-        notice += " No se ha usado ningún objeto.";
+        notice += AppLanguage.text("text_no_item_was_used");
       } else {
-        notice += " No se pudo restaurar la copia previa.";
+        notice += AppLanguage.text("text_could_not_restore_the_backup");
       }
     } else if (!itemUse.failed()) {
       itemCheckpoint.delete();

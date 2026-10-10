@@ -3,7 +3,7 @@ package es.digimap.thor;
 import java.io.File;
 
 final class StartupFlow {
-  static final int WELCOME = 0, BIOS = 1, GAME = 2, READY = 3, HOME = 4;
+  static final int LANGUAGE = -1, WELCOME = 0, BIOS = 1, GAME = 2, READY = 3, HOME = 4;
 
   static boolean biosReady(String path) {
     File file = new File(path);

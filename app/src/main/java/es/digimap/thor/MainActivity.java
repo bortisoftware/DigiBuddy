@@ -128,6 +128,7 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
     getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     fullscreen(getWindow().getDecorView());
     prefs = getSharedPreferences("digimap", MODE_PRIVATE);
+    AppLanguage.apply(this, prefs);
     controllerBindings = new ControllerBindings(prefs);
     inputManager = (android.hardware.input.InputManager) getSystemService(INPUT_SERVICE);
     if (inputManager != null) inputManager.registerInputDeviceListener(inputDeviceListener, ui);
@@ -226,7 +227,11 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
                         .getAbsolutePath());
             session.ram = NativeCore.memory();
             ui.post(
-                () -> showMessage(ok ? "Partida restaurada" : "No se pudo restaurar la partida"));
+                () ->
+                    showMessage(
+                        ok
+                            ? AppLanguage.text("text_game_restored")
+                            : AppLanguage.text("text_could_not_restore_the_game")));
           });
     if ("ram".equals(action))
       session.command(
@@ -241,7 +246,10 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
       panel.select(Math.max(0, Math.min(7, intent.getIntExtra("devTab", 0))));
     if ("confirm".equals(action) && panel != null) {
       panel.select(7);
-      confirmAction(Cheats.LABELS[0], Cheats.DESCRIPTIONS[0], () -> applyCheat(0));
+      confirmAction(
+          AppLanguage.catalogText(Cheats.LABELS[0]),
+          AppLanguage.catalogText(Cheats.DESCRIPTIONS[0]),
+          () -> applyCheat(0));
     }
     if ("itemConfirm".equals(action) && panel != null) {
       panel.select(1);
@@ -277,7 +285,7 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
       profiles.addAll(ProfileLoader.load(getAssets()));
     } catch (Exception ex) {
       android.util.Log.w("DigiBuddy", "profile_load_failed: " + ex.getClass().getSimpleName());
-      showMessage("No se pudieron leer los perfiles de la aplicación.");
+      showMessage(AppLanguage.text("text_could_not_read_the_app_s_profiles"));
     }
   }
 
@@ -285,9 +293,7 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
     String serial = prefs.getString("serial", "");
     for (GameData.Profile p : profiles) {
       if (p.id.equals("us") && !serial.equals("SLUS-01032")) continue;
-      if (p.id.equals("jp")) {
-        if (!p.signatureHashes.isEmpty() && GameData.signatureMatches(ram, p)) return p;
-      } else if (GameData.decode(ram, p).valid) return p;
+      if (!p.signatureHashes.isEmpty() && GameData.signatureMatches(ram, p)) return p;
     }
     return null;
   }
@@ -345,7 +351,9 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
         if (secondary != null) secondary.dismiss();
         secondary = null;
         singleScreen();
-        showMessage("No se pudo abrir la segunda pantalla. Usa Pantallas para elegir otra.");
+        showMessage(
+            AppLanguage.text(
+                "text_could_not_open_the_second_screen_use_screens_to_select_another_one"));
       }
     } else singleScreen();
   }
@@ -391,6 +399,10 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
         new StartupView(
             context,
             new StartupView.Actions() {
+              public void chooseLanguage(String language) {
+                changeLanguage(language);
+              }
+
               public void next() {
                 prefs.edit().putInt("setupStep", 1).apply();
                 updateStartupViews();
@@ -464,6 +476,7 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
   }
 
   private int startupStep() {
+    if (!prefs.contains(AppLanguage.PREFERENCE)) return StartupFlow.LANGUAGE;
     return StartupFlow.step(
         prefs.getInt("setupStep", 0),
         prefs.getBoolean("setupComplete", false),
@@ -471,14 +484,50 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
         StartupFlow.gameReady(prefs.getString("game", "")));
   }
 
+  private void changeLanguage(String choice) {
+    if (!"es".equals(choice) && !"en".equals(choice)) return;
+    prefs.edit().putString(AppLanguage.PREFERENCE, choice).apply();
+    AppLanguage.apply(this, prefs);
+    refreshLanguageViews();
+  }
+
+  private void refreshLanguageViews() {
+    snapshot = GameData.decode(lastRam, profile);
+    if (panelDialog != null) panelDialog.dismiss();
+    if (captureDialog != null) captureDialog.dismiss();
+    if (panel != null && panel.getParent() instanceof android.view.ViewGroup) {
+      Panel previous = panel;
+      android.view.ViewGroup parent = (android.view.ViewGroup) previous.getParent();
+      int index = parent.indexOfChild(previous);
+      android.view.ViewGroup.LayoutParams size = previous.getLayoutParams();
+      panel = new Panel(previous.ctx);
+      if (selectedTab == 6) {
+        panel.expandedSettings.add(AppLanguage.text("language_title"));
+        panel.select(6);
+      }
+      parent.removeView(previous);
+      parent.addView(panel, index, size);
+    }
+    updateStartupViews();
+  }
+
+  @Override
+  public void onConfigurationChanged(android.content.res.Configuration configuration) {
+    super.onConfigurationChanged(configuration);
+    if (prefs != null && "system".equals(AppLanguage.preference(prefs))) {
+      AppLanguage.apply(this, prefs);
+      refreshLanguageViews();
+    }
+  }
+
   private String startupCompatibility() {
     if ("b5ff9ed251bced70c20eb911eab8ac3e5b77d7a140983d3b5dc31decac4837af"
         .equals(prefs.getString("discHash", "")))
-      return "Edición de referencia reconocida: panel compatible.";
-    return "Edición: "
-        + prefs.getString("serial", "Desconocida")
-        + ". Los datos del panel se verificarán al entrar en la partida; otros parches pueden no"
-        + " ser compatibles.";
+      return AppLanguage.text("text_reference_edition_recognized_companion_panel_compatible");
+    return AppLanguage.text("text_edition")
+        + prefs.getString("serial", AppLanguage.text("text_unknown"))
+        + AppLanguage.text(
+            "text_the_companion_data_will_be_checked_when_you_enter_the_game_other_patches_may_be_incom");
   }
 
   private void updateStartupViews() {
@@ -500,10 +549,10 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
 
   private void confirmNewGame() {
     confirmAction(
-        "Nueva partida",
-        "Abrirás el juego desde el inicio. Perderás el progreso de la sesión que no hayas guardado."
-            + " Tus estados y tu tarjeta guardados se conservarán.",
-        "Abrir juego",
+        AppLanguage.text("text_new_game"),
+        AppLanguage.text(
+            "text_the_game_will_restart_from_the_beginning_unsaved_session_progress_will_be_lost_saved"),
+        AppLanguage.text("text_open_game"),
         this::restartFromBeginning);
   }
 
@@ -525,7 +574,8 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
               return;
             }
             if (++retries >= 50) {
-              showMessage("La sesión tarda en detenerse. Vuelve a intentarlo.");
+              showMessage(
+                  AppLanguage.text("text_the_session_is_taking_too_long_to_stop_try_again"));
               return;
             }
             ui.postDelayed(this, 100);
@@ -549,7 +599,7 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
   }
 
   private static String savedDate(File state) {
-    return new java.text.SimpleDateFormat("dd/MM/yyyy · HH:mm", Locale.getDefault())
+    return new java.text.SimpleDateFormat("dd/MM/yyyy · HH:mm", AppLanguage.locale())
         .format(new java.util.Date(state.lastModified()));
   }
 
@@ -607,7 +657,7 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
   private void pick(int request) {
     if (importing) return;
     if (session.running) {
-      showMessage("Detén la partida antes de cambiar la BIOS o el disco.");
+      showMessage(AppLanguage.text("text_stop_the_game_before_changing_the_bios_or_disc"));
       return;
     }
     Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
@@ -618,7 +668,7 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
 
   private void chooseState(boolean export) {
     if (!session.running || session.actionBusy) {
-      showMessage("Inicia el juego y espera a que termine cualquier acción.");
+      showMessage(AppLanguage.text("text_start_the_game_and_wait_for_any_action_to_finish"));
       return;
     }
     Intent intent =
@@ -641,11 +691,12 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
             stateTransfer.exportState(temporary, destination);
             temporary = null;
           } catch (java.io.IOException exception) {
-            ui.post(() -> showMessage("No se pudo preparar el estado actual."));
+            ui.post(
+                () -> showMessage(AppLanguage.text("text_could_not_prepare_the_current_state")));
           } finally {
             if (temporary != null) temporary.delete();
           }
-        })) showMessage("Espera a que termine la acción actual.");
+        })) showMessage(AppLanguage.text("text_wait_for_the_current_action_to_finish"));
   }
 
   private void exportCard(Uri destination) {
@@ -664,7 +715,8 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
                 ui.post(
                     () ->
                         showMessage(
-                            "No se pudo guardar la tarjeta actual. Exportación cancelada."));
+                            AppLanguage.text(
+                                "text_could_not_save_the_current_memory_card_export_cancelled")));
                 return;
               }
               try {
@@ -673,10 +725,16 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
               } catch (java.io.IOException | RuntimeException exception) {
                 android.util.Log.w(
                     "DigiBuddy", "card_snapshot_failed: " + exception.getClass().getSimpleName());
-                ui.post(() -> showMessage("No se pudo preparar la tarjeta para exportarla."));
+                ui.post(
+                    () ->
+                        showMessage(
+                            AppLanguage.text("text_could_not_prepare_the_memory_card_for_export")));
               }
             });
-    if (!queued) showMessage("Espera a que termine la acción actual para exportar la tarjeta.");
+    if (!queued)
+      showMessage(
+          AppLanguage.text(
+              "text_wait_for_the_current_action_to_finish_before_exporting_the_memory_card"));
   }
 
   @Override
@@ -690,7 +748,7 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
           () ->
               stateTransfer.importState(
                   source, session.saveFolder, engine, NativeCore.stateBytes())))
-        showMessage("Inicia la partida para importar un estado.");
+        showMessage(AppLanguage.text("text_start_the_game_to_import_a_state"));
       return;
     }
     if (request == 5) {
@@ -704,7 +762,7 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
     }
     if (importing || session.running || fileImporter == null) return;
     importing = true;
-    importStatus = "Importando…";
+    importStatus = AppLanguage.text("text_importing_2");
     if (!fileImporter.start(data.getData(), request == 1)) importFailed();
   }
 
@@ -730,14 +788,14 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
     profile = null;
     lastRam = null;
     snapshot = new GameData.Snapshot();
-    importStatus = "Importación completada";
+    importStatus = AppLanguage.text("text_import_complete");
     importing = false;
   }
 
   private void importFailed() {
-    importStatus = "Importación fallida";
+    importStatus = AppLanguage.text("text_import_failed");
     importing = false;
-    showMessage("No se pudo importar. Comprueba el formato y el tamaño del archivo.");
+    showMessage(AppLanguage.text("text_could_not_import_check_the_file_s_format_and_size"));
   }
 
   /** Callbacks keep only a weak Activity reference, including while a provider is blocked. */
@@ -756,7 +814,8 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
           () -> {
             MainActivity current = activity.get();
             if (current != null && !current.destroyed)
-              current.importStatus = "Importando: " + bytes / (1024 * 1024) + " MB";
+              current.importStatus =
+                  AppLanguage.text("text_importing") + bytes / (1024 * 1024) + " MB";
           });
     }
 
@@ -783,12 +842,12 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
     if (importing || session.running) return;
     if (startupStep() != StartupFlow.HOME) {
       updateStartupViews();
-      showMessage("Termina la configuración en la pantalla del juego.");
+      showMessage(AppLanguage.text("text_finish_setup_on_the_game_screen"));
       return;
     }
     String bios = prefs.getString("bios", ""), game = prefs.getString("game", "");
     if (!new File(bios).isFile() || !new File(game).isFile()) {
-      showMessage("Importa primero la BIOS y el juego desde la pestaña Ajustes.");
+      showMessage(AppLanguage.text("text_import_your_bios_and_game_first_from_settings"));
       return;
     }
     profile = null;
@@ -811,7 +870,8 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
               } catch (Exception ex) {
                 ui.post(
                     () -> {
-                      if (!destroyed) showMessage("No se pudieron leer los sprites del disco.");
+                      if (!destroyed)
+                        showMessage(AppLanguage.text("text_could_not_read_the_disc_s_sprites"));
                     });
               }
             },
@@ -826,13 +886,14 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
             .getAbsolutePath(),
         new File(bios).getParent(),
         save.getAbsolutePath(),
-        game)) showMessage("Espera a que termine de cerrarse la sesión anterior.");
+        game))
+      showMessage(AppLanguage.text("text_wait_for_the_previous_session_to_finish_closing"));
     cheatBackup = null;
   }
 
   private void resumeGame() {
     if (session.actionBusy) {
-      showMessage("Espera a que termine la acción actual.");
+      showMessage(AppLanguage.text("text_wait_for_the_current_action_to_finish"));
       return;
     }
     File folder = startupSaveFolder();
@@ -841,14 +902,16 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
             ? null
             : StartupFlow.latestState(folder, prefs.getString("engine", "swan-gl"));
     if (latest == null) {
-      showMessage("Todavía no hay una sesión guardada para este juego y emulador.");
+      showMessage(
+          AppLanguage.text("text_there_is_no_saved_session_for_this_game_and_emulator_yet"));
       return;
     }
     if (session.running) {
       confirmAction(
-          "Continuar estado del " + savedDate(latest),
-          "Se sustituirá la sesión actual. Perderás el progreso que no hayas guardado.",
-          "Continuar",
+          AppLanguage.text("text_continue_state_from") + savedDate(latest),
+          AppLanguage.text(
+              "text_the_current_session_will_be_replaced_unsaved_progress_will_be_lost"),
+          AppLanguage.text("text_continue"),
           () -> restoreSession(latest));
       return;
     }
@@ -864,7 +927,10 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
           session.ram = NativeCore.memory();
           ui.post(
               () ->
-                  showMessage(ok ? "Sesión reanudada" : "No se pudo restaurar la última sesión."));
+                  showMessage(
+                      ok
+                          ? AppLanguage.text("text_session_resumed")
+                          : AppLanguage.text("text_could_not_restore_the_latest_session")));
         });
   }
 
@@ -905,13 +971,14 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
   }
 
   private void togglePause() {
-    if (session.actionBusy) showMessage("Espera a que termine la acción actual.");
+    if (session.actionBusy)
+      showMessage(AppLanguage.text("text_wait_for_the_current_action_to_finish"));
     else session.paused = !session.paused;
   }
 
   private void confirmItem(GameData.Item item) {
     if (session.actionBusy) {
-      showMessage("Espera a que termine la acción actual.");
+      showMessage(AppLanguage.text("text_wait_for_the_current_action_to_finish"));
       return;
     }
     String reason = ItemUse.unavailable(session.ram, profile, item.slot, item.id);
@@ -919,18 +986,20 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
     showDetailsDialog(
         item.name,
         atlas != null ? atlas.item(item.id, lastRam, profile) : null,
-        "En la bolsa: "
+        AppLanguage.text("text_in_your_bag")
             + item.count
             + "\n\n"
             + ItemDescriptions.effect(item.id)
             + "\n\n"
-            + (reason == null ? "Se usará una unidad dentro del juego." : reason),
-        "Usar 1",
+            + (reason == null
+                ? AppLanguage.text("text_one_unit_will_be_used_in_the_game")
+                : reason),
+        AppLanguage.text("text_use_1"),
         reason == null,
         () -> {
           if (session.useItem(current, item.slot, item.id))
-            showMessage("Usando " + item.name + "…");
-          else showMessage("Espera a que termine la acción actual.");
+            showMessage(AppLanguage.text("text_using") + item.name + "…");
+          else showMessage(AppLanguage.text("text_wait_for_the_current_action_to_finish"));
         });
   }
 
@@ -938,10 +1007,13 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
     showDetailsDialog(
         evolution.name,
         atlas != null ? atlas.mon(evolution.type, lastRam, profile) : null,
-        (evolution.candidate ? "Requisitos cumplidos" : "Requisitos pendientes")
+        (evolution.candidate
+                ? AppLanguage.text("text_requirements_met")
+                : AppLanguage.text("text_requirements_pending"))
             + "\n\n"
             + evolution.details
-            + "\nLa evolución natural también depende del reloj y de los eventos del juego.",
+            + AppLanguage.text(
+                "text_natural_evolution_also_depends_on_the_in_game_clock_and_events"),
         "Evolucionar…",
         evolution.candidate,
         () -> confirmEvolution(evolution));
@@ -987,7 +1059,8 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
         new LinearLayout.LayoutParams(-1, Math.min(available, explanation.getMeasuredHeight())));
     LinearLayout buttons = new LinearLayout(panel.ctx);
     buttons.addView(
-        button(panel.ctx, "Cerrar", dialog::dismiss), new LinearLayout.LayoutParams(0, dp(48), 1));
+        button(panel.ctx, AppLanguage.text("text_close"), dialog::dismiss),
+        new LinearLayout.LayoutParams(0, dp(48), 1));
     Button apply =
         button(
             panel.ctx,
@@ -1008,7 +1081,7 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
 
   private void confirmEvolution(GameData.Evolution evo) {
     if (session.actionBusy) {
-      showMessage("Espera a que termine la acción actual.");
+      showMessage(AppLanguage.text("text_wait_for_the_current_action_to_finish"));
       return;
     }
     int source = snapshot.type;
@@ -1019,21 +1092,20 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
       return;
     }
     confirmAction(
-        "Evolucionar a " + evo.name,
-        "Cumples los requisitos. Se adelantará esta evolución sin esperar al reloj del juego. Verás"
-            + " la animación original. Podrás volver a la forma anterior sin retroceder la"
-            + " partida.",
-        "Evolucionar",
+        AppLanguage.text("text_evolve_into") + evo.name,
+        AppLanguage.text(
+            "text_you_meet_the_requirements_this_evolution_will_be_triggered_without_waiting_for_the_in"),
+        AppLanguage.text("text_evolve"),
         () -> {
           if (session.evolve(current, source, evo.type, prefs.getString("engine", "swan-gl"))) {
-            showMessage("Evolucionando a " + evo.name + "…");
-          } else showMessage("Espera a que termine la acción actual.");
+            showMessage(AppLanguage.text("text_evolving_into") + evo.name + "…");
+          } else showMessage(AppLanguage.text("text_wait_for_the_current_action_to_finish"));
         });
   }
 
   private void undoEvolution() {
     if (session.actionBusy) {
-      showMessage("Espera a que termine la acción actual.");
+      showMessage(AppLanguage.text("text_wait_for_the_current_action_to_finish"));
       return;
     }
     String engine = prefs.getString("engine", "swan-gl");
@@ -1044,24 +1116,23 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
       showMessage(reason);
       return;
     }
-    String previousName = DataNames.DIGIMON[history.source];
+    String previousName = AppLanguage.catalogText(DataNames.DIGIMON[history.source]);
     confirmAction(
-        "Volver a " + previousName,
-        "Verás la animación del juego para volver a tu forma anterior."
-            + " Conservarás los atributos y cuidados actuales, la bolsa y el progreso del pueblo."
-            + " El tiempo en esta etapa se reiniciará para evitar otra evolución inmediata.",
-        "Deshacer",
+        AppLanguage.text("text_return_to") + previousName,
+        AppLanguage.text(
+            "text_you_will_see_the_in_game_animation_to_return_to_your_previous_form_current_stats_care"),
+        AppLanguage.text("text_undo"),
         () -> {
           if (session.reverseEvolution(currentProfile, history, engine))
-            showMessage("Volviendo a " + previousName + "…");
-          else showMessage("Espera a que termine la acción actual.");
+            showMessage(AppLanguage.text("text_returning_to") + previousName + "…");
+          else showMessage(AppLanguage.text("text_wait_for_the_current_action_to_finish"));
         });
   }
 
   private void applyCheat(int id) {
     if (id < 0 || id >= Cheats.LABELS.length) return;
     if (!session.running || profile == null || !snapshot.valid) {
-      showMessage("Entra en una partida reconocida antes de aplicar trucos.");
+      showMessage(AppLanguage.text("text_enter_a_recognized_game_session_before_applying_cheats"));
       return;
     }
     GameData.Profile current = profile;
@@ -1070,13 +1141,18 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
           byte[] ram = NativeCore.memory();
           GameData.Snapshot state = GameData.decode(ram, current);
           if (!state.valid) {
-            ui.post(() -> showMessage("La partida está cambiando de escena. Prueba de nuevo."));
+            ui.post(
+                () -> showMessage(AppLanguage.text("text_the_game_is_changing_scenes_try_again")));
             return;
           }
           File backup =
               new File(session.saveFolder, "before-cheat-" + System.currentTimeMillis() + ".state");
           if (!NativeCore.saveState(backup.getAbsolutePath())) {
-            ui.post(() -> showMessage("No se pudo crear el respaldo; el truco no se ha aplicado."));
+            ui.post(
+                () ->
+                    showMessage(
+                        AppLanguage.text(
+                            "text_could_not_create_the_backup_the_cheat_was_not_applied")));
             return;
           }
           cheatBackup = backup;
@@ -1108,13 +1184,16 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
           ui.post(
               () ->
                   showMessage(
-                      result ? "Aplicado: " + Cheats.LABELS[id] : "No se pudo aplicar el truco"));
+                      result
+                          ? AppLanguage.text("text_applied")
+                              + AppLanguage.catalogText(Cheats.LABELS[id])
+                          : AppLanguage.text("text_could_not_apply_the_cheat")));
         });
   }
 
   private void undoCheat() {
     if (!session.running || session.saveFolder == null) {
-      showMessage("Inicia una partida primero.");
+      showMessage(AppLanguage.text("text_start_a_game_first"));
       return;
     }
     String engine = prefs.getString("engine", "swan-gl");
@@ -1124,24 +1203,29 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
     }
     File backup = cheatBackup;
     if (backup == null || !session.saveFolder.equals(backup.getParentFile())) {
-      showMessage("No hay un truco que deshacer en esta partida.");
+      showMessage(AppLanguage.text("text_there_is_no_cheat_to_undo_in_this_game_session"));
       return;
     }
     session.command(
         () -> {
           boolean ok = NativeCore.loadState(backup.getAbsolutePath());
           session.ram = NativeCore.memory();
-          ui.post(() -> showMessage(ok ? "Truco deshecho" : "No se pudo restaurar el estado"));
+          ui.post(
+              () ->
+                  showMessage(
+                      ok
+                          ? AppLanguage.text("text_cheat_undone")
+                          : AppLanguage.text("text_could_not_restore_the_state")));
         });
   }
 
   private void confirmAction(String title, String description, Runnable apply) {
-    confirmAction(title, description, "Aplicar", apply);
+    confirmAction(title, description, AppLanguage.text("text_apply"), apply);
   }
 
   private void confirmAction(String title, String description, String positive, Runnable apply) {
     if (session.actionBusy) {
-      showMessage("Espera a que termine la acción actual.");
+      showMessage(AppLanguage.text("text_wait_for_the_current_action_to_finish"));
       return;
     }
     if (panel == null || (panelDialog != null && panelDialog.isShowing())) return;
@@ -1150,13 +1234,18 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
     box.setOrientation(LinearLayout.VERTICAL);
     box.setPadding(dp(20), dp(18), dp(20), dp(18));
     box.setBackground(card(RetroSkin.PAPER, 0));
-    box.addView(text(panel.ctx, "¿" + title + "?", 18, RetroSkin.INK));
+    box.addView(
+        text(
+            panel.ctx,
+            ("es".equals(AppLanguage.locale().getLanguage()) ? "¿" : "") + title + "?",
+            18,
+            RetroSkin.INK));
     TextView explanation = text(panel.ctx, description, 14, MUTED);
     explanation.setPadding(0, dp(14), 0, dp(18));
     box.addView(explanation);
     LinearLayout choices = new LinearLayout(panel.ctx);
     choices.addView(
-        button(panel.ctx, "Cancelar", dialog::dismiss),
+        button(panel.ctx, AppLanguage.text("text_cancel"), dialog::dismiss),
         new LinearLayout.LayoutParams(0, dp(48), 1));
     LinearLayout.LayoutParams size = new LinearLayout.LayoutParams(0, dp(48), 1);
     size.leftMargin = dp(10);
@@ -1230,7 +1319,7 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
       fullscreen(window.getDecorView());
     } catch (RuntimeException ex) {
       dialog.dismiss();
-      showMessage("No se pudo abrir la ventana.");
+      showMessage(AppLanguage.text("text_could_not_open_the_window"));
     }
   }
 
@@ -1241,7 +1330,7 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
     try {
       installed = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
     } catch (Exception exception) {
-      if (manual) showMessage("No se pudo consultar la versión.");
+      if (manual) showMessage(AppLanguage.text("text_could_not_check_the_version"));
       return;
     }
     WeakReference<MainActivity> activity = new WeakReference<>(this);
@@ -1259,7 +1348,8 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
                         return;
                       }
                       if (result.version.isEmpty()) {
-                        if (manual) owner.showMessage("No hay actualizaciones nuevas.");
+                        if (manual)
+                          owner.showMessage(AppLanguage.text("text_no_updates_available"));
                         return;
                       }
                       boolean alreadyShown =
@@ -1270,7 +1360,11 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
                       owner.updateNoticeShown = !manual && alreadyShown;
                       owner.showUpdateNotice();
                     }));
-    if (manual) showMessage(started ? "Buscando actualizaciones…" : "Ya se está comprobando.");
+    if (manual)
+      showMessage(
+          started
+              ? AppLanguage.text("text_checking_for_updates")
+              : AppLanguage.text("text_already_checking"));
   }
 
   private void showUpdateNotice() {
@@ -1287,18 +1381,23 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
     box.setOrientation(LinearLayout.VERTICAL);
     box.setPadding(dp(20), dp(18), dp(20), dp(18));
     box.setBackground(card(RetroSkin.PAPER, 0));
-    box.addView(text(panel.ctx, "DigiBuddy " + update.version + " disponible", 20, RetroSkin.INK));
     box.addView(
         text(
             panel.ctx,
-            "La APK se descargará aquí y se comprobará antes de abrir el instalador de Android."
-                + " Guarda tu progreso antes de actualizar. Tus archivos permanecen en la app.",
+            "DigiBuddy " + update.version + AppLanguage.text("text_available"),
+            20,
+            RetroSkin.INK));
+    box.addView(
+        text(
+            panel.ctx,
+            AppLanguage.text(
+                "text_the_apk_will_download_here_and_be_verified_before_opening_android_s_installer_save_yo"),
             14,
             MUTED));
     box.addView(
         button(
             panel.ctx,
-            "Actualizar",
+            AppLanguage.text("text_update"),
             () -> {
               dialog.dismiss();
               downloadUpdate(update);
@@ -1306,7 +1405,7 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
     box.addView(
         button(
             panel.ctx,
-            "Cancelar",
+            AppLanguage.text("text_cancel"),
             () -> {
               dialog.dismiss();
             }));
@@ -1321,12 +1420,16 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
     box.setPadding(dp(20), dp(18), dp(20), dp(18));
     box.setBackground(card(RetroSkin.PAPER, 0));
     TextView progress =
-        text(panel.ctx, "Descargando DigiBuddy " + update.version + "…", 18, RetroSkin.INK);
+        text(
+            panel.ctx,
+            AppLanguage.text("text_downloading_digibuddy") + update.version + "…",
+            18,
+            RetroSkin.INK);
     box.addView(progress);
     box.addView(
         button(
             panel.ctx,
-            "Cancelar",
+            AppLanguage.text("text_cancel"),
             () -> {
               if (apkDownloader != null) apkDownloader.close();
               apkDownloader = null;
@@ -1347,7 +1450,9 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
                   MainActivity owner = activity.get();
                   if (owner != null && !owner.destroyed && owner.apkDownloader == downloader)
                     progress.setText(
-                        percent == 100 ? "Comprobando APK…" : "Descargando… " + percent + "%");
+                        percent == 100
+                            ? AppLanguage.text("text_verifying_apk")
+                            : AppLanguage.text("text_downloading") + percent + "%");
                 });
           }
 
@@ -1361,7 +1466,8 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
                   owner.apkDownloader = null;
                   dialog.dismiss();
                   if (apk == null) {
-                    owner.showMessage("No se pudo descargar o verificar la APK. Prueba de nuevo.");
+                    owner.showMessage(
+                        AppLanguage.text("text_could_not_download_or_verify_the_apk_try_again"));
                     return;
                   }
                   owner.pendingInstall = apk;
@@ -1379,18 +1485,23 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
       box.setOrientation(LinearLayout.VERTICAL);
       box.setPadding(dp(20), dp(18), dp(20), dp(18));
       box.setBackground(card(RetroSkin.PAPER, 0));
-      box.addView(text(panel.ctx, "Permitir instalación desde DigiBuddy", 19, RetroSkin.INK));
       box.addView(
           text(
               panel.ctx,
-              "La APK está verificada. Android necesita que permitas instalar actualizaciones desde"
-                  + " DigiBuddy. Activa el permiso y vuelve atrás.",
+              AppLanguage.text("text_allow_installation_from_digibuddy"),
+              19,
+              RetroSkin.INK));
+      box.addView(
+          text(
+              panel.ctx,
+              AppLanguage.text(
+                  "text_the_apk_is_verified_android_needs_your_permission_to_install_updates_from_digibuddy_e"),
               14,
               MUTED));
       box.addView(
           button(
               panel.ctx,
-              "Abrir permiso",
+              AppLanguage.text("text_open_permission_settings"),
               () -> {
                 dialog.dismiss();
                 try {
@@ -1401,13 +1512,14 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
                           Uri.parse("package:" + getPackageName())));
                 } catch (RuntimeException failure) {
                   awaitingInstallPermission = false;
-                  showMessage("No se pudo abrir el permiso de instalación.");
+                  showMessage(
+                      AppLanguage.text("text_could_not_open_the_installation_permission_settings"));
                 }
               }));
       box.addView(
           button(
               panel.ctx,
-              "Cancelar",
+              AppLanguage.text("text_cancel"),
               () -> {
                 pendingInstall = null;
                 dialog.dismiss();
@@ -1423,7 +1535,7 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
       startActivity(installer);
       pendingInstall = null;
     } catch (RuntimeException failure) {
-      showMessage("No se pudo abrir el instalador de Android.");
+      showMessage(AppLanguage.text("text_could_not_open_android_s_installer"));
     }
   }
 
@@ -1442,15 +1554,16 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
     clue.setPadding(0, dp(14), 0, dp(14));
     box.addView(clue);
     if (!hint.requirements.isEmpty())
-      box.addView(text(panel.ctx, "Antes necesitas: " + hint.requirements, 14, MUTED));
+      box.addView(
+          text(panel.ctx, AppLanguage.text("text_first_you_need") + hint.requirements, 14, MUTED));
     box.addView(
         text(
             panel.ctx,
-            "Pista de un reclutamiento pendiente. Algunos encuentros dependen de horarios y"
-                + " eventos.",
+            AppLanguage.text(
+                "text_a_hint_for_a_pending_recruitment_some_encounters_depend_on_time_and_events"),
             12,
             MUTED));
-    box.addView(button(panel.ctx, "Cerrar", dialog::dismiss));
+    box.addView(button(panel.ctx, AppLanguage.text("text_close"), dialog::dismiss));
     showPanelDialog(dialog, box);
   }
 
@@ -1466,15 +1579,24 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
     box.setOrientation(LinearLayout.VERTICAL);
     box.setPadding(dp(16), dp(14), dp(16), dp(14));
     box.setBackground(card(RetroSkin.PAPER, 0));
-    box.addView(text(panel.ctx, "¿Qué Digimon quieres consultar?", 17, RetroSkin.INK));
+    box.addView(
+        text(
+            panel.ctx,
+            AppLanguage.text("text_which_digimon_would_you_like_to_check"),
+            17,
+            RetroSkin.INK));
     ScrollView scroll = new ScrollView(panel.ctx);
     LinearLayout choices = new LinearLayout(panel.ctx);
     choices.setOrientation(LinearLayout.VERTICAL);
     for (GameData.Enemy enemy : enemies) {
       String detail =
           enemy.recruitType > 0
-              ? "Reclutable"
-              : enemy.difficulty == 0 ? "Fácil" : enemy.difficulty == 1 ? "Igualado" : "Difícil";
+              ? AppLanguage.text("text_recruitable")
+              : enemy.difficulty == 0
+                  ? AppLanguage.text("text_easy")
+                  : enemy.difficulty == 1
+                      ? AppLanguage.text("text_even_match")
+                      : AppLanguage.text("text_hard");
       Button choice =
           button(
               panel.ctx,
@@ -1504,7 +1626,7 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
         scroll,
         new LinearLayout.LayoutParams(
             -1, Math.min(dp(48) * enemies.size(), Math.max(dp(48), panel.getHeight() - dp(170)))));
-    box.addView(button(panel.ctx, "Cerrar", dialog::dismiss));
+    box.addView(button(panel.ctx, AppLanguage.text("text_close"), dialog::dismiss));
     showPanelDialog(dialog, box);
   }
 
@@ -1537,7 +1659,14 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
     }
     heading.addView(text(panel.ctx, enemy.name, 20, RetroSkin.INK));
     box.addView(heading);
-    String[] labels = {"PV", "PM", "Ataque", "Defensa", "Velocidad", "Inteligencia"};
+    String[] labels = {
+      AppLanguage.text("text_hp"),
+      AppLanguage.text("text_mp"),
+      AppLanguage.text("text_offense"),
+      AppLanguage.text("text_defense"),
+      AppLanguage.text("text_speed"),
+      AppLanguage.text("text_brains")
+    };
     String[] values = {
       enemy.hp + " / " + enemy.maxHp,
       enemy.mp >= 0 && enemy.maxMp >= enemy.mp ? enemy.mp + " / " + enemy.maxMp : "—",
@@ -1561,16 +1690,19 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
     TextView risk =
         text(
             panel.ctx,
-            "Combate estimado: "
+            AppLanguage.text("text_estimated_battle")
                 + (enemy.difficulty == 0
-                    ? "fácil"
-                    : enemy.difficulty == 1 ? "igualado" : "difícil"),
+                    ? AppLanguage.text("text_easy_2")
+                    : enemy.difficulty == 1
+                        ? AppLanguage.text("text_even_match_2")
+                        : AppLanguage.text("text_hard_2")),
             14,
             MUTED);
     risk.setPadding(0, dp(12), 0, dp(16));
     box.addView(risk);
     box.addView(
-        button(panel.ctx, "Cerrar", dialog::dismiss), new LinearLayout.LayoutParams(-1, dp(48)));
+        button(panel.ctx, AppLanguage.text("text_close"), dialog::dismiss),
+        new LinearLayout.LayoutParams(-1, dp(48)));
     showPanelDialog(dialog, box);
   }
 
@@ -1581,15 +1713,15 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
       if (d.getDisplayId() != current.getDisplayId()) choices.add(d);
     if (choices.isEmpty()) {
       showMessage(
-          "Android no presenta una segunda pantalla disponible. En Thor, activa su segunda pantalla"
-              + " y vuelve a pulsar Pantallas.");
+          AppLanguage.text(
+              "text_android_does_not_report_an_available_second_screen_on_thor_enable_the_second_screen_a"));
       return;
     }
     String[] labels = new String[choices.size()];
     for (int i = 0; i < labels.length; i++)
       labels[i] = choices.get(i).getName() + " · ID " + choices.get(i).getDisplayId();
     new AlertDialog.Builder(this)
-        .setTitle("Pantalla secundaria")
+        .setTitle(AppLanguage.text("text_second_screen"))
         .setItems(
             labels,
             (dialog, index) -> {
@@ -1654,7 +1786,7 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
     box.setOrientation(LinearLayout.VERTICAL);
     box.setPadding(dp(16), dp(14), dp(16), dp(14));
     box.setBackground(card(RetroSkin.PAPER, 0));
-    box.addView(text(panel.ctx, "Remapear botones", 18, RetroSkin.INK));
+    box.addView(text(panel.ctx, AppLanguage.text("text_remap_buttons"), 18, RetroSkin.INK));
     List<android.view.InputDevice> devices = new ArrayList<>();
     List<String> names = new ArrayList<>();
     for (int id : android.view.InputDevice.getDeviceIds()) {
@@ -1690,7 +1822,8 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
     controllerStatus =
         text(
             panel.ctx,
-            "Toca un botón del mando y pulsa el botón físico que quieras usar.",
+            AppLanguage.text(
+                "text_tap_a_controller_button_then_press_the_physical_button_you_want_to_use"),
             13,
             MUTED);
     controllerView = new ControllerView(panel.ctx, this::showControllerCapture);
@@ -1699,11 +1832,11 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
     box.addView(
         button(
             panel.ctx,
-            "Restaurar controles de este mando",
+            AppLanguage.text("text_reset_this_controller_s_bindings"),
             () -> {
               controllerBindings.reset(mappingDevice);
               cancelControllerCapture();
-              controllerStatus.setText("Controles predeterminados restaurados.");
+              controllerStatus.setText(AppLanguage.text("text_default_controls_restored"));
             }));
     ScrollView scroll = new ScrollView(panel.ctx);
     scroll.addView(box);
@@ -1712,7 +1845,8 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
     layout.setBackground(card(RetroSkin.PAPER, 0));
     layout.addView(scroll, new LinearLayout.LayoutParams(-1, 0, 1));
     layout.addView(
-        button(panel.ctx, "Cerrar", dialog::dismiss), new LinearLayout.LayoutParams(-1, dp(48)));
+        button(panel.ctx, AppLanguage.text("text_close"), dialog::dismiss),
+        new LinearLayout.LayoutParams(-1, dp(48)));
     showPanelDialog(dialog, layout);
     if (dialog.isShowing())
       dialog
@@ -1733,7 +1867,8 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
     if (controllerView != null) controllerView.selected(-1);
     if (replaceBinding != null) replaceBinding.setVisibility(View.GONE);
     if (controllerStatus != null)
-      controllerStatus.setText("Toca un botón del mando para cambiar su asignación.");
+      controllerStatus.setText(
+          AppLanguage.text("text_tap_a_controller_button_to_change_its_binding"));
   }
 
   private void showControllerCapture(int target) {
@@ -1752,22 +1887,28 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
     box.setPadding(dp(20), dp(18), dp(20), dp(18));
     box.setBackground(card(RetroSkin.PAPER, 0));
     box.addView(
-        text(panel.ctx, "Asignar «" + ControllerBindings.LABELS[target] + "»", 20, RetroSkin.INK));
+        text(
+            panel.ctx,
+            AppLanguage.text("text_assign") + ControllerBindings.LABELS[target] + "»",
+            20,
+            RetroSkin.INK));
     captureStatus =
         text(
             panel.ctx,
-            "Actual: "
+            AppLanguage.text("text_current_2")
                 + controllerBindings.description(mappingDevice, target)
-                + "\n\nPulsa el botón físico o mueve la dirección que quieras usar.",
+                + AppLanguage.text(
+                    "text_press_the_physical_button_or_move_the_direction_you_want_to_use"),
             15,
             MUTED);
     captureStatus.setPadding(0, dp(16), 0, dp(18));
     box.addView(captureStatus);
     LinearLayout actions = new LinearLayout(panel.ctx);
     actions.addView(
-        button(panel.ctx, "Cancelar", this::cancelControllerCapture),
+        button(panel.ctx, AppLanguage.text("text_cancel"), this::cancelControllerCapture),
         new LinearLayout.LayoutParams(0, dp(48), 1));
-    replaceBinding = button(panel.ctx, "Reasignar", this::applyControllerCapture);
+    replaceBinding =
+        button(panel.ctx, AppLanguage.text("text_reassign"), this::applyControllerCapture);
     replaceBinding.setVisibility(View.GONE);
     actions.addView(replaceBinding, new LinearLayout.LayoutParams(0, dp(48), 1));
     box.addView(actions);
@@ -1777,16 +1918,18 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
   private void captureControllerInput(android.view.InputDevice device, String source) {
     if (captureTarget < 0 || pendingSource != null) return;
     if (!mappingDevice.equals(ControllerBindings.device(device))) {
-      captureStatus.setText("Ese botón pertenece a otro dispositivo. Usa el mando seleccionado.");
+      captureStatus.setText(
+          AppLanguage.text(
+              "text_that_button_belongs_to_another_device_use_the_selected_controller"));
       return;
     }
     pendingSource = source;
     int previous = controllerBindings.binding(mappingDevice, source);
     if (previous >= 0 && previous != captureTarget) {
       captureStatus.setText(
-          "Este botón ya controla «"
+          AppLanguage.text("text_this_button_already_controls")
               + ControllerBindings.LABELS[previous]
-              + "». ¿Reasignarlo a «"
+              + AppLanguage.text("text_reassign_it_to")
               + ControllerBindings.LABELS[captureTarget]
               + "»?");
       replaceBinding.setVisibility(View.VISIBLE);
@@ -1798,7 +1941,7 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
     String label = ControllerBindings.LABELS[captureTarget];
     controllerBindings.assign(mappingDevice, pendingSource, captureTarget);
     cancelControllerCapture();
-    controllerStatus.setText("«" + label + "» guardado para este mando.");
+    controllerStatus.setText("«" + label + AppLanguage.text("text_saved_for_this_controller"));
   }
 
   @Override
@@ -1820,7 +1963,7 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
   @Override
   public void onBackPressed() {
     if (session.actionBusy) {
-      showMessage("Espera a que termine la acción actual.");
+      showMessage(AppLanguage.text("text_wait_for_the_current_action_to_finish"));
       return;
     }
     if (panelDialog != null && panelDialog.isShowing()) {
@@ -1833,14 +1976,19 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
     }
     if (panel == null) return;
     panel.content.removeAllViews();
-    panel.section("¿SALIR DE DIGIBUDDY?");
+    panel.section(AppLanguage.text("text_exit_digibuddy"));
     panel.content.addView(
-        text(panel.ctx, "La tarjeta de memoria se guardará al salir.", 15, RetroSkin.INK));
-    panel.content.addView(button(panel.ctx, "Seguir jugando", () -> panel.select(0)));
+        text(
+            panel.ctx,
+            AppLanguage.text("text_the_memory_card_will_be_saved_on_exit"),
+            15,
+            RetroSkin.INK));
+    panel.content.addView(
+        button(panel.ctx, AppLanguage.text("text_keep_playing"), () -> panel.select(0)));
     panel.content.addView(
         button(
             panel.ctx,
-            "Guardar y salir",
+            AppLanguage.text("text_save_and_exit"),
             () -> {
               session.command(
                   () -> {
@@ -1883,7 +2031,7 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
       if (getPackageManager().canRequestPackageInstalls()) installDownloadedUpdate();
       else {
         pendingInstall = null;
-        showMessage("Instalación cancelada: permiso no concedido.");
+        showMessage(AppLanguage.text("text_installation_cancelled_permission_not_granted"));
       }
     }
     checkUpdates(false);
@@ -1963,7 +2111,7 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
       title = text(ctx, "DIGIBUDDY", 20, Color.WHITE);
       title.setTypeface(null, android.graphics.Typeface.BOLD);
       identity.addView(title);
-      status = text(ctx, "Tu compañero, en directo", 11, MUTED);
+      status = text(ctx, AppLanguage.text("text_your_partner_live"), 11, MUTED);
       status.setMaxLines(1);
       status.setEllipsize(android.text.TextUtils.TruncateAt.END);
       identity.addView(status);
@@ -1978,7 +2126,7 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
               });
       playButton = play;
       header.addView(play, new LinearLayout.LayoutParams(dp(48), dp(48)));
-      Button gear = button(ctx, "Ajustes", () -> select(6));
+      Button gear = button(ctx, AppLanguage.text("text_settings"), () -> select(6));
       gear.setTextSize(11);
       LinearLayout.LayoutParams gearSize = new LinearLayout.LayoutParams(dp(80), dp(48));
       gearSize.leftMargin = dp(8);
@@ -1994,8 +2142,8 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
       summary.setPadding(dp(10), dp(6), dp(10), dp(5));
       summary.setBackground(card(RetroSkin.PAPER, 0));
       LinearLayout meters = new LinearLayout(ctx);
-      hpMeter = new RetroSkin.Meter(ctx, "PV", 0xff55a66b);
-      mpMeter = new RetroSkin.Meter(ctx, "PM", 0xff609fd2);
+      hpMeter = new RetroSkin.Meter(ctx, AppLanguage.text("text_hp"), 0xff55a66b);
+      mpMeter = new RetroSkin.Meter(ctx, AppLanguage.text("text_mp"), 0xff609fd2);
       meters.addView(hpMeter, new LinearLayout.LayoutParams(0, dp(34), 1));
       LinearLayout.LayoutParams mpSize = new LinearLayout.LayoutParams(0, dp(34), 1);
       mpSize.leftMargin = dp(12);
@@ -2028,7 +2176,14 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
       mapArea.addView(map, new FrameLayout.LayoutParams(-1, -1));
       mapArea.setVisibility(View.GONE);
       addView(mapArea, new LinearLayout.LayoutParams(-1, 0, 1));
-      String[] names = {"Compañero", "Bolsa", "Mapa", "Prosperidad", "Evolución", "Trucos"};
+      String[] names = {
+        AppLanguage.text("text_partner"),
+        AppLanguage.text("text_bag"),
+        AppLanguage.text("text_map"),
+        AppLanguage.text("text_prosperity"),
+        AppLanguage.text("text_evolution"),
+        AppLanguage.text("text_cheats")
+      };
       for (int rowIndex = 0; rowIndex < 2; rowIndex++) {
         LinearLayout row = new LinearLayout(ctx);
         LinearLayout.LayoutParams rowSize = new LinearLayout.LayoutParams(-1, dp(48));
@@ -2096,75 +2251,117 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
 
     void settings() {
       content.removeView(body);
-      LinearLayout saves = settingsGroup("Partidas");
-      saves.addView(text(ctx, "Estado del emulador · punto exacto de la sesión", 13, MUTED));
+      LinearLayout language = settingsGroup(AppLanguage.text("language_title"));
+      String[] languageChoices = {"es", "en"};
+      String[] languageLabels = {"Español", "English"};
+      android.widget.RadioGroup languageOptions = new android.widget.RadioGroup(ctx);
+      for (int index = 0; index < languageChoices.length; index++) {
+        android.widget.RadioButton option = new android.widget.RadioButton(ctx);
+        option.setId(index + 1);
+        option.setText(languageLabels[index]);
+        option.setTextColor(RetroSkin.INK);
+        option.setMinHeight(dp(48));
+        languageOptions.addView(option);
+        if (languageChoices[index].equals(AppLanguage.locale().getLanguage()))
+          languageOptions.check(index + 1);
+      }
+      languageOptions.setOnCheckedChangeListener(
+          (group, checked) -> {
+            if (checked >= 1 && checked <= languageChoices.length)
+              ui.post(() -> changeLanguage(languageChoices[checked - 1]));
+          });
+      language.addView(languageOptions);
+      language.addView(text(ctx, AppLanguage.text("language_game_note"), 12, MUTED));
+      LinearLayout saves = settingsGroup(AppLanguage.text("text_saves"));
+      saves.addView(
+          text(ctx, AppLanguage.text("text_emulator_state_exact_point_in_the_session"), 13, MUTED));
       File state = quickState();
       saves.addView(
           text(
               ctx,
               state != null && state.isFile()
-                  ? "Último estado manual: " + savedDate(state)
-                  : "No hay un estado manual guardado.",
+                  ? AppLanguage.text("text_last_manual_state") + savedDate(state)
+                  : AppLanguage.text("text_no_manual_state_saved"),
               12,
               MUTED));
-      saves.addView(button(ctx, "Guardar estado", this::saveQuickState));
-      saves.addView(button(ctx, "Cargar estado…", this::confirmLoadQuickState));
-      saves.addView(button(ctx, "Continuar última sesión", MainActivity.this::resumeGame));
-      saves.addView(button(ctx, "Exportar estado actual", () -> chooseState(true)));
-      saves.addView(button(ctx, "Importar estado", () -> chooseState(false)));
-      saves.addView(
-          text(
-              ctx,
-              "Los estados necesitan el mismo juego y núcleo. Importar conserva los anteriores.",
-              12,
-              MUTED));
-      saves.addView(text(ctx, "Tarjeta de memoria · guardado desde el juego", 13, MUTED));
+      saves.addView(button(ctx, AppLanguage.text("text_save_state"), this::saveQuickState));
+      saves.addView(button(ctx, AppLanguage.text("text_load_state"), this::confirmLoadQuickState));
       saves.addView(
           button(
               ctx,
-              "Cargar desde el menú del juego",
+              AppLanguage.text("text_continue_latest_session"),
+              MainActivity.this::resumeGame));
+      saves.addView(
+          button(ctx, AppLanguage.text("text_export_current_state"), () -> chooseState(true)));
+      saves.addView(button(ctx, AppLanguage.text("text_import_state"), () -> chooseState(false)));
+      saves.addView(
+          text(
+              ctx,
+              AppLanguage.text(
+                  "text_states_need_the_same_game_and_core_importing_keeps_the_previous_states"),
+              12,
+              MUTED));
+      saves.addView(
+          text(ctx, AppLanguage.text("text_memory_card_saves_made_in_the_game"), 13, MUTED));
+      saves.addView(
+          button(
+              ctx,
+              AppLanguage.text("text_load_from_the_game_s_menu"),
               () -> {
                 if (!session.running) {
                   startGame();
                   return;
                 }
                 confirmAction(
-                    "Abrir el menú del juego",
-                    "Se reiniciará el juego para cargar desde su tarjeta de memoria. Perderás el"
-                        + " progreso de la sesión que no hayas guardado.",
-                    "Abrir menú",
+                    AppLanguage.text("text_open_the_game_s_menu"),
+                    AppLanguage.text(
+                        "text_the_game_will_restart_to_load_from_your_memory_card_unsaved_session_progress_will_be"),
+                    AppLanguage.text("text_open_menu"),
                     MainActivity.this::restartFromBeginning);
               }));
-      saves.addView(button(ctx, "Exportar tarjeta de memoria", this::exportMemoryCard));
-      saves.addView(button(ctx, "Nueva partida", MainActivity.this::confirmNewGame));
-      saves.addView(button(ctx, "Detener y guardar tarjeta", this::stopGame));
-      graphicsSettings(settingsGroup("Gráficos y sonido"));
-      settingsGroup("Controles")
-          .addView(button(ctx, "Remapear botones", MainActivity.this::showControllerMapping));
-      LinearLayout screens = settingsGroup("Pantallas");
+      saves.addView(
+          button(ctx, AppLanguage.text("text_export_memory_card"), this::exportMemoryCard));
+      saves.addView(
+          button(ctx, AppLanguage.text("text_new_game"), MainActivity.this::confirmNewGame));
+      saves.addView(
+          button(ctx, AppLanguage.text("text_stop_and_save_memory_card"), this::stopGame));
+      graphicsSettings(settingsGroup(AppLanguage.text("text_graphics_and_sound")));
+      settingsGroup(AppLanguage.text("text_controls"))
+          .addView(
+              button(
+                  ctx,
+                  AppLanguage.text("text_remap_buttons"),
+                  MainActivity.this::showControllerMapping));
+      LinearLayout screens = settingsGroup(AppLanguage.text("text_screens"));
       screens.addView(
           button(
               ctx,
-              "Intercambiar pantallas",
+              AppLanguage.text("text_swap_screens"),
               () -> {
                 gameOnSecondary = !gameOnSecondary;
                 prefs.edit().putBoolean("gameOnSecondary", gameOnSecondary).apply();
                 rebuildScreens();
               }));
-      screens.addView(button(ctx, "Elegir pantalla secundaria", MainActivity.this::chooseDisplay));
-      LinearLayout files = settingsGroup("Archivos");
+      screens.addView(
+          button(
+              ctx,
+              AppLanguage.text("text_choose_second_screen"),
+              MainActivity.this::chooseDisplay));
+      LinearLayout files = settingsGroup(AppLanguage.text("text_files"));
       files.addView(
           text(
               ctx,
               "BIOS: "
-                  + (prefs.getString("bios", "").isEmpty() ? "pendiente" : "importada")
-                  + "\nJuego: "
-                  + prefs.getString("discName", "pendiente"),
+                  + (prefs.getString("bios", "").isEmpty()
+                      ? AppLanguage.text("text_not_added")
+                      : AppLanguage.text("text_imported"))
+                  + AppLanguage.text("text_game")
+                  + prefs.getString("discName", AppLanguage.text("text_not_added")),
               13,
               MUTED));
-      files.addView(button(ctx, "Cambiar BIOS", () -> pick(1)));
-      files.addView(button(ctx, "Cambiar juego", () -> pick(2)));
-      LinearLayout updates = settingsGroup("Actualizaciones");
+      files.addView(button(ctx, AppLanguage.text("text_change_bios"), () -> pick(1)));
+      files.addView(button(ctx, AppLanguage.text("text_change_game"), () -> pick(2)));
+      LinearLayout updates = settingsGroup(AppLanguage.text("text_updates"));
       try {
         updates.addView(
             text(
@@ -2174,8 +2371,14 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
                 RetroSkin.INK));
       } catch (android.content.pm.PackageManager.NameNotFoundException ignored) {
       }
-      toggle(updates, "Buscar al abrir la app", "automaticUpdates", true, false);
-      updates.addView(button(ctx, "Buscar actualizaciones ahora", () -> checkUpdates(true)));
+      toggle(
+          updates,
+          AppLanguage.text("text_check_when_the_app_opens"),
+          "automaticUpdates",
+          true,
+          false);
+      updates.addView(
+          button(ctx, AppLanguage.text("text_check_for_updates_now"), () -> checkUpdates(true)));
     }
 
     private LinearLayout settingsGroup(String name) {
@@ -2211,7 +2414,7 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
     private void saveQuickState() {
       File state = quickState();
       if (!session.running || state == null) {
-        showMessage("Inicia una partida primero.");
+        showMessage(AppLanguage.text("text_start_a_game_first"));
         return;
       }
       session.command(
@@ -2219,7 +2422,10 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
             boolean ok = NativeCore.saveState(state.getAbsolutePath());
             ui.post(
                 () -> {
-                  showMessage(ok ? "Estado guardado · " + savedDate(state) : "No se pudo guardar");
+                  showMessage(
+                      ok
+                          ? AppLanguage.text("text_state_saved") + savedDate(state)
+                          : AppLanguage.text("text_could_not_save"));
                   if (tab == 6) {
                     content.removeAllViews();
                     settings();
@@ -2231,19 +2437,19 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
     private void confirmLoadQuickState() {
       File state = quickState();
       if (!session.running) {
-        showMessage("Inicia la partida antes de cargar un estado manual.");
+        showMessage(AppLanguage.text("text_start_the_game_before_loading_a_manual_state"));
         return;
       }
       if (state == null || !state.isFile() || state.length() == 0) {
-        showMessage("No hay un estado manual compatible guardado.");
+        showMessage(AppLanguage.text("text_no_compatible_manual_state_saved"));
         return;
       }
       long timestamp = state.lastModified();
       confirmAction(
-          "Cargar estado del " + savedDate(state),
-          "Volverás a ese punto. Perderás el progreso de la sesión actual que no hayas guardado. La"
-              + " tarjeta de memoria es un guardado distinto.",
-          "Cargar estado",
+          AppLanguage.text("text_load_state_from") + savedDate(state),
+          AppLanguage.text(
+              "text_you_will_return_to_that_point_unsaved_progress_in_the_current_session_will_be_lost_th"),
+          AppLanguage.text("text_load_state_2"),
           () ->
               session.command(
                   () -> {
@@ -2256,22 +2462,22 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
                         () ->
                             showMessage(
                                 ok
-                                    ? "Estado cargado"
-                                    : "El estado cambió o no es compatible. Selecciónalo de"
-                                        + " nuevo."));
+                                    ? AppLanguage.text("text_state_loaded")
+                                    : AppLanguage.text(
+                                        "text_the_state_changed_or_is_incompatible_select_it_again")));
                   }));
     }
 
     private void stopGame() {
       if (session.actionBusy) {
-        showMessage("Espera a que termine la acción actual.");
+        showMessage(AppLanguage.text("text_wait_for_the_current_action_to_finish"));
         return;
       }
       confirmAction(
-          "Detener la partida",
-          "Se guardará la tarjeta de memoria. Para conservar el punto exacto de esta sesión, guarda"
-              + " antes un estado.",
-          "Detener",
+          AppLanguage.text("text_stop_game"),
+          AppLanguage.text(
+              "text_the_memory_card_will_be_saved_to_keep_the_exact_point_in_this_session_save_a_state_fi"),
+          AppLanguage.text("text_stop"),
           () -> {
             session.stop();
             snapshot = new GameData.Snapshot();
@@ -2282,7 +2488,7 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
 
     private void exportMemoryCard() {
       if (session.saveFolder == null) {
-        showMessage("Inicia una partida primero.");
+        showMessage(AppLanguage.text("text_start_a_game_first"));
         return;
       }
       Intent out = new Intent(Intent.ACTION_CREATE_DOCUMENT);
@@ -2294,10 +2500,12 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
     private void graphicsSettings(LinearLayout graphics) {
       choice(
           graphics,
-          "Motor gráfico (detén la partida para cambiar)",
+          AppLanguage.text("text_graphics_core_stop_the_game_to_change"),
           "engine",
           new String[] {
-            "SwanStation · OpenGL ES", "SwanStation · software", "PCSX ReARMed · compatibilidad"
+            "SwanStation · OpenGL ES",
+            "SwanStation · software",
+            AppLanguage.text("text_pcsx_rearmed_compatibility")
           },
           new String[] {"swan-gl", "swan-sw", "pcsx"},
           "swan-gl",
@@ -2306,38 +2514,65 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
       if (engine.equals("swan-gl")) {
         choice(
             graphics,
-            "Resolución interna",
+            AppLanguage.text("text_internal_resolution"),
             "resolution",
-            new String[] {"1× · PSX original", "2×", "3×", "4×", "5×", "6×", "8×"},
+            new String[] {
+              AppLanguage.text("text_1_original_psx"), "2×", "3×", "4×", "5×", "6×", "8×"
+            },
             new String[] {"1", "2", "3", "4", "5", "6", "8"},
             "4",
             false);
         choice(
             graphics,
-            "Filtro de texturas",
+            AppLanguage.text("text_texture_filter"),
             "textureFilter",
-            new String[] {"Nearest · original", "Bilinear", "Bilinear sin bordes"},
+            new String[] {
+              AppLanguage.text("text_nearest_original"),
+              "Bilinear",
+              AppLanguage.text("text_bilinear_without_borders")
+            },
             new String[] {"Nearest", "Bilinear", "BilinearBinAlpha"},
             "Nearest",
             false);
-        toggle(graphics, "PGXP · estabilizar geometría 3D", "pgxp", false, false);
-        toggle(graphics, "PGXP · corregir perspectiva de texturas", "pgxpTexture", true, false);
-        toggle(graphics, "Color de 24 bits", "trueColor", false, false);
-        toggle(graphics, "Suavizar escalado de pantalla", "smoothScaling", false, false);
+        toggle(graphics, AppLanguage.text("text_pgxp_stabilize_3d_geometry"), "pgxp", false, false);
+        toggle(
+            graphics,
+            AppLanguage.text("text_pgxp_correct_texture_perspective"),
+            "pgxpTexture",
+            true,
+            false);
+        toggle(graphics, AppLanguage.text("text_24_bit_color"), "trueColor", false, false);
+        toggle(
+            graphics,
+            AppLanguage.text("text_smooth_screen_scaling"),
+            "smoothScaling",
+            false,
+            false);
       } else if (engine.equals("pcsx")) {
-        toggle(graphics, "Resolución interna 2× (3D)", "resolution2x", true, false);
-        toggle(graphics, "Ajuste de texturas para 2×", "textureFix", true, false);
-        toggle(graphics, "Dithering original de PSX", "dithering", true, false);
-        toggle(graphics, "Interpolación de sonido cúbica", "audioCubic", true, false);
+        toggle(
+            graphics,
+            AppLanguage.text("text_2_internal_resolution_3d"),
+            "resolution2x",
+            true,
+            false);
+        toggle(graphics, AppLanguage.text("text_adjust_textures_for_2"), "textureFix", true, false);
+        toggle(graphics, AppLanguage.text("text_original_psx_dithering"), "dithering", true, false);
+        toggle(
+            graphics,
+            AppLanguage.text("text_cubic_sound_interpolation"),
+            "audioCubic",
+            true,
+            false);
       }
-      toggle(graphics, "Llenar pantalla (desactiva para formato 4:3)", "stretch", true, true);
+      toggle(graphics, AppLanguage.text("text_fill_screen_disable_for_4_3"), "stretch", true, true);
       graphics.addView(
           text(
               ctx,
               engine.equals("swan-sw")
-                  ? "Modo por software: resolución nativa, útil para comprobar compatibilidad.\n"
-                  : "Más resolución mejora los modelos 3D; los fondos y vídeos 2D conservan su"
-                      + " detalle original. PGXP puede cambiar algunos efectos.\n",
+                  ? AppLanguage.text(
+                      "text_software_mode_native_resolution_useful_for_checking_compatibility")
+                  : AppLanguage.text(
+                      "text_higher_resolution_improves_3d_models_2d_backgrounds_and_videos_retain_their_original"),
               11,
               MUTED));
     }
@@ -2391,7 +2626,7 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
               String value = values[selected];
               if (value.equals(prefs.getString(key, initial))) return;
               if (restart && session.running) {
-                showMessage("Detén la partida antes de cambiar de motor gráfico.");
+                showMessage(AppLanguage.text("text_stop_the_game_before_changing_graphics_cores"));
                 String old = prefs.getString(key, initial);
                 for (int i = 0; i < values.length; i++)
                   if (values[i].equals(old)) selector.setSelection(i);
@@ -2439,10 +2674,12 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
         Button apply =
             button(
                 ctx,
-                Cheats.LABELS[i],
+                AppLanguage.catalogText(Cheats.LABELS[i]),
                 () ->
                     confirmAction(
-                        Cheats.LABELS[id], Cheats.DESCRIPTIONS[id], () -> applyCheat(id)));
+                        AppLanguage.catalogText(Cheats.LABELS[id]),
+                        AppLanguage.catalogText(Cheats.DESCRIPTIONS[id]),
+                        () -> applyCheat(id)));
         LinearLayout.LayoutParams size = new LinearLayout.LayoutParams(-1, dp(44));
         size.bottomMargin = dp(7);
         content.addView(apply, size);
@@ -2450,12 +2687,12 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
       content.addView(
           button(
               ctx,
-              "Deshacer último truco",
+              AppLanguage.text("text_undo_latest_cheat"),
               () ->
                   confirmAction(
-                      "Deshacer último truco",
-                      "Restaura la partida al momento anterior al último truco. Se perderá el"
-                          + " progreso posterior a ese respaldo.",
+                      AppLanguage.text("text_undo_latest_cheat"),
+                      AppLanguage.text(
+                          "text_restores_the_game_to_the_point_before_the_latest_cheat_progress_after_that_backup_wil"),
                       MainActivity.this::undoCheat)));
     }
 
@@ -2538,7 +2775,13 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
       content.removeAllViews();
       if (tab == 0) {
         String[] labels = {
-          "Sueño", "Cansancio", "Hambre", "Necesita baño", "Tristeza", "Herida", "Enfermedad"
+          AppLanguage.text("text_sleepy"),
+          AppLanguage.text("text_fatigue"),
+          AppLanguage.text("text_hunger"),
+          AppLanguage.text("text_needs_toilet"),
+          AppLanguage.text("text_sadness"),
+          AppLanguage.text("text_injury"),
+          AppLanguage.text("text_sickness")
         };
         StringBuilder needs = new StringBuilder();
         for (int i = 0; i < labels.length; i++)
@@ -2547,24 +2790,35 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
             needs.append(labels[i]);
           }
         if (needs.length() > 0) {
-          TextView attention = text(ctx, "Necesita atención · " + needs, 14, RetroSkin.INK);
+          TextView attention =
+              text(ctx, AppLanguage.text("text_needs_attention") + needs, 14, RetroSkin.INK);
           attention.setPadding(dp(8), dp(8), dp(8), dp(8));
           attention.setBackground(card(RetroSkin.GOLD, 0));
           content.addView(attention);
-        } else content.addView(text(ctx, "✓ Todo bien", 13, MUTED));
-        section("ESTADÍSTICAS");
+        } else content.addView(text(ctx, AppLanguage.text("text_all_good"), 13, MUTED));
+        section(AppLanguage.text("text_stats"));
         metricGrid(
-            new String[] {"Ataque", "Defensa", "Velocidad", "Inteligencia"},
+            new String[] {
+              AppLanguage.text("text_offense"),
+              AppLanguage.text("text_defense"),
+              AppLanguage.text("text_speed"),
+              AppLanguage.text("text_brains")
+            },
             new int[] {s.offense, s.defense, s.speed, s.brains});
-        section("CUIDADO");
-        dataRow("Felicidad", s.happiness + " / 100");
-        dataRow("Disciplina", s.discipline + " / 100");
-        dataRow("Cansancio", Integer.toString(s.tiredness));
-        dataRow("Errores de cuidado", Integer.toString(s.care));
-        dataRow("Combates", Integer.toString(s.battles));
+        section(AppLanguage.text("text_care"));
+        dataRow(AppLanguage.text("text_happiness"), s.happiness + " / 100");
+        dataRow(AppLanguage.text("text_discipline"), s.discipline + " / 100");
+        dataRow(AppLanguage.text("text_fatigue"), Integer.toString(s.tiredness));
+        dataRow(AppLanguage.text("text_care_mistakes_2"), Integer.toString(s.care));
+        dataRow(AppLanguage.text("text_battles"), Integer.toString(s.battles));
         dataRow("Bits", Integer.toString(s.money));
       } else if (tab == 1) {
-        section("BOLSA · " + s.items.size() + " / " + s.inventorySize + " HUECOS");
+        section(
+            AppLanguage.text("text_bag_2")
+                + s.items.size()
+                + " / "
+                + s.inventorySize
+                + AppLanguage.text("text_slots"));
         for (GameData.Item item : s.items) {
           android.graphics.Bitmap icon =
               atlas != null ? atlas.item(item.id, lastRam, profile) : null;
@@ -2577,54 +2831,74 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
           }
         }
         if (s.items.isEmpty())
-          content.addView(text(ctx, "Todavía no hay objetos en la bolsa.", 15, MUTED));
+          content.addView(
+              text(ctx, AppLanguage.text("text_there_are_no_items_in_the_bag_yet"), 15, MUTED));
       } else if (tab == 2) {
         map.update(s);
       } else if (tab == 3) {
-        section("PROSPERIDAD DEL PUEBLO");
+        section(AppLanguage.text("text_city_prosperity"));
         if (!s.prosperityAvailable) {
-          content.addView(text(ctx, "La prosperidad todavía no está disponible.", 15, MUTED));
+          content.addView(
+              text(ctx, AppLanguage.text("text_prosperity_is_not_available_yet"), 15, MUTED));
         } else {
-          dataRow("Prosperidad", s.prosperity + " / 100");
-          section("PISTAS CERCANAS");
+          dataRow(AppLanguage.text("text_prosperity"), s.prosperity + " / 100");
+          section(AppLanguage.text("text_nearby_hints"));
           List<RecruitmentHints.Hint> hints = RecruitmentHints.nearby(s);
           for (RecruitmentHints.Hint hint : hints) {
             dataRow(
                 hint.recruit.name + " · +" + hint.recruit.points,
-                "Ver pista ›",
+                AppLanguage.text("text_view_hint"),
                 atlas != null ? atlas.mon(hint.recruit.type, lastRam, profile) : null,
                 () -> showRecruitHint(hint));
             content.addView(text(ctx, hint.location + " · " + hint.proximity, 12, MUTED));
           }
           if (hints.isEmpty())
             content.addView(
-                text(ctx, "No hay pistas registradas cerca. Explora otra región.", 14, MUTED));
-          section("DIGIMON RECLUTADOS · " + s.recruits.size() + " / " + s.recruitable);
+                text(
+                    ctx,
+                    AppLanguage.text("text_no_hints_recorded_nearby_explore_another_region"),
+                    14,
+                    MUTED));
+          section(
+              AppLanguage.text("text_recruited_digimon")
+                  + s.recruits.size()
+                  + " / "
+                  + s.recruitable);
           for (GameData.Recruit recruit : s.recruits)
             spriteRow(recruit.type, recruit.name, "+" + recruit.points);
           if (s.recruits.isEmpty())
             content.addView(
-                text(ctx, "Trae Digimon al pueblo para aumentar su prosperidad.", 15, MUTED));
+                text(
+                    ctx,
+                    AppLanguage.text("text_bring_digimon_to_the_city_to_increase_prosperity"),
+                    15,
+                    MUTED));
         }
       } else {
-        section("PRÓXIMAS EVOLUCIONES");
+        section(AppLanguage.text("text_next_evolutions"));
         for (GameData.Evolution evo : s.evolutions) {
           dataRow(
               evo.name,
-              evo.candidate ? "Disponible ›" : "Ver requisitos ›",
+              evo.candidate
+                  ? AppLanguage.text("text_available_2")
+                  : AppLanguage.text("text_view_requirements"),
               atlas != null ? atlas.mon(evo.type, lastRam, profile) : null,
               () -> showEvolutionDetails(evo));
         }
         content.addView(
             text(
                 ctx,
-                "Toca una evolución para ver sus requisitos. La evolución directa adelanta el reloj"
-                    + " y conserva la secuencia original del juego.",
+                AppLanguage.text(
+                    "text_tap_an_evolution_to_view_its_requirements_direct_evolution_advances_the_clock_and_kee"),
                 12,
                 MUTED));
       }
       if (tab == 4)
-        content.addView(button(ctx, "Deshacer última evolución", MainActivity.this::undoEvolution));
+        content.addView(
+            button(
+                ctx,
+                AppLanguage.text("text_undo_latest_evolution"),
+                MainActivity.this::undoEvolution));
       scroll.post(() -> scroll.scrollTo(0, y));
     }
 
@@ -2635,7 +2909,10 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
       if (playButton != null) {
         playButton.setText(
             session.actionBusy ? "…" : session.running && !session.paused ? "Ⅱ" : "▶");
-        playButton.setContentDescription(session.running ? "Pausar o continuar" : "Jugar");
+        playButton.setContentDescription(
+            session.running
+                ? AppLanguage.text("text_pause_or_resume")
+                : AppLanguage.text("text_play"));
       }
       updateSprites(s);
       if (feedback.getVisibility() == View.VISIBLE && System.currentTimeMillis() > noticeUntil)
@@ -2644,32 +2921,36 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
           tab == 0
               ? (s.valid ? s.name : "DIGIBUDDY")
               : tab == 1
-                  ? "BOLSA"
+                  ? AppLanguage.text("text_bag_3")
                   : tab == 3
-                      ? "PROSPERIDAD"
+                      ? AppLanguage.text("text_prosperity_2")
                       : tab == 4
-                          ? "EVOLUCIÓN"
-                          : tab == 6 ? "AJUSTES" : tab == 7 ? "TRUCOS" : "MAPA");
+                          ? AppLanguage.text("text_evolution_2")
+                          : tab == 6
+                              ? AppLanguage.text("text_settings_2")
+                              : tab == 7
+                                  ? AppLanguage.text("text_cheats_2")
+                                  : AppLanguage.text("text_map_2"));
       hpMeter.update(s.valid ? s.hp : 0, s.valid ? s.maxHp : 0);
       mpMeter.update(s.valid ? s.mp : 0, s.valid ? s.maxMp : 0);
       status.setText(
           importing
               ? importStatus
               : session.error != null
-                  ? "Error al iniciar"
+                  ? AppLanguage.text("text_failed_to_start")
                   : session.running
-                      ? (session.paused ? "Partida en pausa" : s.message)
+                      ? (session.paused ? AppLanguage.text("text_game_paused") : s.message)
                       : prefs.getString("game", "").isEmpty()
-                          ? "Importa tu juego y pulsa Jugar"
-                          : "Continúa tu partida desde la pantalla superior");
+                          ? AppLanguage.text("text_import_your_game_and_tap_play")
+                          : AppLanguage.text("text_continue_your_game_from_the_upper_screen"));
       stats.setText(
           s.valid
               ? s.age
-                  + " días · "
+                  + AppLanguage.text("text_days")
                   + s.weight
                   + " g · "
                   + String.format(Locale.ROOT, "%02d:%02d", s.hour, s.minute)
-              : "Tu compañero aparecerá al comenzar la partida");
+              : AppLanguage.text("text_your_partner_will_appear_when_you_start_the_game"));
       String value;
       if (tab == 8) return;
       if (tab == 2) {
@@ -2682,62 +2963,76 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
       }
       if (tab == 7)
         value =
-            "Aplica cambios a esta partida. Cada truco crea un estado de respaldo para poder"
-                + " deshacerlo.\n";
+            AppLanguage.text(
+                "text_apply_changes_to_this_game_session_each_cheat_creates_a_backup_state_so_you_can_undo");
       else if (tab == 6)
         value =
-            "Biblioteca\nBIOS: "
-                + (prefs.getString("bios", "").isEmpty() ? "pendiente" : "importada")
-                + "\nDisco: "
-                + prefs.getString("discName", "pendiente")
-                + "\nVersión: "
+            AppLanguage.text("text_library_bios")
+                + (prefs.getString("bios", "").isEmpty()
+                    ? AppLanguage.text("text_not_added")
+                    : AppLanguage.text("text_imported"))
+                + AppLanguage.text("text_disc")
+                + prefs.getString("discName", AppLanguage.text("text_not_added"))
+                + AppLanguage.text("text_version")
                 + prefs.getString("serial", "—")
                 + "\n"
                 + importStatus
                 + "\n";
       else if (!session.running && tab == 0) {
         String[] steps = {
-          "Bienvenida",
-          "Seleccionar BIOS",
-          "Seleccionar juego",
-          "Todo preparado",
-          "Continuar partida"
+          AppLanguage.text("text_welcome"),
+          AppLanguage.text("text_select_bios"),
+          AppLanguage.text("text_select_game"),
+          AppLanguage.text("text_ready_to_play"),
+          AppLanguage.text("text_continue_game")
         };
         value =
             "DIGIBUDDY\n\n"
-                + steps[startupStep()]
+                + (startupStep() == StartupFlow.LANGUAGE
+                    ? AppLanguage.text("language_welcome")
+                    : steps[startupStep()])
                 + "\n\n"
-                + (importing ? importStatus : "Sigue los pasos de la pantalla superior.")
-                + "\n\nLos archivos importados se conservan si cierras la aplicación.";
+                + (importing
+                    ? importStatus
+                    : AppLanguage.text("text_follow_the_steps_on_the_upper_screen"))
+                + AppLanguage.text("text_imported_files_are_kept_when_you_close_the_app");
       } else if (!s.valid) value = s.message;
       else if (tab == 0) {
         String[] conditions = {
-          "Sueño", "Cansancio", "Hambre", "Necesita baño", "Tristeza", "Herida", "Enfermedad"
+          AppLanguage.text("text_sleepy"),
+          AppLanguage.text("text_fatigue"),
+          AppLanguage.text("text_hunger"),
+          AppLanguage.text("text_needs_toilet"),
+          AppLanguage.text("text_sadness"),
+          AppLanguage.text("text_injury"),
+          AppLanguage.text("text_sickness")
         };
         StringBuilder needs = new StringBuilder();
         for (int i = 0; i < conditions.length; i++)
           if ((s.conditions & (1 << i)) != 0) needs.append(conditions[i]).append(" · ");
         value =
-            "Ataque   "
+            AppLanguage.text("text_offense_2")
                 + s.offense
-                + "\nDefensa   "
+                + AppLanguage.text("text_defense_2")
                 + s.defense
-                + "\nVelocidad   "
+                + AppLanguage.text("text_speed_2")
                 + s.speed
-                + "\nInteligencia   "
+                + AppLanguage.text("text_brains_2")
                 + s.brains
-                + "\n\nFelicidad   "
+                + AppLanguage.text("text_happiness_2")
                 + s.happiness
-                + "/100\nDisciplina   "
+                + AppLanguage.text("text_100_discipline")
                 + s.discipline
-                + "/100\nCansancio   "
+                + AppLanguage.text("text_100_fatigue")
                 + s.tiredness
-                + "\nErrores de cuidado   "
+                + AppLanguage.text("text_care_mistakes_3")
                 + s.care
-                + "\nCombates   "
+                + AppLanguage.text("text_battles_2")
                 + s.battles
                 + "\n\n"
-                + (needs.length() == 0 ? "Sin avisos de necesidades" : needs.toString())
+                + (needs.length() == 0
+                    ? AppLanguage.text("text_no_care_warnings")
+                    : needs.toString())
                 + "\n\n"
                 + s.money
                 + " bits · "
@@ -2745,19 +3040,25 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
       } else if (tab == 1) {
         StringBuilder list =
             new StringBuilder(
-                "Bolsa · " + s.items.size() + " / " + s.inventorySize + " huecos\n\n");
+                AppLanguage.text("text_bag_4")
+                    + s.items.size()
+                    + " / "
+                    + s.inventorySize
+                    + AppLanguage.text("text_slots_2"));
         for (GameData.Item item : s.items)
           list.append(item.name)
               .append("    × ")
               .append(item.count)
               .append(ItemUse.unavailable(lastRam, profile, item.slot, item.id))
               .append('\n');
-        if (s.items.isEmpty()) list.append("Sin objetos");
+        if (s.items.isEmpty()) list.append(AppLanguage.text("text_no_items"));
         value = list.toString();
       } else if (tab == 3) {
         StringBuilder list =
             new StringBuilder(
-                s.prosperityAvailable ? "Prosperidad " + s.prosperity : "Prosperidad pendiente");
+                s.prosperityAvailable
+                    ? AppLanguage.text("text_prosperity_3") + s.prosperity
+                    : AppLanguage.text("text_prosperity_pending"));
         list.append(" zone=").append(s.zoneId);
         for (GameData.Exit exit : s.exits) list.append(" exit=").append(exit.name);
         for (GameData.Recruit recruit : s.pendingRecruits)
@@ -2767,20 +3068,19 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
       } else {
         StringBuilder list =
             new StringBuilder(
-                "Rutas naturales y requisitos actuales\n"
-                    + "Son candidatos, no una evolución garantizada: influyen el reloj, las"
-                    + " prioridades, el historial y los eventos especiales.\n\n");
+                AppLanguage.text(
+                    "text_natural_paths_and_current_requirements_these_are_candidates_not_a_guaranteed_evolutio"));
         for (GameData.Evolution evo : s.evolutions)
           list.append(evo.name)
               .append(" · ")
               .append(evo.score)
-              .append("/4 categorías")
-              .append(evo.candidate ? " · requisitos cumplidos" : "")
+              .append(AppLanguage.text("text_4_categories"))
+              .append(evo.candidate ? AppLanguage.text("text_requirements_met_2") : "")
               .append('\n')
               .append(evo.details)
               .append('\n');
         if (s.evolutions.isEmpty())
-          list.append("No hay rutas naturales decodificadas para esta especie.");
+          list.append(AppLanguage.text("text_no_natural_paths_decoded_for_this_species"));
         value = list.toString();
       }
       if (!value.equals(previous)) {

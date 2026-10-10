@@ -95,7 +95,7 @@ final class CardExporter implements AutoCloseable {
           output.flush();
         }
       }
-      if (!closed) notice.accept("Tarjeta exportada");
+      if (!closed) notice.accept(AppLanguage.text("text_memory_card_exported"));
     } catch (IOException | RuntimeException exception) {
       failure(exception);
     } finally {
@@ -120,7 +120,7 @@ final class CardExporter implements AutoCloseable {
 
   private void failure(Exception exception) {
     Log.w("DigiBuddy", "card_export_failed: " + exception.getClass().getSimpleName());
-    if (!closed) notice.accept("No se pudo exportar la tarjeta.");
+    if (!closed) notice.accept(AppLanguage.text("text_could_not_export_the_memory_card"));
   }
 
   private void removeSnapshot(File snapshot) {

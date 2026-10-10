@@ -12,12 +12,16 @@ final class RecruitmentHints {
 
     Hint(GameData.Recruit recruit, Entry entry, int distance, String requirements) {
       this.recruit = recruit;
-      location = DataNames.ZONES[entry.zone];
-      clue = entry.clue;
+      location = AppLanguage.catalogText(DataNames.ZONES[entry.zone]);
+      clue = AppLanguage.catalogText(entry.clue);
       this.requirements = requirements;
       this.distance = distance;
       proximity =
-          distance == 0 ? "En tu zona" : distance == 1 ? "Zona de una salida" : "En esta región";
+          distance == 0
+              ? AppLanguage.text("text_in_your_area")
+              : distance == 1
+                  ? AppLanguage.text("text_one_exit_away")
+                  : AppLanguage.text("text_in_this_region");
     }
   }
 
@@ -39,59 +43,60 @@ final class RecruitmentHints {
   }
 
   private static final Entry[] ENTRIES = {
-    clue(3, 0, "El primer encuentro del bosque termina en combate."),
-    clue(46, 0, "Busca al sur del WC. Insiste en hablar."),
-    clue(32, 68, "Lleva comida para quien espera en el árbol."),
-    clue(49, 1, "Visita la costa al atardecer; regresa tras cruzar."),
-    new Entry(5, 8, 15, -1, "Habla con Jijimon y sal de su casa."),
-    new Entry(7, 8, 50, -1, "Jijimon anuncia la apertura del monte; sal preparado."),
-    new Entry(42, 0, 50, -1, "Revisa el árbol con una puerta."),
-    clue(58, 4, "Busca al ninja cuando exista la tienda secreta."),
-    clue(4, 6, "Habla con el Digimon perdido entre los manglares."),
-    new Entry(25, 5, 0, 46, "Una planta marchita necesita la planta de lluvia."),
-    clue(36, 69, "El recorrido correcto termina en la señal circular."),
-    clue(55, 5, "El visitante de la playa aparece solo ocasionalmente."),
-    clue(9, 17, "Ayuda a despejar el túnel para alcanzar la lava."),
-    new Entry(38, 12, 0, 9, "Regresa al excavador después de unos días."),
-    clue(34, 12, "La persecución del bandido acaba en este túnel."),
-    new Entry(33, 11, 0, 36, "Habla antes en la clínica; lleva recuperación."),
-    clue(13, 9, "Un visitante poco frecuente puede retarte aquí."),
-    new Entry(28, 11, 45, 35, "Los círculos y las noticias llevan a un visitante."),
-    clue(18, 30, "Ten paciencia con sus descargas y vuelve a hablar."),
-    clue(31, 30, "Este rival necesita varias victorias consecutivas."),
-    clue(45, 30, "Tu compañero puede ayudarte a cortar su huida."),
-    new Entry(48, 30, 45, 9, "Busca su legado en la cueva ancestral."),
-    clue(39, 56, "Habla con el súbdito que está cerca del rey."),
-    clue(37, 19, "Las respuestas importan más que combatir."),
-    new Entry(26, 29, 40, 35, "Investiga la desaparición de Myotismon; necesitas un Virus."),
-    clue(47, 26, "Demuestra tu habilidad gestionando su tienda."),
-    clue(21, 21, "En lo alto del cañón hay un nido."),
-    clue(35, 39, "El ascensor del bandido deja a alguien atrapado."),
-    new Entry(8, 32, 0, 36, "Investiga el problema de la región del tiempo."),
-    clue(53, 33, "Este viajero se deja ver en cinco lugares."),
-    clue(53, 25, "Este viajero se deja ver en cinco lugares."),
-    clue(53, 37, "Este viajero se deja ver en cinco lugares."),
-    clue(53, 50, "Este viajero se deja ver en cinco lugares."),
-    clue(53, 57, "Este viajero se deja ver en cinco lugares."),
-    clue(52, 34, "Completa los intercambios de los tres comerciantes."),
-    clue(57, 34, "Una victoria en curling puede convencerlo."),
-    clue(24, 34, "Ayuda a recuperar la cueva ocupada por bandidos."),
-    clue(23, 34, "Tras su rescate, vuelve con alguien resistente al frío."),
-    clue(22, 34, "La revancha tiene una hora y reglas propias."),
-    clue(20, 35, "Un compañero Vacuna puede abrir el santuario."),
-    clue(50, 38, "Busca al ave antes de que termine la mañana."),
-    clue(17, 38, "Un tímido habitante se esconde detrás de un árbol."),
-    clue(14, 62, "Numemon puede encontrar uso a un disfraz vacío."),
-    clue(19, 58, "Habla de entrenamiento con los habitantes de la isla."),
-    clue(51, 58, "Pregunta por el entrenamiento dentro de su gimnasio."),
-    clue(11, 57, "Antes hay que resolver la crisis de la fábrica."),
-    clue(40, 52, "Investiga la fábrica y vuelve tras resolver su problema."),
-    clue(41, 52, "Detén al saboteador y regresa más tarde."),
-    clue(27, 52, "Este visitante de la fábrica aparece ocasionalmente."),
-    clue(6, 59, "En el monte abierto te espera un combate."),
-    clue(54, 59, "Busca otro desafío dentro del monte."),
-    clue(12, 59, "Continúa por el monte hasta encontrarlo."),
-    clue(56, 59, "Regresa al monte después de completar la historia.")
+    clue(3, 0, "@text_the_first_encounter_in_the_forest_ends_in_battle"),
+    clue(46, 0, "@text_look_south_of_the_toilet_keep_talking"),
+    clue(32, 68, "@text_bring_food_for_the_one_waiting_in_the_tree"),
+    clue(49, 1, "@text_visit_the_coast_at_dusk_return_after_crossing"),
+    new Entry(5, 8, 15, -1, "@text_talk_to_jijimon_and_leave_his_house"),
+    new Entry(7, 8, 50, -1, "@text_jijimon_announces_the_mountain_s_opening_leave_prepared"),
+    new Entry(42, 0, 50, -1, "@text_check_the_tree_with_a_door"),
+    clue(58, 4, "@text_look_for_the_ninja_once_the_secret_shop_exists"),
+    clue(4, 6, "@text_talk_to_the_digimon_lost_among_the_mangroves"),
+    new Entry(25, 5, 0, 46, "@text_a_wilting_plant_needs_the_rain_plant"),
+    clue(36, 69, "@text_the_correct_route_ends_at_the_circular_sign"),
+    clue(55, 5, "@text_the_beach_visitor_only_appears_occasionally"),
+    clue(9, 17, "@text_help_clear_the_tunnel_to_reach_the_lava"),
+    new Entry(38, 12, 0, 9, "@text_return_to_the_digger_after_a_few_days"),
+    clue(34, 12, "@text_chasing_the_bandit_ends_in_this_tunnel"),
+    new Entry(33, 11, 0, 36, "@text_talk_at_the_clinic_first_bring_recovery_items"),
+    clue(13, 9, "@text_a_rare_visitor_may_challenge_you_here"),
+    new Entry(28, 11, 45, 35, "@text_the_circles_and_the_news_lead_to_a_visitor"),
+    clue(18, 30, "@text_be_patient_with_its_electric_shocks_and_talk_again"),
+    clue(31, 30, "@text_this_rival_needs_several_consecutive_victories"),
+    clue(45, 30, "@text_your_partner_can_help_cut_off_its_escape"),
+    new Entry(48, 30, 45, 9, "@text_look_for_his_legacy_in_the_ancestor_cave"),
+    clue(39, 56, "@text_talk_to_the_subject_near_the_king"),
+    clue(37, 19, "@text_your_answers_matter_more_than_fighting"),
+    new Entry(
+        26, 29, 40, 35, "@text_investigate_myotismon_s_disappearance_you_need_a_virus_digimon"),
+    clue(47, 26, "@text_prove_your_skill_by_managing_his_shop"),
+    clue(21, 21, "@text_there_is_a_nest_at_the_top_of_the_canyon"),
+    clue(35, 39, "@text_the_bandit_s_elevator_leaves_someone_trapped"),
+    new Entry(8, 32, 0, 36, "@text_investigate_the_problem_in_the_time_region"),
+    clue(53, 33, "@text_this_traveler_appears_in_five_places"),
+    clue(53, 25, "@text_this_traveler_appears_in_five_places"),
+    clue(53, 37, "@text_this_traveler_appears_in_five_places"),
+    clue(53, 50, "@text_this_traveler_appears_in_five_places"),
+    clue(53, 57, "@text_this_traveler_appears_in_five_places"),
+    clue(52, 34, "@text_complete_the_trades_with_the_three_merchants"),
+    clue(57, 34, "@text_a_curling_victory_may_convince_him"),
+    clue(24, 34, "@text_help_reclaim_the_cave_occupied_by_bandits"),
+    clue(23, 34, "@text_after_the_rescue_return_with_a_partner_resistant_to_cold"),
+    clue(22, 34, "@text_the_rematch_has_its_own_time_and_rules"),
+    clue(20, 35, "@text_a_vaccine_partner_can_open_the_sanctuary"),
+    clue(50, 38, "@text_look_for_the_bird_before_the_morning_ends"),
+    clue(17, 38, "@text_a_shy_resident_hides_behind_a_tree"),
+    clue(14, 62, "@text_numemon_can_find_a_use_for_an_empty_costume"),
+    clue(19, 58, "@text_talk_about_training_with_the_island_s_residents"),
+    clue(51, 58, "@text_ask_about_training_inside_his_gym"),
+    clue(11, 57, "@text_first_solve_the_factory_crisis"),
+    clue(40, 52, "@text_investigate_the_factory_and_return_after_solving_its_problem"),
+    clue(41, 52, "@text_stop_the_saboteur_and_return_later"),
+    clue(27, 52, "@text_this_factory_visitor_appears_occasionally"),
+    clue(6, 59, "@text_a_battle_awaits_you_in_the_open_mountain"),
+    clue(54, 59, "@text_look_for_another_challenge_inside_the_mountain"),
+    clue(12, 59, "@text_keep_going_through_the_mountain_until_you_find_him"),
+    clue(56, 59, "@text_return_to_the_mountain_after_completing_the_story")
   };
 
   static List<Hint> nearby(GameData.Snapshot snapshot) {
@@ -137,15 +142,19 @@ final class RecruitmentHints {
 
   private static String requirements(GameData.Snapshot snapshot, Entry entry) {
     List<String> missing = new ArrayList<>();
-    if (snapshot.prosperity < entry.prosperity) missing.add("Prosperidad " + entry.prosperity);
+    if (snapshot.prosperity < entry.prosperity)
+      missing.add(AppLanguage.text("text_prosperity_3") + entry.prosperity);
     if (entry.prerequisite >= 0 && pending(snapshot, entry.prerequisite) != null)
-      missing.add("Reclutar a " + DataNames.DIGIMON[entry.prerequisite]);
+      missing.add(
+          AppLanguage.text("text_recruit")
+              + AppLanguage.catalogText(DataNames.DIGIMON[entry.prerequisite]));
     return String.join(" · ", missing);
   }
 
   private static int distance(GameData.Snapshot snapshot, int zone) {
     if (snapshot.zoneId == zone) return 0;
-    for (GameData.Exit exit : snapshot.exits) if (DataNames.ZONES[zone].equals(exit.name)) return 1;
+    for (GameData.Exit exit : snapshot.exits)
+      if (AppLanguage.catalogText(DataNames.ZONES[zone]).equals(exit.name)) return 1;
     int region = region(snapshot.zoneId);
     return region >= 0 && region == region(zone) ? 2 : -1;
   }

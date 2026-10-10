@@ -34,7 +34,7 @@ final class StateTransfer implements AutoCloseable {
 
   void importState(Uri source, File folder, String engine, long expectedBytes) {
     if (!validSize(expectedBytes) || !engine.matches("swan-gl|swan-sw|pcsx")) {
-      notice.accept("Inicia el juego antes de importar un estado.");
+      notice.accept(AppLanguage.text("text_start_the_game_before_importing_a_state"));
       return;
     }
     submit(
@@ -61,10 +61,13 @@ final class StateTransfer implements AutoCloseable {
             File destination = new File(folder, temporary.getName().replace(".pending", ".state"));
             if (destination.exists() || !temporary.renameTo(destination)) throw new IOException();
             temporary = null;
-            notice.accept("Estado importado. Usa «Continuar última sesión» para cargarlo.");
+            notice.accept(
+                AppLanguage.text("text_state_imported_use_continue_latest_session_to_load_it"));
           } catch (IOException | RuntimeException exception) {
             if (!closed)
-              notice.accept("No se pudo importar. Usa un estado del mismo juego y motor.");
+              notice.accept(
+                  AppLanguage.text(
+                      "text_could_not_import_use_a_state_from_the_same_game_and_core"));
           } finally {
             if (temporary != null) temporary.delete();
           }
@@ -91,9 +94,9 @@ final class StateTransfer implements AutoCloseable {
             } finally {
               active.set(null);
             }
-            if (!closed) notice.accept("Estado exportado");
+            if (!closed) notice.accept(AppLanguage.text("text_state_exported"));
           } catch (IOException | RuntimeException exception) {
-            if (!closed) notice.accept("No se pudo exportar el estado.");
+            if (!closed) notice.accept(AppLanguage.text("text_could_not_export_the_state"));
           } finally {
             removeExport(snapshot);
           }

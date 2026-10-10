@@ -1,0 +1,832 @@
+<resources>
+    <string name="text_memory_card_exported" formatted="false">"Memory card exported"</string>
+    <string name="text_could_not_export_the_memory_card" formatted="false">"Could not export the memory card."</string>
+    <string name="text_restore_hp_and_mp" formatted="false">"Restore HP and MP"</string>
+    <string name="text_999_999_bits" formatted="false">"999,999 bits"</string>
+    <string name="text_maximize_stats" formatted="false">"Maximize stats"</string>
+    <string name="text_happiness_and_discipline_to_100" formatted="false">"Happiness and discipline to 100"</string>
+    <string name="text_clear_fatigue" formatted="false">"Clear fatigue"</string>
+    <string name="text_clear_care_mistakes" formatted="false">"Clear care mistakes"</string>
+    <string name="text_current_items_99" formatted="false">"Current items ×99"</string>
+    <string name="text_learn_all_techniques" formatted="false">"Learn all techniques"</string>
+    <string name="text_restores_your_partner_s_hp_and_mp" formatted="false">"Restores your partner\'s HP and MP."</string>
+    <string name="text_sets_your_money_to_999_999_bits" formatted="false">"Sets your money to 999,999 bits."</string>
+    <string name="text_sets_hp_and_mp_to_9_999_and_the_other_stats_to_999" formatted="false">"Sets HP and MP to 9,999 and the other stats to 999."</string>
+    <string name="text_sets_happiness_and_discipline_to_100" formatted="false">"Sets happiness and discipline to 100."</string>
+    <string name="text_clears_your_partner_s_fatigue" formatted="false">"Clears your partner\'s fatigue."</string>
+    <string name="text_clears_accumulated_care_mistakes" formatted="false">"Clears accumulated care mistakes."</string>
+    <string name="text_sets_every_item_already_in_your_bag_to_99_units" formatted="false">"Sets every item already in your bag to 99 units."</string>
+    <string name="text_your_partner_learns_all_56_techniques" formatted="false">"Your partner learns all 56 techniques."</string>
+    <string name="text_unassigned" formatted="false">"unassigned"</string>
+    <string name="text_playstation_controller_tap_the_button_you_want_to_remap" formatted="false">"PlayStation controller: tap the button you want to remap"</string>
+    <string name="text_hero" formatted="false">"Hero"</string>
+    <string name="text_fire_tower" formatted="false">"Fire Tower"</string>
+    <string name="text_prominence_beam" formatted="false">"Prominence Beam"</string>
+    <string name="text_spit_fire" formatted="false">"Spit Fire"</string>
+    <string name="text_red_inferno" formatted="false">"Red Inferno"</string>
+    <string name="text_magma_bomb" formatted="false">"Magma Bomb"</string>
+    <string name="text_heat_laser" formatted="false">"Heat Laser"</string>
+    <string name="text_infinity_burn" formatted="false">"Infinity Burn"</string>
+    <string name="text_meltdown" formatted="false">"Meltdown"</string>
+    <string name="text_thunder_justice" formatted="false">"Thunder Justice"</string>
+    <string name="text_spinning_shot" formatted="false">"Spinning Shot"</string>
+    <string name="text_electric_cloud" formatted="false">"Electric Cloud"</string>
+    <string name="text_megalo_spark" formatted="false">"Megalo Spark"</string>
+    <string name="text_static_elect" formatted="false">"Static Elect"</string>
+    <string name="text_wind_cutter" formatted="false">"Wind Cutter"</string>
+    <string name="text_confused_storm" formatted="false">"Confused Storm"</string>
+    <string name="text_hurricane" formatted="false">"Hurricane"</string>
+    <string name="text_giga_freeze" formatted="false">"Giga Freeze"</string>
+    <string name="text_ice_statue" formatted="false">"Ice Statue"</string>
+    <string name="text_winter_blast" formatted="false">"Winter Blast"</string>
+    <string name="text_ice_needle" formatted="false">"Ice Needle"</string>
+    <string name="text_water_blit" formatted="false">"Water Blit"</string>
+    <string name="text_aqua_magic" formatted="false">"Aqua Magic"</string>
+    <string name="text_aurora_freeze" formatted="false">"Aurora Freeze"</string>
+    <string name="text_tear_drop" formatted="false">"Tear Drop"</string>
+    <string name="text_power_crane" formatted="false">"Power Crane"</string>
+    <string name="text_all_range_beam" formatted="false">"All Range Beam"</string>
+    <string name="text_metal_sprinter" formatted="false">"Metal Sprinter"</string>
+    <string name="text_pulse_laser" formatted="false">"Pulse Laser"</string>
+    <string name="text_delete_program" formatted="false">"Delete Program"</string>
+    <string name="text_dg_dimension" formatted="false">"DG Dimension"</string>
+    <string name="text_full_potential" formatted="false">"Full Potential"</string>
+    <string name="text_reverse_prog" formatted="false">"Reverse Prog"</string>
+    <string name="text_poison_powder" formatted="false">"Poison Powder"</string>
+    <string name="text_bug" formatted="false">"Bug"</string>
+    <string name="text_mass_morph" formatted="false">"Mass Morph"</string>
+    <string name="text_insect_plague" formatted="false">"Insect Plague"</string>
+    <string name="text_charm_perfume" formatted="false">"Charm Perfume"</string>
+    <string name="text_poison_claw" formatted="false">"Poison Claw"</string>
+    <string name="text_danger_sting" formatted="false">"Danger Sting"</string>
+    <string name="text_green_trap" formatted="false">"Green Trap"</string>
+    <string name="text_tremar" formatted="false">"Tremar"</string>
+    <string name="text_muscle_charge" formatted="false">"Muscle Charge"</string>
+    <string name="text_war_cry" formatted="false">"War Cry"</string>
+    <string name="text_sonic_jab" formatted="false">"Sonic Jab"</string>
+    <string name="text_dynamite_kick" formatted="false">"Dynamite Kick"</string>
+    <string name="text_counter" formatted="false">"Counter"</string>
+    <string name="text_megaton_punch" formatted="false">"Megaton Punch"</string>
+    <string name="text_buster_dive" formatted="false">"Buster Dive"</string>
+    <string name="text_odor_spray" formatted="false">"Odor Spray"</string>
+    <string name="text_poop_speed" formatted="false">"Poop Speed"</string>
+    <string name="text_big_poop" formatted="false">"Big Poop"</string>
+    <string name="text_big_rnd_poop" formatted="false">"Big Rnd Poop"</string>
+    <string name="text_rnd_poop" formatted="false">"Rnd Poop"</string>
+    <string name="text_rnd_poop_speed" formatted="false">"Rnd Poop Speed"</string>
+    <string name="text_horizontal_kick" formatted="false">"Horizontal Kick"</string>
+    <string name="text_ult_poop_hell" formatted="false">"Ult Poop Hell"</string>
+    <string name="text_native_forest" formatted="false">"Native Forest"</string>
+    <string name="text_coela_point" formatted="false">"Coela Point"</string>
+    <string name="text_dragon_eye_lake" formatted="false">"Dragon Eye Lake"</string>
+    <string name="text_drill_tunnel_entrance" formatted="false">"Drill Tunnel Entrance"</string>
+    <string name="text_digimon_bridge" formatted="false">"Digimon Bridge"</string>
+    <string name="text_tropical_jungle" formatted="false">"Tropical Jungle"</string>
+    <string name="text_mangrove_region" formatted="false">"Mangrove Region"</string>
+    <string name="text_mt_panorama_road" formatted="false">"Mt. Panorama Road"</string>
+    <string name="text_file_city_entrance" formatted="false">"File City Entrance"</string>
+    <string name="text_mt_panorama_plains" formatted="false">"Mt. Panorama Plains"</string>
+    <string name="text_mt_panorama_foothills" formatted="false">"Mt. Panorama Foothills"</string>
+    <string name="text_spore_area" formatted="false">"Spore Area"</string>
+    <string name="text_drill_tunnel" formatted="false">"Drill Tunnel"</string>
+    <string name="text_drill_tunnel_floor_2" formatted="false">"Drill Tunnel · Floor 2"</string>
+    <string name="text_drill_tunnel_floor_3" formatted="false">"Drill Tunnel · Floor 3"</string>
+    <string name="text_residential_area" formatted="false">"Residential Area"</string>
+    <string name="text_underground_pond" formatted="false">"Underground Pond"</string>
+    <string name="text_lava_cave" formatted="false">"Lava Cave"</string>
+    <string name="text_overdell" formatted="false">"Overdell"</string>
+    <string name="text_overdell_cemetery" formatted="false">"Overdell Cemetery"</string>
+    <string name="text_great_canyon_entrance" formatted="false">"Great Canyon Entrance"</string>
+    <string name="text_great_canyon_top" formatted="false">"Great Canyon Top"</string>
+    <string name="text_great_canyon_bridge" formatted="false">"Great Canyon Bridge"</string>
+    <string name="text_fortress_entrance" formatted="false">"Fortress Entrance"</string>
+    <string name="text_great_canyon_bottom" formatted="false">"Great Canyon Bottom"</string>
+    <string name="text_ogremon_s_fortress" formatted="false">"Ogremon\'s Fortress"</string>
+    <string name="text_monochromon_s_shop" formatted="false">"Monochromon\'s Shop"</string>
+    <string name="text_grey_lord_s_mansion" formatted="false">"Grey Lord\'s Mansion"</string>
+    <string name="text_mansion_basement" formatted="false">"Mansion Basement"</string>
+    <string name="text_underground_lab" formatted="false">"Underground Lab"</string>
+    <string name="text_gear_savannah" formatted="false">"Gear Savannah"</string>
+    <string name="text_dino_region" formatted="false">"Dino Region"</string>
+    <string name="text_ancient_glacial_region" formatted="false">"Ancient Glacial Region"</string>
+    <string name="text_ancient_speedy_region" formatted="false">"Ancient Speedy Region"</string>
+    <string name="text_freezeland" formatted="false">"Freezeland"</string>
+    <string name="text_ice_sanctuary" formatted="false">"Ice Sanctuary"</string>
+    <string name="text_green_gym" formatted="false">"Green Gym"</string>
+    <string name="text_leomon_s_ancestor_cave" formatted="false">"Leomon\'s Ancestor Cave"</string>
+    <string name="text_misty_trees" formatted="false">"Misty Trees"</string>
+    <string name="text_great_canyon" formatted="false">"Great Canyon"</string>
+    <string name="text_geko_swamp" formatted="false">"Geko Swamp"</string>
+    <string name="text_volume_villa" formatted="false">"Volume Villa"</string>
+    <string name="text_file_city" formatted="false">"File City"</string>
+    <string name="text_item_storage" formatted="false">"Item Storage"</string>
+    <string name="text_centarumon_s_clinic" formatted="false">"Centarumon\'s Clinic"</string>
+    <string name="text_restaurant" formatted="false">"Restaurant"</string>
+    <string name="text_item_shop" formatted="false">"Item Shop"</string>
+    <string name="text_jijimon_s_house" formatted="false">"Jijimon\'s House"</string>
+    <string name="text_secret_shop" formatted="false">"Secret Shop"</string>
+    <string name="text_toy_town" formatted="false">"Toy Town"</string>
+    <string name="text_secret_beach_cave" formatted="false">"Secret Beach Cave"</string>
+    <string name="text_factorial_town" formatted="false">"Factorial Town"</string>
+    <string name="text_birdramon_transport" formatted="false">"Birdramon Transport"</string>
+    <string name="text_arena_lobby" formatted="false">"Arena Lobby"</string>
+    <string name="text_treasure_hunt" formatted="false">"Treasure Hunt"</string>
+    <string name="text_trash_mountain" formatted="false">"Trash Mountain"</string>
+    <string name="text_sewer" formatted="false">"Sewer"</string>
+    <string name="text_beetle_land" formatted="false">"Beetle Land"</string>
+    <string name="text_mt_infinity" formatted="false">"Mt. Infinity"</string>
+    <string name="text_digimon_curling" formatted="false">"Digimon Curling"</string>
+    <string name="text_toy_mansion" formatted="false">"Toy Mansion"</string>
+    <string name="text_costume_house" formatted="false">"Costume House"</string>
+    <string name="text_robot_house" formatted="false">"Robot House"</string>
+    <string name="text_mansion_floor_2" formatted="false">"Mansion · Floor 2"</string>
+    <string name="text_mansion_attic" formatted="false">"Mansion Attic"</string>
+    <string name="text_back_dimension" formatted="false">"Back Dimension"</string>
+    <string name="text_kunemon_s_bed" formatted="false">"Kunemon\'s Bed"</string>
+    <string name="text_amida_forest" formatted="false">"Amida Forest"</string>
+    <string name="text_small_recovery" formatted="false">"Small Recovery"</string>
+    <string name="text_medium_recovery" formatted="false">"Medium Recovery"</string>
+    <string name="text_large_recovery" formatted="false">"Large Recovery"</string>
+    <string name="text_super_recovery" formatted="false">"Super Recovery"</string>
+    <string name="text_mp_floppy" formatted="false">"MP Floppy"</string>
+    <string name="text_medium_mp_floppy" formatted="false">"Medium MP Floppy"</string>
+    <string name="text_large_mp_floppy" formatted="false">"Large MP Floppy"</string>
+    <string name="text_double_floppy" formatted="false">"Double Floppy"</string>
+    <string name="text_various" formatted="false">"Various"</string>
+    <string name="text_omnipotent" formatted="false">"Omnipotent"</string>
+    <string name="text_protection" formatted="false">"Protection"</string>
+    <string name="text_restore" formatted="false">"Restore"</string>
+    <string name="text_super_restore" formatted="false">"Super Restore"</string>
+    <string name="text_bandage" formatted="false">"Bandage"</string>
+    <string name="text_medicine" formatted="false">"Medicine"</string>
+    <string name="text_off_disk" formatted="false">"Off. Disk"</string>
+    <string name="text_def_disk" formatted="false">"Def. Disk"</string>
+    <string name="text_speed_disk" formatted="false">"Speed Disk"</string>
+    <string name="text_omni_disk" formatted="false">"Omni Disk"</string>
+    <string name="text_super_off_disk" formatted="false">"Super Off. Disk"</string>
+    <string name="text_super_def_disk" formatted="false">"Super Def. Disk"</string>
+    <string name="text_super_speed_disk" formatted="false">"Super Speed Disk"</string>
+    <string name="text_auto_pilot" formatted="false">"Auto Pilot"</string>
+    <string name="text_off_chip" formatted="false">"Off. Chip"</string>
+    <string name="text_def_chip" formatted="false">"Def. Chip"</string>
+    <string name="text_brain_chip" formatted="false">"Brain Chip"</string>
+    <string name="text_speed_chip" formatted="false">"Speed Chip"</string>
+    <string name="text_hp_chip" formatted="false">"HP Chip"</string>
+    <string name="text_mp_chip" formatted="false">"MP Chip"</string>
+    <string name="text_dv_chip_a" formatted="false">"DV Chip A"</string>
+    <string name="text_dv_chip_d" formatted="false">"DV Chip D"</string>
+    <string name="text_dv_chip_e" formatted="false">"DV Chip E"</string>
+    <string name="text_portable_potty" formatted="false">"Portable Potty"</string>
+    <string name="text_training_manual" formatted="false">"Training Manual"</string>
+    <string name="text_rest_pillow" formatted="false">"Rest Pillow"</string>
+    <string name="text_enemy_repel" formatted="false">"Enemy Repel"</string>
+    <string name="text_enemy_bell" formatted="false">"Enemy Bell"</string>
+    <string name="text_health_shoes" formatted="false">"Health Shoes"</string>
+    <string name="text_meat" formatted="false">"Meat"</string>
+    <string name="text_giant_meat" formatted="false">"Giant Meat"</string>
+    <string name="text_sirloin" formatted="false">"Sirloin"</string>
+    <string name="text_super_carrot" formatted="false">"Super Carrot"</string>
+    <string name="text_hawk_radish" formatted="false">"Hawk Radish"</string>
+    <string name="text_spiny_green" formatted="false">"Spiny Green"</string>
+    <string name="text_digimushroom" formatted="false">"DigiMushroom"</string>
+    <string name="text_ice_mushroom" formatted="false">"Ice Mushroom"</string>
+    <string name="text_deluxe_mushroom" formatted="false">"Deluxe Mushroom"</string>
+    <string name="text_digipine" formatted="false">"DigiPine"</string>
+    <string name="text_blue_apple" formatted="false">"Blue Apple"</string>
+    <string name="text_red_berry" formatted="false">"Red Berry"</string>
+    <string name="text_gold_acorn" formatted="false">"Gold Acorn"</string>
+    <string name="text_big_berry" formatted="false">"Big Berry"</string>
+    <string name="text_sweet_nut" formatted="false">"Sweet Nut"</string>
+    <string name="text_super_veggy" formatted="false">"Super Veggy"</string>
+    <string name="text_prickly_pear" formatted="false">"Prickly Pear"</string>
+    <string name="text_orange_banana" formatted="false">"Orange Banana"</string>
+    <string name="text_power_fruit" formatted="false">"Power Fruit"</string>
+    <string name="text_power_ice" formatted="false">"Power Ice"</string>
+    <string name="text_speed_leaf" formatted="false">"Speed Leaf"</string>
+    <string name="text_sage_fruit" formatted="false">"Sage Fruit"</string>
+    <string name="text_muscle_yam" formatted="false">"Muscle Yam"</string>
+    <string name="text_calm_berry" formatted="false">"Calm Berry"</string>
+    <string name="text_digianchovy" formatted="false">"DigiAnchovy"</string>
+    <string name="text_digisnapper" formatted="false">"DigiSnapper"</string>
+    <string name="text_digitrout" formatted="false">"DigiTrout"</string>
+    <string name="text_black_trout" formatted="false">"Black Trout"</string>
+    <string name="text_digicatfish" formatted="false">"DigiCatfish"</string>
+    <string name="text_digiseabass" formatted="false">"DigiSeabass"</string>
+    <string name="text_moldy_meat" formatted="false">"Moldy Meat"</string>
+    <string name="text_happy_mushroom" formatted="false">"Happy Mushroom"</string>
+    <string name="text_chain_melon" formatted="false">"Chain Melon"</string>
+    <string name="text_grey_claws" formatted="false">"Grey Claws"</string>
+    <string name="text_fireball" formatted="false">"Fireball"</string>
+    <string name="text_flaming_wing" formatted="false">"Flaming Wing"</string>
+    <string name="text_iron_hoof" formatted="false">"Iron Hoof"</string>
+    <string name="text_mono_stone" formatted="false">"Mono Stone"</string>
+    <string name="text_steel_drill" formatted="false">"Steel Drill"</string>
+    <string name="text_white_fang" formatted="false">"White Fang"</string>
+    <string name="text_black_wing" formatted="false">"Black Wing"</string>
+    <string name="text_spike_club" formatted="false">"Spike Club"</string>
+    <string name="text_flaming_mane" formatted="false">"Flaming Mane"</string>
+    <string name="text_white_wing" formatted="false">"White Wing"</string>
+    <string name="text_tattered_clothes" formatted="false">"Tattered Clothes"</string>
+    <string name="text_electric_ring" formatted="false">"Electric Ring"</string>
+    <string name="text_rainbow_horn" formatted="false">"Rainbow Horn"</string>
+    <string name="text_rooster" formatted="false">"Rooster"</string>
+    <string name="text_unique_horn" formatted="false">"Unique Horn"</string>
+    <string name="text_horn_helmet" formatted="false">"Horn Helmet"</string>
+    <string name="text_scissor_jaw" formatted="false">"Scissor Jaw"</string>
+    <string name="text_fertilizer" formatted="false">"Fertilizer"</string>
+    <string name="text_koga_laws" formatted="false">"Koga Laws"</string>
+    <string name="text_water_bottle" formatted="false">"Water Bottle"</string>
+    <string name="text_north_star" formatted="false">"North Star"</string>
+    <string name="text_red_shell" formatted="false">"Red Shell"</string>
+    <string name="text_hard_scale" formatted="false">"Hard Scale"</string>
+    <string name="text_blue_crystal" formatted="false">"Blue Crystal"</string>
+    <string name="text_ice_crystal" formatted="false">"Ice Crystal"</string>
+    <string name="text_hair_grower" formatted="false">"Hair Grower"</string>
+    <string name="text_sunglasses" formatted="false">"Sunglasses"</string>
+    <string name="text_metal_part" formatted="false">"Metal Part"</string>
+    <string name="text_fatal_bone" formatted="false">"Fatal Bone"</string>
+    <string name="text_cyber_part" formatted="false">"Cyber Part"</string>
+    <string name="text_mega_hand" formatted="false">"Mega Hand"</string>
+    <string name="text_silver_ball" formatted="false">"Silver Ball"</string>
+    <string name="text_metal_armor" formatted="false">"Metal Armor"</string>
+    <string name="text_chainsaw" formatted="false">"Chainsaw"</string>
+    <string name="text_small_spear" formatted="false">"Small Spear"</string>
+    <string name="text_x_bandage" formatted="false">"X Bandage"</string>
+    <string name="text_ray_gun" formatted="false">"Ray Gun"</string>
+    <string name="text_gold_banana" formatted="false">"Gold Banana"</string>
+    <string name="text_mystery_egg" formatted="false">"Mystery Egg"</string>
+    <string name="text_red_ruby" formatted="false">"Red Ruby"</string>
+    <string name="text_beetle_pearl" formatted="false">"Beetle Pearl"</string>
+    <string name="text_coral_charm" formatted="false">"Coral Charm"</string>
+    <string name="text_moon_mirror" formatted="false">"Moon Mirror"</string>
+    <string name="text_blue_flute" formatted="false">"Blue Flute"</string>
+    <string name="text_old_rod" formatted="false">"Old Rod"</string>
+    <string name="text_amazing_rod" formatted="false">"Amazing Rod"</string>
+    <string name="text_leomon_s_stone" formatted="false">"Leomon\'s Stone"</string>
+    <string name="text_mansion_key" formatted="false">"Mansion Key"</string>
+    <string name="text_gear" formatted="false">"Gear"</string>
+    <string name="text_rain_plant" formatted="false">"Rain Plant"</string>
+    <string name="text_steak" formatted="false">"Steak"</string>
+    <string name="text_fridge_key" formatted="false">"Fridge Key"</string>
+    <string name="text_as_decoder" formatted="false">"AS Decoder"</string>
+    <string name="text_giga_hand" formatted="false">"Giga Hand"</string>
+    <string name="text_noble_mane" formatted="false">"Noble Mane"</string>
+    <string name="text_metal_banana" formatted="false">"Metal Banana"</string>
+    <string name="text_unknown" formatted="false">"Unknown"</string>
+    <string name="text_could_not_create_the_save_folder" formatted="false">"Could not create the save folder"</string>
+    <string name="text_invalid_audio_or_video_rate" formatted="false">"Invalid audio or video rate"</string>
+    <string name="text_audio_unavailable" formatted="false">"Audio unavailable"</string>
+    <string name="text_the_session_was_interrupted" formatted="false">"The session was interrupted"</string>
+    <string name="text_could_not_continue_the_emulator_session_restart_the_session_from_settings" formatted="false">"Could not continue the emulator session. Restart the session from Settings."</string>
+    <string name="text_could_not_save_the_memory_card" formatted="false">"Could not save the memory card"</string>
+    <string name="text_could_not_save_the_backup_before_using_the_item" formatted="false">"Could not save the backup before using the item."</string>
+    <string name="text_the_recorded_evolution_has_changed" formatted="false">"The recorded evolution has changed."</string>
+    <string name="text_could_not_save_the_backup_action_cancelled" formatted="false">"Could not save the backup. Action cancelled."</string>
+    <string name="text_could_not_start_the_evolution" formatted="false">"Could not start the evolution."</string>
+    <string name="text_could_not_save_the_history_action_cancelled" formatted="false">"Could not save the history. Action cancelled."</string>
+    <string name="text_could_not_restore_the_backup" formatted="false">" Could not restore the backup."</string>
+    <string name="text_could_not_update_the_evolution_history" formatted="false">"Could not update the evolution history."</string>
+    <string name="text_your_partner_has_returned_to_its_previous_form" formatted="false">"Your partner has returned to its previous form."</string>
+    <string name="text_evolution_complete" formatted="false">"Evolution complete."</string>
+    <string name="text_the_sequence_did_not_finish_the_state_before_this_action_has_been_restored" formatted="false">"The sequence did not finish. The state before this action has been restored."</string>
+    <string name="text_the_sequence_did_not_finish_and_its_backup_could_not_be_restored" formatted="false">"The sequence did not finish and its backup could not be restored."</string>
+    <string name="text_no_item_was_used" formatted="false">" No item was used."</string>
+    <string name="text_your_partner_has_changed_select_the_evolution_again" formatted="false">"Your partner has changed. Select the evolution again."</string>
+    <string name="text_you_do_not_yet_meet_this_evolution_s_requirements" formatted="false">"You do not yet meet this evolution\'s requirements."</string>
+    <string name="text_there_is_no_recorded_evolution_to_undo_yet" formatted="false">"There is no recorded evolution to undo yet."</string>
+    <string name="text_the_recorded_evolution_does_not_match_your_current_partner" formatted="false">"The recorded evolution does not match your current partner."</string>
+    <string name="text_could_not_verify_your_partner_s_previous_form" formatted="false">"Could not verify your partner\'s previous form."</string>
+    <string name="text_direct_evolution_has_not_been_validated_for_this_version_yet" formatted="false">"Direct evolution has not been validated for this version yet."</string>
+    <string name="text_data_for_direct_evolution_is_missing" formatted="false">"Data for direct evolution is missing."</string>
+    <string name="text_enter_a_recognized_game_session_first" formatted="false">"Enter a recognized game session first."</string>
+    <string name="text_the_partner_data_does_not_match_a_recognized_game_session" formatted="false">"The partner data does not match a recognized game session."</string>
+    <string name="text_close_the_menus_and_wait_until_you_regain_control_of_the_character" formatted="false">"Close the menus and wait until you regain control of the character."</string>
+    <string name="text_close_the_in_game_dialogue_before_evolving" formatted="false">"Close the in-game dialogue before evolving."</string>
+    <string name="text_wake_up_and_heal_your_partner_before_evolving" formatted="false">"Wake up and heal your partner before evolving."</string>
+    <string name="text_could_not_identify_your_partner" formatted="false">"Could not identify your partner."</string>
+    <string name="text_waiting_for_an_active_game" formatted="false">"Waiting for an active game…"</string>
+    <string name="text_digimon" formatted="false">"Digimon "</string>
+    <string name="text_preparing_the_game" formatted="false">"Preparing the game…"</string>
+    <string name="text_waiting_for_a_compatible_game_to_enable_the_companion_panel" formatted="false">"Waiting for a compatible game to enable the companion panel…"</string>
+    <string name="text_waiting_for_game_memory" formatted="false">"Waiting for game memory…"</string>
+    <string name="text_the_data_is_not_consistent_yet_waiting_for_an_active_game" formatted="false">"The data is not consistent yet. Waiting for an active game…"</string>
+    <string name="text_waiting_for_the_game_code_or_this_patch_does_not_match_the_profile" formatted="false">"Waiting for the game code, or this patch does not match the profile."</string>
+    <string name="text_the_data_layout_does_not_match_the_profile_companion_panel_disabled" formatted="false">"The data layout does not match the profile. Companion panel disabled."</string>
+    <string name="text_item" formatted="false">"Item "</string>
+    <string name="text_technique" formatted="false">"Technique "</string>
+    <string name="text_area" formatted="false">"Area "</string>
+    <string name="text_location_unavailable" formatted="false">"Location unavailable"</string>
+    <string name="text_you_are_in" formatted="false">"You are in: "</string>
+    <string name="text_hp" formatted="false">"HP"</string>
+    <string name="text_mp" formatted="false">"MP"</string>
+    <string name="text_offense" formatted="false">"Offense"</string>
+    <string name="text_defense" formatted="false">"Defense"</string>
+    <string name="text_speed" formatted="false">"Speed"</string>
+    <string name="text_brains" formatted="false">"Brains"</string>
+    <string name="text_dominant_stat" formatted="false">" Dominant stat: "</string>
+    <string name="text_discipline" formatted="false">"Discipline"</string>
+    <string name="text_happiness" formatted="false">"Happiness"</string>
+    <string name="text_battles" formatted="false">"Battles"</string>
+    <string name="text_techniques" formatted="false">"Techniques"</string>
+    <string name="text_care_mistakes" formatted="false">" Care mistakes "</string>
+    <string name="text_current" formatted="false">" (current: "</string>
+    <string name="text_weight" formatted="false">" Weight "</string>
+    <string name="text_bonus" formatted="false">" Bonus: "</string>
+    <string name="text_species_affinity" formatted="false">"species affinity"</string>
+    <string name="text_baby_evolution_also_depends_on_the_in_game_clock" formatted="false">"Baby evolution also depends on the in-game clock.\n"</string>
+    <string name="text_restores_your_partner_s_hp" formatted="false">"Restores your partner\'s HP."</string>
+    <string name="text_restores_more_hp_than_a_small_recovery" formatted="false">"Restores more HP than a Small Recovery."</string>
+    <string name="text_restores_a_large_amount_of_hp" formatted="false">"Restores a large amount of HP."</string>
+    <string name="text_fully_restores_your_partner_s_hp" formatted="false">"Fully restores your partner\'s HP."</string>
+    <string name="text_restores_your_partner_s_mp" formatted="false">"Restores your partner\'s MP."</string>
+    <string name="text_restores_more_mp_than_a_basic_floppy" formatted="false">"Restores more MP than a basic floppy."</string>
+    <string name="text_restores_a_large_amount_of_mp" formatted="false">"Restores a large amount of MP."</string>
+    <string name="text_restores_hp_and_mp_together" formatted="false">"Restores HP and MP together."</string>
+    <string name="text_cures_battle_status_effects_such_as_poison_paralysis_and_confusion" formatted="false">"Cures battle status effects such as poison, paralysis and confusion."</string>
+    <string name="text_cures_status_effects_and_restores_hp_and_mp" formatted="false">"Cures status effects and restores HP and MP."</string>
+    <string name="text_protects_against_status_effects_during_battle" formatted="false">"Protects against status effects during battle."</string>
+    <string name="text_revives_a_defeated_partner_and_restores_some_hp" formatted="false">"Revives a defeated partner and restores some HP."</string>
+    <string name="text_revives_a_defeated_partner_removes_status_effects_and_fully_restores_hp" formatted="false">"Revives a defeated partner, removes status effects and fully restores HP."</string>
+    <string name="text_treats_injuries_and_may_help_with_sickness" formatted="false">"Treats injuries and may help with sickness."</string>
+    <string name="text_treats_injuries_and_sickness" formatted="false">"Treats injuries and sickness."</string>
+    <string name="text_raises_offense_for_the_current_battle" formatted="false">"Raises offense for the current battle."</string>
+    <string name="text_raises_defense_for_the_current_battle" formatted="false">"Raises defense for the current battle."</string>
+    <string name="text_raises_speed_for_the_current_battle" formatted="false">"Raises speed for the current battle."</string>
+    <string name="text_raises_several_stats_for_the_current_battle" formatted="false">"Raises several stats for the current battle."</string>
+    <string name="text_greatly_raises_offense_for_the_current_battle" formatted="false">"Greatly raises offense for the current battle."</string>
+    <string name="text_greatly_raises_defense_for_the_current_battle" formatted="false">"Greatly raises defense for the current battle."</string>
+    <string name="text_greatly_raises_speed_for_the_current_battle" formatted="false">"Greatly raises speed for the current battle."</string>
+    <string name="text_returns_you_to_the_city_quickly_when_the_game_allows_it" formatted="false">"Returns you to the city quickly when the game allows it."</string>
+    <string name="text_permanently_raises_offense" formatted="false">"Permanently raises offense."</string>
+    <string name="text_permanently_raises_defense" formatted="false">"Permanently raises defense."</string>
+    <string name="text_permanently_raises_brains" formatted="false">"Permanently raises brains."</string>
+    <string name="text_permanently_raises_speed" formatted="false">"Permanently raises speed."</string>
+    <string name="text_permanently_raises_maximum_hp" formatted="false">"Permanently raises maximum HP."</string>
+    <string name="text_permanently_raises_maximum_mp" formatted="false">"Permanently raises maximum MP."</string>
+    <string name="text_raises_offense_and_brains_but_shortens_your_partner_s_remaining_lifespan" formatted="false">"Raises offense and brains, but shortens your partner\'s remaining lifespan."</string>
+    <string name="text_raises_defense_and_speed_but_shortens_your_partner_s_remaining_lifespan" formatted="false">"Raises defense and speed, but shortens your partner\'s remaining lifespan."</string>
+    <string name="text_raises_maximum_hp_and_mp_but_shortens_your_partner_s_remaining_lifespan" formatted="false">"Raises maximum HP and MP, but shortens your partner\'s remaining lifespan."</string>
+    <string name="text_takes_care_of_the_toilet_need_without_visiting_a_toilet_consumed_on_use" formatted="false">"Takes care of the toilet need without visiting a toilet. Consumed on use."</string>
+    <string name="text_improves_training_while_carried_in_your_bag_it_is_not_consumed_from_this_panel" formatted="false">"Improves training while carried in your bag. It is not consumed from this panel."</string>
+    <string name="text_improves_recovery_during_sleep_while_carried_in_your_bag" formatted="false">"Improves recovery during sleep while carried in your bag."</string>
+    <string name="text_reduces_the_number_of_enemies_joining_battles_while_carried_in_your_bag" formatted="false">"Reduces the number of enemies joining battles while carried in your bag."</string>
+    <string name="text_encourages_enemies_to_join_battles_while_carried_in_your_bag" formatted="false">"Encourages enemies to join battles while carried in your bag."</string>
+    <string name="text_restores_some_hp_and_mp_while_walking_does_not_work_while_running" formatted="false">"Restores some HP and MP while walking; does not work while running."</string>
+    <string name="text_reduces_hunger_and_slightly_increases_weight" formatted="false">"Reduces hunger and slightly increases weight."</string>
+    <string name="text_reduces_hunger_more_than_normal_meat_and_increases_weight" formatted="false">"Reduces hunger more than normal meat and increases weight."</string>
+    <string name="text_greatly_reduces_hunger_improves_mood_and_relieves_fatigue_increases_weight" formatted="false">"Greatly reduces hunger, improves mood and relieves fatigue; increases weight."</string>
+    <string name="text_reduces_hunger_lowers_weight_and_temporarily_improves_certain_training_activities" formatted="false">"Reduces hunger, lowers weight and temporarily improves certain training activities."</string>
+    <string name="text_reduces_hunger_increases_weight_and_temporarily_improves_certain_training_activities" formatted="false">"Reduces hunger, increases weight and temporarily improves certain training activities."</string>
+    <string name="text_reduces_hunger_and_greatly_relieves_fatigue_slightly_increases_weight" formatted="false">"Reduces hunger and greatly relieves fatigue; slightly increases weight."</string>
+    <string name="text_reduces_hunger_and_increases_weight_by_1" formatted="false">"Reduces hunger and increases weight by 1."</string>
+    <string name="text_reduces_hunger_and_improves_discipline_increases_weight" formatted="false">"Reduces hunger and improves discipline; increases weight."</string>
+    <string name="text_greatly_reduces_hunger_and_improves_several_stats_increases_weight" formatted="false">"Greatly reduces hunger and improves several stats; increases weight."</string>
+    <string name="text_reduces_hunger_and_temporarily_improves_training_increases_weight" formatted="false">"Reduces hunger and temporarily improves training; increases weight."</string>
+    <string name="text_reduces_hunger_and_improves_mood_increases_weight" formatted="false">"Reduces hunger and improves mood; increases weight."</string>
+    <string name="text_reduces_hunger_and_fatigue_and_improves_mood_and_discipline_increases_weight" formatted="false">"Reduces hunger and fatigue, and improves mood and discipline; increases weight."</string>
+    <string name="text_food_that_increases_weight_and_can_be_sold_for_a_good_price" formatted="false">"Food that increases weight and can be sold for a good price."</string>
+    <string name="text_greatly_reduces_hunger_but_also_greatly_increases_weight" formatted="false">"Greatly reduces hunger, but also greatly increases weight."</string>
+    <string name="text_reduces_hunger_and_restores_hp_increases_weight" formatted="false">"Reduces hunger and restores HP; increases weight."</string>
+    <string name="text_reduces_hunger_and_restores_mp_increases_weight" formatted="false">"Reduces hunger and restores MP; increases weight."</string>
+    <string name="text_reduces_hunger_and_lowers_weight" formatted="false">"Reduces hunger and lowers weight."</string>
+    <string name="text_reduces_hunger_and_restores_hp_and_mp_increases_weight" formatted="false">"Reduces hunger and restores HP and MP; increases weight."</string>
+    <string name="text_reduces_hunger_and_raises_offense_increases_weight" formatted="false">"Reduces hunger and raises offense; increases weight."</string>
+    <string name="text_reduces_hunger_and_raises_defense_increases_weight" formatted="false">"Reduces hunger and raises defense; increases weight."</string>
+    <string name="text_reduces_hunger_and_raises_speed_increases_weight" formatted="false">"Reduces hunger and raises speed; increases weight."</string>
+    <string name="text_reduces_hunger_and_raises_brains_increases_weight" formatted="false">"Reduces hunger and raises brains; increases weight."</string>
+    <string name="text_reduces_hunger_and_raises_maximum_hp_increases_weight" formatted="false">"Reduces hunger and raises maximum HP; increases weight."</string>
+    <string name="text_reduces_hunger_and_raises_maximum_mp_increases_weight" formatted="false">"Reduces hunger and raises maximum MP; increases weight."</string>
+    <string name="text_fish_that_slightly_reduces_hunger_and_slightly_increases_weight" formatted="false">"Fish that slightly reduces hunger and slightly increases weight."</string>
+    <string name="text_fish_that_reduces_hunger_and_slightly_increases_weight" formatted="false">"Fish that reduces hunger and slightly increases weight."</string>
+    <string name="text_fish_that_reduces_hunger_and_increases_weight" formatted="false">"Fish that reduces hunger and increases weight."</string>
+    <string name="text_reduces_hunger_improves_several_stats_and_lowers_weight" formatted="false">"Reduces hunger, improves several stats and lowers weight."</string>
+    <string name="text_fish_that_greatly_reduces_hunger_and_greatly_increases_weight" formatted="false">"Fish that greatly reduces hunger and greatly increases weight."</string>
+    <string name="text_restores_hp_and_mp_and_slightly_extends_lifespan_increases_weight_and_may_cause_sickn" formatted="false">"Restores HP and MP and slightly extends lifespan; increases weight and may cause sickness."</string>
+    <string name="text_reduces_hunger_and_increases_weight_but_causes_sickness" formatted="false">"Reduces hunger and increases weight, but causes sickness."</string>
+    <string name="text_improves_mood_and_relieves_fatigue_but_may_cause_sickness" formatted="false">"Improves mood and relieves fatigue, but may cause sickness."</string>
+    <string name="text_reduces_hunger_improves_mood_relieves_fatigue_and_extends_lifespan_may_cause_sickness" formatted="false">"Reduces hunger, improves mood, relieves fatigue and extends lifespan. May cause sickness."</string>
+    <string name="text_evolution_item_associated_with_greymon_it_can_only_be_used_when_the_game_allows_that" formatted="false">"Evolution item associated with Greymon. It can only be used when the game allows that evolution."</string>
+    <string name="text_evolution_item_associated_with_meramon_it_can_only_be_used_when_the_game_allows_that" formatted="false">"Evolution item associated with Meramon. It can only be used when the game allows that evolution."</string>
+    <string name="text_evolution_item_associated_with_birdramon_it_can_only_be_used_when_the_game_allows_tha" formatted="false">"Evolution item associated with Birdramon. It can only be used when the game allows that evolution."</string>
+    <string name="text_evolution_item_associated_with_centarumon_it_can_only_be_used_when_the_game_allows_th" formatted="false">"Evolution item associated with Centarumon. It can only be used when the game allows that evolution."</string>
+    <string name="text_evolution_item_associated_with_monochromon_it_can_only_be_used_when_the_game_allows_t" formatted="false">"Evolution item associated with Monochromon. It can only be used when the game allows that evolution."</string>
+    <string name="text_evolution_item_associated_with_drimogemon_it_can_only_be_used_when_the_game_allows_th" formatted="false">"Evolution item associated with Drimogemon. It can only be used when the game allows that evolution."</string>
+    <string name="text_evolution_item_associated_with_tyrannomon_it_can_only_be_used_when_the_game_allows_th" formatted="false">"Evolution item associated with Tyrannomon. It can only be used when the game allows that evolution."</string>
+    <string name="text_evolution_item_associated_with_devimon_it_can_only_be_used_when_the_game_allows_that" formatted="false">"Evolution item associated with Devimon. It can only be used when the game allows that evolution."</string>
+    <string name="text_evolution_item_associated_with_ogremon_it_can_only_be_used_when_the_game_allows_that" formatted="false">"Evolution item associated with Ogremon. It can only be used when the game allows that evolution."</string>
+    <string name="text_evolution_item_associated_with_leomon_it_can_only_be_used_when_the_game_allows_that_e" formatted="false">"Evolution item associated with Leomon. It can only be used when the game allows that evolution."</string>
+    <string name="text_evolution_item_associated_with_angemon_it_can_only_be_used_when_the_game_allows_that" formatted="false">"Evolution item associated with Angemon. It can only be used when the game allows that evolution."</string>
+    <string name="text_evolution_item_associated_with_bakemon_it_can_only_be_used_when_the_game_allows_that" formatted="false">"Evolution item associated with Bakemon. It can only be used when the game allows that evolution."</string>
+    <string name="text_evolution_item_associated_with_kaminarmon_it_can_only_be_used_when_the_game_allows_th" formatted="false">"Evolution item associated with Kaminarmon. It can only be used when the game allows that evolution."</string>
+    <string name="text_evolution_item_associated_with_airdramon_it_can_only_be_used_when_the_game_allows_tha" formatted="false">"Evolution item associated with Airdramon. It can only be used when the game allows that evolution."</string>
+    <string name="text_evolution_item_associated_with_cockatrimon_it_can_only_be_used_when_the_game_allows_t" formatted="false">"Evolution item associated with Kokatorimon. It can only be used when the game allows that evolution."</string>
+    <string name="text_evolution_item_associated_with_unimon_it_can_only_be_used_when_the_game_allows_that_e" formatted="false">"Evolution item associated with Unimon. It can only be used when the game allows that evolution."</string>
+    <string name="text_evolution_item_associated_with_kabuterimon_it_can_only_be_used_when_the_game_allows_t" formatted="false">"Evolution item associated with Kabuterimon. It can only be used when the game allows that evolution."</string>
+    <string name="text_evolution_item_associated_with_kuwagamon_it_can_only_be_used_when_the_game_allows_tha" formatted="false">"Evolution item associated with Kuwagamon. It can only be used when the game allows that evolution."</string>
+    <string name="text_evolution_item_associated_with_vegimon_it_can_only_be_used_when_the_game_allows_that" formatted="false">"Evolution item associated with Vegiemon. It can only be used when the game allows that evolution."</string>
+    <string name="text_evolution_item_associated_with_igamon_it_can_only_be_used_when_the_game_allows_that_e" formatted="false">"Evolution item associated with Ninjamon. It can only be used when the game allows that evolution."</string>
+    <string name="text_evolution_item_associated_with_seadramon_it_can_only_be_used_when_the_game_allows_tha" formatted="false">"Evolution item associated with Seadramon. It can only be used when the game allows that evolution."</string>
+    <string name="text_evolution_item_associated_with_whamon_it_can_only_be_used_when_the_game_allows_that_e" formatted="false">"Evolution item associated with Whamon. It can only be used when the game allows that evolution."</string>
+    <string name="text_evolution_item_associated_with_shellmon_it_can_only_be_used_when_the_game_allows_that" formatted="false">"Evolution item associated with Shellmon. It can only be used when the game allows that evolution."</string>
+    <string name="text_evolution_item_associated_with_coelamon_it_can_only_be_used_when_the_game_allows_that" formatted="false">"Evolution item associated with Coelamon. It can only be used when the game allows that evolution."</string>
+    <string name="text_evolution_item_associated_with_garurumon_it_can_only_be_used_when_the_game_allows_tha" formatted="false">"Evolution item associated with Garurumon. It can only be used when the game allows that evolution."</string>
+    <string name="text_evolution_item_associated_with_yukidarumon_it_can_only_be_used_when_the_game_allows_t" formatted="false">"Evolution item associated with Frigimon. It can only be used when the game allows that evolution."</string>
+    <string name="text_evolution_item_associated_with_mojyamon_it_can_only_be_used_when_the_game_allows_that" formatted="false">"Evolution item associated with Mojyamon. It can only be used when the game allows that evolution."</string>
+    <string name="text_evolution_item_associated_with_nanimon_it_can_only_be_used_when_the_game_allows_that" formatted="false">"Evolution item associated with Nanimon. It can only be used when the game allows that evolution."</string>
+    <string name="text_evolution_item_associated_with_metalgreymon_it_can_only_be_used_when_the_game_allows" formatted="false">"Evolution item associated with MetalGreymon. It can only be used when the game allows that evolution."</string>
+    <string name="text_evolution_item_associated_with_skullgreymon_it_can_only_be_used_when_the_game_allows" formatted="false">"Evolution item associated with SkullGreymon. It can only be used when the game allows that evolution."</string>
+    <string name="text_evolution_item_associated_with_andromon_it_can_only_be_used_when_the_game_allows_that" formatted="false">"Evolution item associated with Andromon. It can only be used when the game allows that evolution."</string>
+    <string name="text_evolution_item_associated_with_megadramon_it_can_only_be_used_when_the_game_allows_th" formatted="false">"Evolution item associated with Megadramon. It can only be used when the game allows that evolution."</string>
+    <string name="text_evolution_item_associated_with_mamemon_it_can_only_be_used_when_the_game_allows_that" formatted="false">"Evolution item associated with Mamemon. It can only be used when the game allows that evolution."</string>
+    <string name="text_evolution_item_associated_with_metalmamemon_it_can_only_be_used_when_the_game_allows" formatted="false">"Evolution item associated with MetalMamemon. It can only be used when the game allows that evolution."</string>
+    <string name="text_evolution_item_associated_with_giromon_it_can_only_be_used_when_the_game_allows_that" formatted="false">"Evolution item associated with Giromon. It can only be used when the game allows that evolution."</string>
+    <string name="text_evolution_item_associated_with_piccolomon_it_can_only_be_used_when_the_game_allows_th" formatted="false">"Evolution item associated with Piximon. It can only be used when the game allows that evolution."</string>
+    <string name="text_evolution_item_associated_with_monzaemon_it_can_only_be_used_when_the_game_allows_tha" formatted="false">"Evolution item associated with Monzaemon. It can only be used when the game allows that evolution."</string>
+    <string name="text_evolution_item_associated_with_vademon_it_can_only_be_used_when_the_game_allows_that" formatted="false">"Evolution item associated with Vademon. It can only be used when the game allows that evolution."</string>
+    <string name="text_evolution_item_associated_with_etemon_it_can_only_be_used_when_the_game_allows_that_e" formatted="false">"Evolution item associated with Etemon. It can only be used when the game allows that evolution."</string>
+    <string name="text_evolution_item_associated_with_digitamamon_it_can_only_be_used_when_the_game_allows_t" formatted="false">"Evolution item associated with Digitamamon. It can only be used when the game allows that evolution."</string>
+    <string name="text_evolution_item_associated_with_hououmon_it_can_only_be_used_when_the_game_allows_that" formatted="false">"Evolution item associated with Phoenixmon. It can only be used when the game allows that evolution."</string>
+    <string name="text_evolution_item_associated_with_herculeskabuterimon_it_can_only_be_used_when_the_game" formatted="false">"Evolution item associated with HerculesKabuterimon. It can only be used when the game allows that evolution."</string>
+    <string name="text_evolution_item_associated_with_megaseadramon_it_can_only_be_used_when_the_game_allows" formatted="false">"Evolution item associated with MegaSeadramon. It can only be used when the game allows that evolution."</string>
+    <string name="text_evolution_item_associated_with_weregarurumon_it_can_only_be_used_when_the_game_allows" formatted="false">"Evolution item associated with WereGarurumon. It can only be used when the game allows that evolution."</string>
+    <string name="text_a_token_of_friendship_with_seadramon_related_to_access_to_dragon_eye_lake" formatted="false">"A token of friendship with Seadramon; related to access to Dragon Eye Lake."</string>
+    <string name="text_lets_you_fish_in_the_lake_used_at_fishing_spots" formatted="false">"Lets you fish in the lake. Used at fishing spots."</string>
+    <string name="text_an_improved_fishing_rod_for_the_lake_used_at_fishing_spots" formatted="false">"An improved fishing rod for the lake. Used at fishing spots."</string>
+    <string name="text_a_tablet_linked_to_the_story_of_leomon_and_his_ancestors" formatted="false">"A tablet linked to the story of Leomon and his ancestors."</string>
+    <string name="text_a_key_to_the_mansion_used_during_the_corresponding_event" formatted="false">"A key to the mansion. Used during the corresponding event."</string>
+    <string name="text_a_special_story_item_used_in_its_event_not_a_care_consumable" formatted="false">"A special story item used in its event; not a care consumable."</string>
+    <string name="text_restores_mp_and_has_a_special_role_in_a_story_event" formatted="false">"Restores MP and has a special role in a story event."</string>
+    <string name="text_food_that_reduces_hunger_and_restores_hp_may_cause_sickness" formatted="false">"Food that reduces hunger and restores HP; may cause sickness."</string>
+    <string name="text_fridge_key_used_during_the_corresponding_event" formatted="false">"Fridge key. Used during the corresponding event."</string>
+    <string name="text_lets_you_read_ancient_writing_during_the_corresponding_events" formatted="false">"Lets you read ancient writing during the corresponding events."</string>
+    <string name="text_evolution_item_associated_with_gigadramon_use_depends_on_the_game_s_conditions" formatted="false">"Evolution item associated with Gigadramon. Use depends on the game\'s conditions."</string>
+    <string name="text_evolution_item_associated_with_panjyamon_use_depends_on_the_game_s_conditions" formatted="false">"Evolution item associated with Panjyamon. Use depends on the game\'s conditions."</string>
+    <string name="text_evolution_item_associated_with_metaletemon_use_depends_on_the_game_s_conditions" formatted="false">"Evolution item associated with MetalEtemon. Use depends on the game\'s conditions."</string>
+    <string name="text_unidentified_item_do_not_use_it_until_the_game_recognizes_it" formatted="false">"Unidentified item. Do not use it until the game recognizes it."</string>
+    <string name="text_direct_item_use_has_not_been_validated_for_this_version_yet" formatted="false">"Direct item use has not been validated for this version yet."</string>
+    <string name="text_data_for_direct_item_use_is_missing" formatted="false">"Data for direct item use is missing."</string>
+    <string name="text_the_bag_has_changed_select_the_item_again" formatted="false">"The bag has changed. Select the item again."</string>
+    <string name="text_wait_for_this_scene_to_finish" formatted="false">"Wait for this scene to finish."</string>
+    <string name="text_this_item_cannot_be_used_from_the_bag" formatted="false">"This item cannot be used from the bag."</string>
+    <string name="text_this_item_can_only_be_used_in_battle" formatted="false">"This item can only be used in battle."</string>
+    <string name="text_this_item_can_only_be_used_outside_battle" formatted="false">"This item can only be used outside battle."</string>
+    <string name="text_wait_for_the_previous_item_to_finish" formatted="false">"Wait for the previous item to finish."</string>
+    <string name="text_close_the_in_game_bag_options_first" formatted="false">"Close the in-game bag options first."</string>
+    <string name="text_close_the_in_game_dialogue_or_menu_first" formatted="false">"Close the in-game dialogue or menu first."</string>
+    <string name="text_wait_until_you_regain_control_of_the_character" formatted="false">"Wait until you regain control of the character."</string>
+    <string name="text_wait_until_the_battle_is_active" formatted="false">"Wait until the battle is active."</string>
+    <string name="text_the_game_session_has_changed" formatted="false">"The game session has changed."</string>
+    <string name="text_the_game_is_still_processing_the_item" formatted="false">"The game is still processing the item."</string>
+    <string name="text_the_game_could_not_open_the_item" formatted="false">"The game could not open the item."</string>
+    <string name="text_used" formatted="false">"Used: "</string>
+    <string name="text_the_item_s_quantity_has_changed" formatted="false">"The item\'s quantity has changed."</string>
+    <string name="text_the_game_has_not_consumed_the_item" formatted="false">"The game has not consumed the item."</string>
+    <string name="text_the_game_situation_has_changed" formatted="false">"The game situation has changed."</string>
+    <string name="text_the_bag_has_changed" formatted="false">"The bag has changed."</string>
+    <string name="text_the_in_game_menu_does_not_match" formatted="false">"The in-game menu does not match."</string>
+    <string name="text_the_in_game_bag_is_busy" formatted="false">"The in-game bag is busy."</string>
+    <string name="text_invalid_in_game_selection" formatted="false">"Invalid in-game selection."</string>
+    <string name="text_the_use_option_is_not_selected" formatted="false">"The Use option is not selected."</string>
+    <string name="text_game_restored" formatted="false">"Game restored"</string>
+    <string name="text_could_not_restore_the_game" formatted="false">"Could not restore the game"</string>
+    <string name="text_could_not_read_the_app_s_profiles" formatted="false">"Could not read the app\'s profiles."</string>
+    <string name="text_could_not_open_the_second_screen_use_screens_to_select_another_one" formatted="false">"Could not open the second screen. Use Screens to select another one."</string>
+    <string name="text_reference_edition_recognized_companion_panel_compatible" formatted="false">"Reference edition recognized: companion panel compatible."</string>
+    <string name="text_edition" formatted="false">"Edition: "</string>
+    <string name="text_the_companion_data_will_be_checked_when_you_enter_the_game_other_patches_may_be_incom" formatted="false">". The companion data will be checked when you enter the game; other patches may be incompatible."</string>
+    <string name="text_new_game" formatted="false">"New game"</string>
+    <string name="text_the_game_will_restart_from_the_beginning_unsaved_session_progress_will_be_lost_saved" formatted="false">"The game will restart from the beginning. Unsaved session progress will be lost. Saved states and your memory card will be kept."</string>
+    <string name="text_open_game" formatted="false">"Open game"</string>
+    <string name="text_the_session_is_taking_too_long_to_stop_try_again" formatted="false">"The session is taking too long to stop. Try again."</string>
+    <string name="text_stop_the_game_before_changing_the_bios_or_disc" formatted="false">"Stop the game before changing the BIOS or disc."</string>
+    <string name="text_start_the_game_and_wait_for_any_action_to_finish" formatted="false">"Start the game and wait for any action to finish."</string>
+    <string name="text_could_not_prepare_the_current_state" formatted="false">"Could not prepare the current state."</string>
+    <string name="text_wait_for_the_current_action_to_finish" formatted="false">"Wait for the current action to finish."</string>
+    <string name="text_could_not_save_the_current_memory_card_export_cancelled" formatted="false">"Could not save the current memory card. Export cancelled."</string>
+    <string name="text_could_not_prepare_the_memory_card_for_export" formatted="false">"Could not prepare the memory card for export."</string>
+    <string name="text_wait_for_the_current_action_to_finish_before_exporting_the_memory_card" formatted="false">"Wait for the current action to finish before exporting the memory card."</string>
+    <string name="text_start_the_game_to_import_a_state" formatted="false">"Start the game to import a state."</string>
+    <string name="text_import_complete" formatted="false">"Import complete"</string>
+    <string name="text_import_failed" formatted="false">"Import failed"</string>
+    <string name="text_could_not_import_check_the_file_s_format_and_size" formatted="false">"Could not import. Check the file\'s format and size."</string>
+    <string name="text_importing" formatted="false">"Importing: "</string>
+    <string name="text_finish_setup_on_the_game_screen" formatted="false">"Finish setup on the game screen."</string>
+    <string name="text_import_your_bios_and_game_first_from_settings" formatted="false">"Import your BIOS and game first from Settings."</string>
+    <string name="text_could_not_read_the_disc_s_sprites" formatted="false">"Could not read the disc\'s sprites."</string>
+    <string name="text_wait_for_the_previous_session_to_finish_closing" formatted="false">"Wait for the previous session to finish closing."</string>
+    <string name="text_there_is_no_saved_session_for_this_game_and_emulator_yet" formatted="false">"There is no saved session for this game and emulator yet."</string>
+    <string name="text_continue_state_from" formatted="false">"Continue state from "</string>
+    <string name="text_the_current_session_will_be_replaced_unsaved_progress_will_be_lost" formatted="false">"The current session will be replaced. Unsaved progress will be lost."</string>
+    <string name="text_continue" formatted="false">"Continue"</string>
+    <string name="text_session_resumed" formatted="false">"Session resumed"</string>
+    <string name="text_could_not_restore_the_latest_session" formatted="false">"Could not restore the latest session."</string>
+    <string name="text_in_your_bag" formatted="false">"In your bag: "</string>
+    <string name="text_one_unit_will_be_used_in_the_game" formatted="false">"One unit will be used in the game."</string>
+    <string name="text_use_1" formatted="false">"Use 1"</string>
+    <string name="text_using" formatted="false">"Using "</string>
+    <string name="text_requirements_met" formatted="false">"Requirements met"</string>
+    <string name="text_requirements_pending" formatted="false">"Requirements pending"</string>
+    <string name="text_natural_evolution_also_depends_on_the_in_game_clock_and_events" formatted="false">"\nNatural evolution also depends on the in-game clock and events."</string>
+    <string name="text_close" formatted="false">"Close"</string>
+    <string name="text_evolve_into" formatted="false">"Evolve into "</string>
+    <string name="text_you_meet_the_requirements_this_evolution_will_be_triggered_without_waiting_for_the_in" formatted="false">"You meet the requirements. This evolution will be triggered without waiting for the in-game clock. You will see the original animation. You can return to the previous form without rewinding your game."</string>
+    <string name="text_evolve" formatted="false">"Evolve"</string>
+    <string name="text_evolving_into" formatted="false">"Evolving into "</string>
+    <string name="text_return_to" formatted="false">"Return to "</string>
+    <string name="text_you_will_see_the_in_game_animation_to_return_to_your_previous_form_current_stats_care" formatted="false">"You will see the in-game animation to return to your previous form. Current stats, care, bag and city progress will be kept. Time in this stage will reset to avoid another immediate evolution."</string>
+    <string name="text_undo" formatted="false">"Undo"</string>
+    <string name="text_returning_to" formatted="false">"Returning to "</string>
+    <string name="text_enter_a_recognized_game_session_before_applying_cheats" formatted="false">"Enter a recognized game session before applying cheats."</string>
+    <string name="text_the_game_is_changing_scenes_try_again" formatted="false">"The game is changing scenes. Try again."</string>
+    <string name="text_could_not_create_the_backup_the_cheat_was_not_applied" formatted="false">"Could not create the backup; the cheat was not applied."</string>
+    <string name="text_applied" formatted="false">"Applied: "</string>
+    <string name="text_could_not_apply_the_cheat" formatted="false">"Could not apply the cheat"</string>
+    <string name="text_start_a_game_first" formatted="false">"Start a game first."</string>
+    <string name="text_there_is_no_cheat_to_undo_in_this_game_session" formatted="false">"There is no cheat to undo in this game session."</string>
+    <string name="text_cheat_undone" formatted="false">"Cheat undone"</string>
+    <string name="text_could_not_restore_the_state" formatted="false">"Could not restore the state"</string>
+    <string name="text_apply" formatted="false">"Apply"</string>
+    <string name="text_cancel" formatted="false">"Cancel"</string>
+    <string name="text_could_not_open_the_window" formatted="false">"Could not open the window."</string>
+    <string name="text_could_not_check_the_version" formatted="false">"Could not check the version."</string>
+    <string name="text_no_updates_available" formatted="false">"No updates available."</string>
+    <string name="text_checking_for_updates" formatted="false">"Checking for updates…"</string>
+    <string name="text_already_checking" formatted="false">"Already checking."</string>
+    <string name="text_available" formatted="false">" available"</string>
+    <string name="text_the_apk_will_download_here_and_be_verified_before_opening_android_s_installer_save_yo" formatted="false">"The APK will download here and be verified before opening Android\'s installer. Save your progress before updating. Your files stay in the app."</string>
+    <string name="text_update" formatted="false">"Update"</string>
+    <string name="text_downloading_digibuddy" formatted="false">"Downloading DigiBuddy "</string>
+    <string name="text_verifying_apk" formatted="false">"Verifying APK…"</string>
+    <string name="text_downloading" formatted="false">"Downloading… "</string>
+    <string name="text_could_not_download_or_verify_the_apk_try_again" formatted="false">"Could not download or verify the APK. Try again."</string>
+    <string name="text_allow_installation_from_digibuddy" formatted="false">"Allow installation from DigiBuddy"</string>
+    <string name="text_the_apk_is_verified_android_needs_your_permission_to_install_updates_from_digibuddy_e" formatted="false">"The APK is verified. Android needs your permission to install updates from DigiBuddy. Enable the permission and go back."</string>
+    <string name="text_open_permission_settings" formatted="false">"Open permission settings"</string>
+    <string name="text_could_not_open_the_installation_permission_settings" formatted="false">"Could not open the installation permission settings."</string>
+    <string name="text_could_not_open_android_s_installer" formatted="false">"Could not open Android\'s installer."</string>
+    <string name="text_first_you_need" formatted="false">"First you need: "</string>
+    <string name="text_a_hint_for_a_pending_recruitment_some_encounters_depend_on_time_and_events" formatted="false">"A hint for a pending recruitment. Some encounters depend on time and events."</string>
+    <string name="text_which_digimon_would_you_like_to_check" formatted="false">"Which Digimon would you like to check?"</string>
+    <string name="text_recruitable" formatted="false">"Recruitable"</string>
+    <string name="text_easy" formatted="false">"Easy"</string>
+    <string name="text_even_match" formatted="false">"Even match"</string>
+    <string name="text_hard" formatted="false">"Hard"</string>
+    <string name="text_estimated_battle" formatted="false">"Estimated battle: "</string>
+    <string name="text_easy_2" formatted="false">"easy"</string>
+    <string name="text_hard_2" formatted="false">"hard"</string>
+    <string name="text_android_does_not_report_an_available_second_screen_on_thor_enable_the_second_screen_a" formatted="false">"Android does not report an available second screen. On Thor, enable the second screen and tap Screens again."</string>
+    <string name="text_second_screen" formatted="false">"Second screen"</string>
+    <string name="text_remap_buttons" formatted="false">"Remap buttons"</string>
+    <string name="text_tap_a_controller_button_then_press_the_physical_button_you_want_to_use" formatted="false">"Tap a controller button, then press the physical button you want to use."</string>
+    <string name="text_reset_this_controller_s_bindings" formatted="false">"Reset this controller\'s bindings"</string>
+    <string name="text_default_controls_restored" formatted="false">"Default controls restored."</string>
+    <string name="text_tap_a_controller_button_to_change_its_binding" formatted="false">"Tap a controller button to change its binding."</string>
+    <string name="text_assign" formatted="false">"Assign “"</string>
+    <string name="text_current_2" formatted="false">"Current: "</string>
+    <string name="text_press_the_physical_button_or_move_the_direction_you_want_to_use" formatted="false">"\n\nPress the physical button or move the direction you want to use."</string>
+    <string name="text_reassign" formatted="false">"Reassign"</string>
+    <string name="text_that_button_belongs_to_another_device_use_the_selected_controller" formatted="false">"That button belongs to another device. Use the selected controller."</string>
+    <string name="text_this_button_already_controls" formatted="false">"This button already controls “"</string>
+    <string name="text_reassign_it_to" formatted="false">"”. Reassign it to “"</string>
+    <string name="text_saved_for_this_controller" formatted="false">"” saved for this controller."</string>
+    <string name="text_exit_digibuddy" formatted="false">"EXIT DIGIBUDDY?"</string>
+    <string name="text_the_memory_card_will_be_saved_on_exit" formatted="false">"The memory card will be saved on exit."</string>
+    <string name="text_keep_playing" formatted="false">"Keep playing"</string>
+    <string name="text_save_and_exit" formatted="false">"Save and exit"</string>
+    <string name="text_installation_cancelled_permission_not_granted" formatted="false">"Installation cancelled: permission not granted."</string>
+    <string name="text_your_partner_live" formatted="false">"Your partner, live"</string>
+    <string name="text_settings" formatted="false">"Settings"</string>
+    <string name="text_partner" formatted="false">"Partner"</string>
+    <string name="text_bag" formatted="false">"Bag"</string>
+    <string name="text_map" formatted="false">"Map"</string>
+    <string name="text_prosperity" formatted="false">"Prosperity"</string>
+    <string name="text_evolution" formatted="false">"Evolution"</string>
+    <string name="text_cheats" formatted="false">"Cheats"</string>
+    <string name="text_saves" formatted="false">"Saves"</string>
+    <string name="text_emulator_state_exact_point_in_the_session" formatted="false">"Emulator state · exact point in the session"</string>
+    <string name="text_last_manual_state" formatted="false">"Last manual state: "</string>
+    <string name="text_no_manual_state_saved" formatted="false">"No manual state saved."</string>
+    <string name="text_save_state" formatted="false">"Save state"</string>
+    <string name="text_load_state" formatted="false">"Load state…"</string>
+    <string name="text_continue_latest_session" formatted="false">"Continue latest session"</string>
+    <string name="text_export_current_state" formatted="false">"Export current state"</string>
+    <string name="text_import_state" formatted="false">"Import state"</string>
+    <string name="text_states_need_the_same_game_and_core_importing_keeps_the_previous_states" formatted="false">"States need the same game and core. Importing keeps the previous states."</string>
+    <string name="text_memory_card_saves_made_in_the_game" formatted="false">"Memory card · saves made in the game"</string>
+    <string name="text_load_from_the_game_s_menu" formatted="false">"Load from the game\'s menu"</string>
+    <string name="text_open_the_game_s_menu" formatted="false">"Open the game\'s menu"</string>
+    <string name="text_the_game_will_restart_to_load_from_your_memory_card_unsaved_session_progress_will_be" formatted="false">"The game will restart to load from your memory card. Unsaved session progress will be lost."</string>
+    <string name="text_open_menu" formatted="false">"Open menu"</string>
+    <string name="text_export_memory_card" formatted="false">"Export memory card"</string>
+    <string name="text_stop_and_save_memory_card" formatted="false">"Stop and save memory card"</string>
+    <string name="text_graphics_and_sound" formatted="false">"Graphics and sound"</string>
+    <string name="text_controls" formatted="false">"Controls"</string>
+    <string name="text_screens" formatted="false">"Screens"</string>
+    <string name="text_swap_screens" formatted="false">"Swap screens"</string>
+    <string name="text_choose_second_screen" formatted="false">"Choose second screen"</string>
+    <string name="text_files" formatted="false">"Files"</string>
+    <string name="text_game" formatted="false">"\nGame: "</string>
+    <string name="text_change_bios" formatted="false">"Change BIOS"</string>
+    <string name="text_change_game" formatted="false">"Change game"</string>
+    <string name="text_updates" formatted="false">"Updates"</string>
+    <string name="text_check_when_the_app_opens" formatted="false">"Check when the app opens"</string>
+    <string name="text_check_for_updates_now" formatted="false">"Check for updates now"</string>
+    <string name="text_state_saved" formatted="false">"State saved · "</string>
+    <string name="text_could_not_save" formatted="false">"Could not save"</string>
+    <string name="text_start_the_game_before_loading_a_manual_state" formatted="false">"Start the game before loading a manual state."</string>
+    <string name="text_no_compatible_manual_state_saved" formatted="false">"No compatible manual state saved."</string>
+    <string name="text_load_state_from" formatted="false">"Load state from "</string>
+    <string name="text_you_will_return_to_that_point_unsaved_progress_in_the_current_session_will_be_lost_th" formatted="false">"You will return to that point. Unsaved progress in the current session will be lost. The memory card is a separate save."</string>
+    <string name="text_load_state_2" formatted="false">"Load state"</string>
+    <string name="text_state_loaded" formatted="false">"State loaded"</string>
+    <string name="text_the_state_changed_or_is_incompatible_select_it_again" formatted="false">"The state changed or is incompatible. Select it again."</string>
+    <string name="text_stop_game" formatted="false">"Stop game"</string>
+    <string name="text_the_memory_card_will_be_saved_to_keep_the_exact_point_in_this_session_save_a_state_fi" formatted="false">"The memory card will be saved. To keep the exact point in this session, save a state first."</string>
+    <string name="text_stop" formatted="false">"Stop"</string>
+    <string name="text_graphics_core_stop_the_game_to_change" formatted="false">"Graphics core (stop the game to change)"</string>
+    <string name="text_pcsx_rearmed_compatibility" formatted="false">"PCSX ReARMed · compatibility"</string>
+    <string name="text_internal_resolution" formatted="false">"Internal resolution"</string>
+    <string name="text_1_original_psx" formatted="false">"1× · original PSX"</string>
+    <string name="text_texture_filter" formatted="false">"Texture filter"</string>
+    <string name="text_nearest_original" formatted="false">"Nearest · original"</string>
+    <string name="text_bilinear_without_borders" formatted="false">"Bilinear without borders"</string>
+    <string name="text_pgxp_stabilize_3d_geometry" formatted="false">"PGXP · stabilize 3D geometry"</string>
+    <string name="text_pgxp_correct_texture_perspective" formatted="false">"PGXP · correct texture perspective"</string>
+    <string name="text_24_bit_color" formatted="false">"24-bit color"</string>
+    <string name="text_smooth_screen_scaling" formatted="false">"Smooth screen scaling"</string>
+    <string name="text_2_internal_resolution_3d" formatted="false">"2× internal resolution (3D)"</string>
+    <string name="text_adjust_textures_for_2" formatted="false">"Adjust textures for 2×"</string>
+    <string name="text_original_psx_dithering" formatted="false">"Original PSX dithering"</string>
+    <string name="text_cubic_sound_interpolation" formatted="false">"Cubic sound interpolation"</string>
+    <string name="text_fill_screen_disable_for_4_3" formatted="false">"Fill screen (disable for 4:3)"</string>
+    <string name="text_software_mode_native_resolution_useful_for_checking_compatibility" formatted="false">"Software mode: native resolution, useful for checking compatibility.\n"</string>
+    <string name="text_higher_resolution_improves_3d_models_2d_backgrounds_and_videos_retain_their_original" formatted="false">"Higher resolution improves 3D models; 2D backgrounds and videos retain their original detail. PGXP may change some effects.\n"</string>
+    <string name="text_stop_the_game_before_changing_graphics_cores" formatted="false">"Stop the game before changing graphics cores."</string>
+    <string name="text_undo_latest_cheat" formatted="false">"Undo latest cheat"</string>
+    <string name="text_restores_the_game_to_the_point_before_the_latest_cheat_progress_after_that_backup_wil" formatted="false">"Restores the game to the point before the latest cheat. Progress after that backup will be lost."</string>
+    <string name="text_sleepy" formatted="false">"Sleepy"</string>
+    <string name="text_fatigue" formatted="false">"Fatigue"</string>
+    <string name="text_hunger" formatted="false">"Hunger"</string>
+    <string name="text_needs_toilet" formatted="false">"Needs toilet"</string>
+    <string name="text_sadness" formatted="false">"Sadness"</string>
+    <string name="text_injury" formatted="false">"Injury"</string>
+    <string name="text_sickness" formatted="false">"Sickness"</string>
+    <string name="text_needs_attention" formatted="false">"Needs attention · "</string>
+    <string name="text_all_good" formatted="false">"✓ All good"</string>
+    <string name="text_stats" formatted="false">"STATS"</string>
+    <string name="text_care" formatted="false">"CARE"</string>
+    <string name="text_care_mistakes_2" formatted="false">"Care mistakes"</string>
+    <string name="text_bag_2" formatted="false">"BAG · "</string>
+    <string name="text_slots" formatted="false">" SLOTS"</string>
+    <string name="text_there_are_no_items_in_the_bag_yet" formatted="false">"There are no items in the bag yet."</string>
+    <string name="text_city_prosperity" formatted="false">"CITY PROSPERITY"</string>
+    <string name="text_prosperity_is_not_available_yet" formatted="false">"Prosperity is not available yet."</string>
+    <string name="text_nearby_hints" formatted="false">"NEARBY HINTS"</string>
+    <string name="text_view_hint" formatted="false">"View hint ›"</string>
+    <string name="text_no_hints_recorded_nearby_explore_another_region" formatted="false">"No hints recorded nearby. Explore another region."</string>
+    <string name="text_recruited_digimon" formatted="false">"RECRUITED DIGIMON · "</string>
+    <string name="text_bring_digimon_to_the_city_to_increase_prosperity" formatted="false">"Bring Digimon to the city to increase prosperity."</string>
+    <string name="text_next_evolutions" formatted="false">"NEXT EVOLUTIONS"</string>
+    <string name="text_available_2" formatted="false">"Available ›"</string>
+    <string name="text_view_requirements" formatted="false">"View requirements ›"</string>
+    <string name="text_tap_an_evolution_to_view_its_requirements_direct_evolution_advances_the_clock_and_kee" formatted="false">"Tap an evolution to view its requirements. Direct evolution advances the clock and keeps the game\'s original sequence."</string>
+    <string name="text_undo_latest_evolution" formatted="false">"Undo latest evolution"</string>
+    <string name="text_pause_or_resume" formatted="false">"Pause or resume"</string>
+    <string name="text_play" formatted="false">"Play"</string>
+    <string name="text_bag_3" formatted="false">"BAG"</string>
+    <string name="text_prosperity_2" formatted="false">"PROSPERITY"</string>
+    <string name="text_evolution_2" formatted="false">"EVOLUTION"</string>
+    <string name="text_settings_2" formatted="false">"SETTINGS"</string>
+    <string name="text_cheats_2" formatted="false">"CHEATS"</string>
+    <string name="text_map_2" formatted="false">"MAP"</string>
+    <string name="text_failed_to_start" formatted="false">"Failed to start"</string>
+    <string name="text_game_paused" formatted="false">"Game paused"</string>
+    <string name="text_import_your_game_and_tap_play" formatted="false">"Import your game and tap Play"</string>
+    <string name="text_continue_your_game_from_the_upper_screen" formatted="false">"Continue your game from the upper screen"</string>
+    <string name="text_days" formatted="false">" days · "</string>
+    <string name="text_your_partner_will_appear_when_you_start_the_game" formatted="false">"Your partner will appear when you start the game"</string>
+    <string name="text_apply_changes_to_this_game_session_each_cheat_creates_a_backup_state_so_you_can_undo" formatted="false">"Apply changes to this game session. Each cheat creates a backup state so you can undo it.\n"</string>
+    <string name="text_library_bios" formatted="false">"Library\nBIOS: "</string>
+    <string name="text_disc" formatted="false">"\nDisc: "</string>
+    <string name="text_version" formatted="false">"\nVersion: "</string>
+    <string name="text_welcome" formatted="false">"Welcome"</string>
+    <string name="text_select_bios" formatted="false">"Select BIOS"</string>
+    <string name="text_select_game" formatted="false">"Select game"</string>
+    <string name="text_ready_to_play" formatted="false">"Ready to play"</string>
+    <string name="text_continue_game" formatted="false">"Continue game"</string>
+    <string name="text_follow_the_steps_on_the_upper_screen" formatted="false">"Follow the steps on the upper screen."</string>
+    <string name="text_imported_files_are_kept_when_you_close_the_app" formatted="false">"\n\nImported files are kept when you close the app."</string>
+    <string name="text_offense_2" formatted="false">"Offense   "</string>
+    <string name="text_defense_2" formatted="false">"\nDefense   "</string>
+    <string name="text_speed_2" formatted="false">"\nSpeed   "</string>
+    <string name="text_brains_2" formatted="false">"\nBrains   "</string>
+    <string name="text_happiness_2" formatted="false">"\n\nHappiness   "</string>
+    <string name="text_100_discipline" formatted="false">"/100\nDiscipline   "</string>
+    <string name="text_100_fatigue" formatted="false">"/100\nFatigue   "</string>
+    <string name="text_care_mistakes_3" formatted="false">"\nCare mistakes   "</string>
+    <string name="text_battles_2" formatted="false">"\nBattles   "</string>
+    <string name="text_no_care_warnings" formatted="false">"No care warnings"</string>
+    <string name="text_bag_4" formatted="false">"Bag · "</string>
+    <string name="text_slots_2" formatted="false">" slots\n\n"</string>
+    <string name="text_no_items" formatted="false">"No items"</string>
+    <string name="text_prosperity_3" formatted="false">"Prosperity "</string>
+    <string name="text_prosperity_pending" formatted="false">"Prosperity pending"</string>
+    <string name="text_natural_paths_and_current_requirements_these_are_candidates_not_a_guaranteed_evolutio" formatted="false">"Natural paths and current requirements\nThese are candidates, not a guaranteed evolution: the clock, priorities, history and special events also matter.\n\n"</string>
+    <string name="text_4_categories" formatted="false">"/4 categories"</string>
+    <string name="text_requirements_met_2" formatted="false">" · requirements met"</string>
+    <string name="text_no_natural_paths_decoded_for_this_species" formatted="false">"No natural paths decoded for this species."</string>
+    <string name="text_in_your_area" formatted="false">"In your area"</string>
+    <string name="text_one_exit_away" formatted="false">"One exit away"</string>
+    <string name="text_in_this_region" formatted="false">"In this region"</string>
+    <string name="text_the_first_encounter_in_the_forest_ends_in_battle" formatted="false">"The first encounter in the forest ends in battle."</string>
+    <string name="text_look_south_of_the_toilet_keep_talking" formatted="false">"Look south of the toilet. Keep talking."</string>
+    <string name="text_bring_food_for_the_one_waiting_in_the_tree" formatted="false">"Bring food for the one waiting in the tree."</string>
+    <string name="text_visit_the_coast_at_dusk_return_after_crossing" formatted="false">"Visit the coast at dusk; return after crossing."</string>
+    <string name="text_talk_to_jijimon_and_leave_his_house" formatted="false">"Talk to Jijimon and leave his house."</string>
+    <string name="text_jijimon_announces_the_mountain_s_opening_leave_prepared" formatted="false">"Jijimon announces the mountain\'s opening; leave prepared."</string>
+    <string name="text_check_the_tree_with_a_door" formatted="false">"Check the tree with a door."</string>
+    <string name="text_look_for_the_ninja_once_the_secret_shop_exists" formatted="false">"Look for the ninja once the secret shop exists."</string>
+    <string name="text_talk_to_the_digimon_lost_among_the_mangroves" formatted="false">"Talk to the Digimon lost among the mangroves."</string>
+    <string name="text_a_wilting_plant_needs_the_rain_plant" formatted="false">"A wilting plant needs the Rain Plant."</string>
+    <string name="text_the_correct_route_ends_at_the_circular_sign" formatted="false">"The correct route ends at the circular sign."</string>
+    <string name="text_the_beach_visitor_only_appears_occasionally" formatted="false">"The beach visitor only appears occasionally."</string>
+    <string name="text_help_clear_the_tunnel_to_reach_the_lava" formatted="false">"Help clear the tunnel to reach the lava."</string>
+    <string name="text_return_to_the_digger_after_a_few_days" formatted="false">"Return to the digger after a few days."</string>
+    <string name="text_chasing_the_bandit_ends_in_this_tunnel" formatted="false">"Chasing the bandit ends in this tunnel."</string>
+    <string name="text_talk_at_the_clinic_first_bring_recovery_items" formatted="false">"Talk at the clinic first; bring recovery items."</string>
+    <string name="text_a_rare_visitor_may_challenge_you_here" formatted="false">"A rare visitor may challenge you here."</string>
+    <string name="text_the_circles_and_the_news_lead_to_a_visitor" formatted="false">"The circles and the news lead to a visitor."</string>
+    <string name="text_be_patient_with_its_electric_shocks_and_talk_again" formatted="false">"Be patient with its electric shocks and talk again."</string>
+    <string name="text_this_rival_needs_several_consecutive_victories" formatted="false">"This rival needs several consecutive victories."</string>
+    <string name="text_your_partner_can_help_cut_off_its_escape" formatted="false">"Your partner can help cut off its escape."</string>
+    <string name="text_look_for_his_legacy_in_the_ancestor_cave" formatted="false">"Look for his legacy in the ancestor cave."</string>
+    <string name="text_talk_to_the_subject_near_the_king" formatted="false">"Talk to the subject near the king."</string>
+    <string name="text_your_answers_matter_more_than_fighting" formatted="false">"Your answers matter more than fighting."</string>
+    <string name="text_investigate_myotismon_s_disappearance_you_need_a_virus_digimon" formatted="false">"Investigate Myotismon\'s disappearance; you need a Virus Digimon."</string>
+    <string name="text_prove_your_skill_by_managing_his_shop" formatted="false">"Prove your skill by managing his shop."</string>
+    <string name="text_there_is_a_nest_at_the_top_of_the_canyon" formatted="false">"There is a nest at the top of the canyon."</string>
+    <string name="text_the_bandit_s_elevator_leaves_someone_trapped" formatted="false">"The bandit\'s elevator leaves someone trapped."</string>
+    <string name="text_investigate_the_problem_in_the_time_region" formatted="false">"Investigate the problem in the time region."</string>
+    <string name="text_this_traveler_appears_in_five_places" formatted="false">"This traveler appears in five places."</string>
+    <string name="text_complete_the_trades_with_the_three_merchants" formatted="false">"Complete the trades with the three merchants."</string>
+    <string name="text_a_curling_victory_may_convince_him" formatted="false">"A curling victory may convince him."</string>
+    <string name="text_help_reclaim_the_cave_occupied_by_bandits" formatted="false">"Help reclaim the cave occupied by bandits."</string>
+    <string name="text_after_the_rescue_return_with_a_partner_resistant_to_cold" formatted="false">"After the rescue, return with a partner resistant to cold."</string>
+    <string name="text_the_rematch_has_its_own_time_and_rules" formatted="false">"The rematch has its own time and rules."</string>
+    <string name="text_a_vaccine_partner_can_open_the_sanctuary" formatted="false">"A Vaccine partner can open the sanctuary."</string>
+    <string name="text_look_for_the_bird_before_the_morning_ends" formatted="false">"Look for the bird before the morning ends."</string>
+    <string name="text_a_shy_resident_hides_behind_a_tree" formatted="false">"A shy resident hides behind a tree."</string>
+    <string name="text_numemon_can_find_a_use_for_an_empty_costume" formatted="false">"Numemon can find a use for an empty costume."</string>
+    <string name="text_talk_about_training_with_the_island_s_residents" formatted="false">"Talk about training with the island\'s residents."</string>
+    <string name="text_ask_about_training_inside_his_gym" formatted="false">"Ask about training inside his gym."</string>
+    <string name="text_first_solve_the_factory_crisis" formatted="false">"First, solve the factory crisis."</string>
+    <string name="text_investigate_the_factory_and_return_after_solving_its_problem" formatted="false">"Investigate the factory and return after solving its problem."</string>
+    <string name="text_stop_the_saboteur_and_return_later" formatted="false">"Stop the saboteur and return later."</string>
+    <string name="text_this_factory_visitor_appears_occasionally" formatted="false">"This factory visitor appears occasionally."</string>
+    <string name="text_a_battle_awaits_you_in_the_open_mountain" formatted="false">"A battle awaits you in the open mountain."</string>
+    <string name="text_look_for_another_challenge_inside_the_mountain" formatted="false">"Look for another challenge inside the mountain."</string>
+    <string name="text_keep_going_through_the_mountain_until_you_find_him" formatted="false">"Keep going through the mountain until you find him."</string>
+    <string name="text_return_to_the_mountain_after_completing_the_story" formatted="false">"Return to the mountain after completing the story."</string>
+    <string name="text_recruit" formatted="false">"Recruit "</string>
+    <string name="text_could_not_check_try_later_or_open_the_github_releases" formatted="false">"Could not check. Try later or open the GitHub releases."</string>
+    <string name="text_github_has_temporarily_limited_requests_try_later_or_open_the_releases" formatted="false">"GitHub has temporarily limited requests. Try later or open the releases."</string>
+    <string name="text_the_update_service_is_unavailable_right_now_try_later" formatted="false">"The update service is unavailable right now. Try later."</string>
+    <string name="text_welcome_bios_game_ready" formatted="false">"Welcome  ·  BIOS  ·  Game  ·  Ready"</string>
+    <string name="text_your_adventure_starts_here" formatted="false">"Your adventure starts here"</string>
+    <string name="text_add_your_playstation_bios_and_your_copy_of_digimon_world_digibuddy_does_not_include_t" formatted="false">"Add your PlayStation BIOS and your copy of Digimon World. DigiBuddy does not include these files."</string>
+    <string name="text_get_started" formatted="false">"Get started"</string>
+    <string name="text_1_add_your_bios" formatted="false">"1 · Add your BIOS"</string>
+    <string name="text_select_your_512_kib_playstation_bios_file" formatted="false">"Select your 512 KiB PlayStation BIOS file."</string>
+    <string name="text_bios_ready" formatted="false">"BIOS ready ✓"</string>
+    <string name="text_2_add_digimon_world" formatted="false">"2 · Add Digimon World"</string>
+    <string name="text_select_the_iso_bin_img_or_chd_disc_companion_panel_compatibility_depends_on_the_editi" formatted="false">"Select the .iso, .bin, .img or .chd disc. Companion panel compatibility depends on the edition."</string>
+    <string name="text_bios_and_game_ready" formatted="false">"BIOS and game ready ✓"</string>
+    <string name="text_the_game_appears_above_your_partner_bag_map_and_evolutions_appear_below" formatted="false">"The game appears above. Your partner, bag, map and evolutions appear below."</string>
+    <string name="text_finish_setup" formatted="false">"Finish setup"</string>
+    <string name="text_state_from" formatted="false">"State from "</string>
+    <string name="text_returns_to_that_exact_point" formatted="false">" · returns to that exact point."</string>
+    <string name="text_load_in_game_save" formatted="false">"Load in-game save"</string>
+    <string name="text_starts_the_game_from_the_beginning_choose_load_in_its_menu_to_use_your_memory_card" formatted="false">"Starts the game from the beginning. Choose Load in its menu to use your memory card."</string>
+    <string name="text_there_is_no_saved_session_yet_start_a_game_you_can_load_your_memory_card_from_the_in" formatted="false">"There is no saved session yet. Start a game; you can load your memory card from the in-game menu."</string>
+    <string name="text_start_the_game_before_importing_a_state" formatted="false">"Start the game before importing a state."</string>
+    <string name="text_state_imported_use_continue_latest_session_to_load_it" formatted="false">"State imported. Use “Continue latest session” to load it."</string>
+    <string name="text_could_not_import_use_a_state_from_the_same_game_and_core" formatted="false">"Could not import. Use a state from the same game and core."</string>
+    <string name="text_state_exported" formatted="false">"State exported"</string>
+    <string name="text_could_not_export_the_state" formatted="false">"Could not export the state."</string>
+    <string name="text_not_added" formatted="false">"not added"</string>
+    <string name="text_imported" formatted="false">"imported"</string>
+    <string name="text_even_match_2" formatted="false">"even match"</string>
+    <string name="text_importing_2" formatted="false">"Importing…"</string>
+    <string name="language_title">App language</string>
+    <string name="language_welcome">Choose your language / Elige tu idioma</string>
+    <string name="language_game_note">The game language depends on your ROM.</string>
+    <string name="language_continue">Continue / Continuar</string>
+    <string name="species_frigimon">Frigimon</string>
+    <string name="species_biyomon">Biyomon</string>
+    <string name="species_kokatorimon">Kokatorimon</string>
+    <string name="species_piximon">Piximon</string>
+    <string name="species_penguinmon">Penguinmon</string>
+    <string name="species_ninjamon">Ninjamon</string>
+    <string name="species_phoenixmon">Phoenixmon</string>
+    <string name="species_vegiemon">Vegiemon</string>
+</resources>
