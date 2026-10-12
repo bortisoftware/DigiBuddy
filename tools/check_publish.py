@@ -20,6 +20,7 @@ def allowed_source(name):
     p=PurePosixPath(name)
     if p.is_absolute() or ".." in p.parts or p.suffix.lower() in FORBIDDEN:return False
     if name in DOCS or name in ICONS:return True
+    if name in {"docs/index.html","docs/site.css","docs/site.js","docs/.nojekyll"}:return True
     if name.startswith("tools/"):return p.suffix in (".py",".json")
     if name=="app/src/main/AndroidManifest.xml":return True
     if name.startswith("app/src/main/java/"):return p.suffix==".java"

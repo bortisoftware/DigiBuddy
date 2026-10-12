@@ -1,4 +1,4 @@
-[Español](README.md) | [English](README.en.md)
+[Español](README.md) | [English](README.en.md) · [Web del proyecto](https://bortisoftware.github.io/DigiBuddy/)
 
 ![DigiBuddy: Digimon World en doble pantalla](docs/banner.png)
 
