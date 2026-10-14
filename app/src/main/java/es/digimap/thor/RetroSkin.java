@@ -166,14 +166,14 @@ final class RetroSkin {
       float d = getResources().getDisplayMetrics().density, w = getWidth(), h = getHeight();
       p.setTypeface(Typeface.create("monospace", Typeface.BOLD));
       p.setTextSize(12 * d);
-      p.setColor(INK);
+      p.setColor(AppAppearance.text(INK));
       c.drawText(label, 4 * d, 13 * d, p);
       p.setTextAlign(Paint.Align.RIGHT);
       c.drawText(max > 0 ? value + " / " + max : "—", w - 4 * d, 13 * d, p);
       p.setTextAlign(Paint.Align.LEFT);
-      p.setColor(INK);
+      p.setColor(AppAppearance.text(INK));
       c.drawRect(3 * d, 19 * d, w - 3 * d, h - 2 * d, p);
-      p.setColor(0xffd4ddcd);
+      p.setColor(AppAppearance.isDark() ? 0xff30455e : 0xffd4ddcd);
       c.drawRect(5 * d, 21 * d, w - 5 * d, h - 4 * d, p);
       p.setColor(color);
       c.drawRect(

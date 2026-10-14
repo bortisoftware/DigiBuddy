@@ -74,6 +74,8 @@ El idioma del juego depende de la ROM; el selector traduce el panel de DigiBuddy
 
 Las mejoras gráficas afectan principalmente al 3D; los fondos y vídeos conservan su detalle original. El rendimiento depende del dispositivo y los ajustes.
 
+En **Ajustes → Apariencia**, activa **Modo oscuro** para oscurecer el panel inferior y sus ventanas. La elección se guarda y el juego conserva su aspecto.
+
 ## Actualizaciones
 
 DigiBuddy avisa si hay una nueva APK en las releases oficiales de GitHub. Al pulsar Actualizar, descarga y verifica la APK dentro de la app y abre el instalador de Android. La primera vez tendrás que permitir instalaciones desde DigiBuddy. Guarda tu progreso antes de instalar. También puedes comprobar manualmente en Ajustes. La consulta automática se puede desactivar; el juego funciona sin conexión.

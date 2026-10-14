@@ -129,6 +129,7 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
     fullscreen(getWindow().getDecorView());
     prefs = getSharedPreferences("digimap", MODE_PRIVATE);
     AppLanguage.apply(this, prefs);
+    AppAppearance.setDark(prefs.getBoolean(AppAppearance.PREFERENCE, false));
     controllerBindings = new ControllerBindings(prefs);
     inputManager = (android.hardware.input.InputManager) getSystemService(INPUT_SERVICE);
     if (inputManager != null) inputManager.registerInputDeviceListener(inputDeviceListener, ui);
@@ -309,7 +310,7 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
       secondary = null;
     }
     root = new FrameLayout(this);
-    root.setBackgroundColor(BG);
+    root.setBackgroundColor(AppAppearance.surface(BG));
     setContentView(root);
     Display target = null;
     Display current = getWindowManager().getDefaultDisplay();
@@ -607,7 +608,7 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
     TextView v = new TextView(ctx);
     v.setText(content);
     v.setTextSize(sp);
-    v.setTextColor(color == Color.WHITE ? RetroSkin.INK : color);
+    v.setTextColor(AppAppearance.text(color == Color.WHITE ? RetroSkin.INK : color));
     v.setTypeface(android.graphics.Typeface.create("monospace", android.graphics.Typeface.NORMAL));
     return v;
   }
@@ -615,14 +616,15 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
   private android.graphics.drawable.Drawable card(int color, int radius) {
     if (color == Color.rgb(18, 35, 43) || color == Color.rgb(18, 29, 38)) color = RetroSkin.PAPER;
     if (color == Color.rgb(25, 40, 50) || color == Color.rgb(27, 43, 54)) color = 0xffe1e8d6;
-    return new RetroSkin.Frame(color, getResources().getDisplayMetrics().density);
+    return new RetroSkin.Frame(
+        AppAppearance.surface(color), getResources().getDisplayMetrics().density);
   }
 
   private Button button(Context ctx, String label, Runnable action) {
     Button b = new Button(ctx);
     b.setText(label);
     b.setTextSize(13);
-    b.setTextColor(RetroSkin.INK);
+    b.setTextColor(AppAppearance.text(RetroSkin.INK));
     b.setTypeface(android.graphics.Typeface.create("monospace", android.graphics.Typeface.BOLD));
     b.setAllCaps(false);
     b.setFocusable(false);
@@ -1720,7 +1722,12 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
     String[] labels = new String[choices.size()];
     for (int i = 0; i < labels.length; i++)
       labels[i] = choices.get(i).getName() + " · ID " + choices.get(i).getDisplayId();
-    new AlertDialog.Builder(this)
+    new AlertDialog.Builder(
+            new android.view.ContextThemeWrapper(
+                this,
+                AppAppearance.isDark()
+                    ? android.R.style.Theme_Material_Dialog_Alert
+                    : android.R.style.Theme_Material_Light_Dialog_Alert))
         .setTitle(AppLanguage.text("text_second_screen"))
         .setItems(
             labels,
@@ -2095,7 +2102,7 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
       super(context);
       ctx = context;
       setOrientation(VERTICAL);
-      setBackgroundColor(BG);
+      setBackgroundColor(AppAppearance.surface(BG));
       setPadding(dp(14), dp(12), dp(14), dp(12));
       header = new LinearLayout(ctx);
       header.setGravity(Gravity.CENTER_VERTICAL);
@@ -2240,7 +2247,7 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
       if (tab == 2) feedback.setVisibility(View.GONE);
       for (int i = 0; i < navigation.size(); i++) {
         Button item = navigation.get(i);
-        item.setTextColor(RetroSkin.INK);
+        item.setTextColor(AppAppearance.text(RetroSkin.INK));
         item.setBackground(card(navTabs[i] == tab ? RetroSkin.GOLD : 0xffe1e8d6, 0));
       }
       if (tab == 6) settings();
@@ -2251,6 +2258,27 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
 
     void settings() {
       content.removeView(body);
+      LinearLayout appearance = settingsGroup(AppLanguage.text("appearance_title"));
+      android.widget.Switch darkMode = new android.widget.Switch(ctx);
+      darkMode.setText(AppLanguage.text("appearance_dark_mode"));
+      darkMode.setTextColor(AppAppearance.text(RetroSkin.INK));
+      darkMode.setMinHeight(dp(48));
+      darkMode.setPadding(dp(8), dp(8), dp(8), dp(8));
+      darkMode.setChecked(AppAppearance.isDark());
+      darkMode.setOnCheckedChangeListener(
+          (control, enabled) -> {
+            prefs.edit().putBoolean(AppAppearance.PREFERENCE, enabled).apply();
+            AppAppearance.setDark(enabled);
+            ui.post(
+                () -> {
+                  refreshLanguageViews();
+                  if (panel != null) {
+                    panel.expandedSettings.add(AppLanguage.text("appearance_title"));
+                    panel.select(6);
+                  }
+                });
+          });
+      appearance.addView(darkMode, new LinearLayout.LayoutParams(-1, -2));
       LinearLayout language = settingsGroup(AppLanguage.text("language_title"));
       String[] languageChoices = {"es", "en"};
       String[] languageLabels = {"Español", "English"};
@@ -2259,7 +2287,7 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
         android.widget.RadioButton option = new android.widget.RadioButton(ctx);
         option.setId(index + 1);
         option.setText(languageLabels[index]);
-        option.setTextColor(RetroSkin.INK);
+        option.setTextColor(AppAppearance.text(RetroSkin.INK));
         option.setMinHeight(dp(48));
         languageOptions.addView(option);
         if (languageChoices[index].equals(AppLanguage.locale().getLanguage()))
@@ -2585,7 +2613,7 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
         LinearLayout destination, String label, String key, boolean initial, boolean layout) {
       Switch control = new Switch(ctx);
       control.setText(label);
-      control.setTextColor(RetroSkin.INK);
+      control.setTextColor(AppAppearance.text(RetroSkin.INK));
       control.setFocusable(false);
       control.setTextSize(13);
       control.setMinHeight(dp(48));

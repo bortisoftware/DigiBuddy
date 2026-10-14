@@ -74,6 +74,8 @@ The game's language depends on your ROM. This setting translates DigiBuddy's com
 
 Graphics enhancements mainly affect 3D models. Backgrounds and videos retain their original detail. Performance depends on your device and settings.
 
+Enable **Dark mode** in **Settings → Appearance** to darken the companion panel and its dialogs. Your choice is saved; game graphics stay unchanged.
+
 ## Updates
 
 DigiBuddy checks the official GitHub releases for a new APK. Tap Update to download and verify it inside the app, then open Android's installer. The first time, allow installation from DigiBuddy. Save your progress before installing. You can also check manually in Settings or disable automatic checks. The game works offline.

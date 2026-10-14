@@ -829,4 +829,6 @@
     <string name="species_ninjamon">Igamon</string>
     <string name="species_phoenixmon">Hououmon</string>
     <string name="species_vegiemon">Vegimon</string>
+  <string name="appearance_title">Apariencia</string>
+  <string name="appearance_dark_mode">Modo oscuro</string>
 </resources>

@@ -829,4 +829,6 @@
     <string name="species_ninjamon">Ninjamon</string>
     <string name="species_phoenixmon">Phoenixmon</string>
     <string name="species_vegiemon">Vegiemon</string>
+  <string name="appearance_title">Appearance</string>
+  <string name="appearance_dark_mode">Dark mode</string>
 </resources>
