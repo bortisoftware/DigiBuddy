@@ -3,7 +3,7 @@ import argparse, hashlib, re, subprocess, sys, zipfile
 from pathlib import Path, PurePosixPath
 ROOT=Path(__file__).resolve().parents[1]
 DOCS={".gitignore",".gitattributes","LICENSE","README.md","README.en.md","DESIGN.md","CORE_PROVENANCE.md",
-      "THIRD_PARTY_NOTICES.md","ICON.md","SECURITY.md","REVIEW.md"}
+      "THIRD_PARTY_NOTICES.md","ICON.md","SECURITY.md","REVIEW.md","CHANGELOG.md"}
 ICONS={"app/src/main/res/drawable-nodpi/jijimon_foreground.png",
        "app/src/main/res/drawable-nodpi/map_icon.png",
        "docs/banner.png", "docs/video-preview.png", "docs/screenshots/game.png", "docs/screenshots/companion.png", "docs/screenshots/startup.png"}

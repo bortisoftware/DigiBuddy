@@ -78,6 +78,9 @@ Enable **Dark mode** in **Settings → Appearance** to darken the companion pane
 
 ## Updates
 
+See the [changelog](CHANGELOG.md) for release changes.
+
+
 DigiBuddy checks the official GitHub releases for a new APK. Tap Update to download and verify it inside the app, then open Android's installer. The first time, allow installation from DigiBuddy. Save your progress before installing. You can also check manually in Settings or disable automatic checks. The game works offline.
 
 Settings uses collapsible groups: App language, Saves, Graphics and sound, Controls, Screens, Files and Updates. Play and Settings stay accessible on every tab, including the map.

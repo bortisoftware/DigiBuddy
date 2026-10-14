@@ -78,6 +78,9 @@ En **Ajustes → Apariencia**, activa **Modo oscuro** para oscurecer el panel in
 
 ## Actualizaciones
 
+Consulta las novedades en el [changelog](CHANGELOG.md).
+
+
 DigiBuddy avisa si hay una nueva APK en las releases oficiales de GitHub. Al pulsar Actualizar, descarga y verifica la APK dentro de la app y abre el instalador de Android. La primera vez tendrás que permitir instalaciones desde DigiBuddy. Guarda tu progreso antes de instalar. También puedes comprobar manualmente en Ajustes. La consulta automática se puede desactivar; el juego funciona sin conexión.
 
 Ajustes se organiza en desplegables: Idioma de la app, Partidas, Gráficos y sonido, Controles, Pantallas, Archivos y Actualizaciones. Play y Ajustes permanecen accesibles en todas las pestañas, incluido el mapa.
