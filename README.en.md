@@ -123,4 +123,3 @@ Original code is licensed under [GPL-3.0-or-later](LICENSE). A fan project with 
 ## AI tooling note
 
 This project may use AI-assisted development tools, such as **Codex**, to help with code generation, refactoring and documentation. All changes are still reviewed by the maintainer and validated with the project's existing checks before release.
-

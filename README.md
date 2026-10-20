@@ -123,4 +123,3 @@ Código propio bajo [GPL-3.0-or-later](LICENSE). Proyecto de aficionados, sin af
 ## Nota sobre herramientas de IA
 
 Este proyecto puede utilizar herramientas de desarrollo asistido por IA, como **Codex**, para ayudar con la generación de código, la refactorización y la documentación. Todos los cambios siguen siendo revisados por el responsable del proyecto y se validan con las comprobaciones existentes antes de cada release.
-
