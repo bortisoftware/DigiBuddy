@@ -831,4 +831,8 @@
     <string name="species_vegiemon">Vegimon</string>
   <string name="appearance_title">Apariencia</string>
   <string name="appearance_dark_mode">Modo oscuro</string>
+  <string name="fast_forward">Avance rápido</string>
+  <string name="fast_forward_speed">Velocidad de avance rápido</string>
+  <string name="fast_forward_hold">Asignar avance rápido (mantener pulsado)</string>
+  <string name="fast_forward_note">El audio se silencia durante el avance rápido. La velocidad real depende de la consola y de los ajustes gráficos.</string>
 </resources>

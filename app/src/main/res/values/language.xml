@@ -831,4 +831,8 @@
     <string name="species_vegiemon">Vegiemon</string>
   <string name="appearance_title">Appearance</string>
   <string name="appearance_dark_mode">Dark mode</string>
+  <string name="fast_forward">Fast forward</string>
+  <string name="fast_forward_speed">Fast-forward speed</string>
+  <string name="fast_forward_hold">Assign fast forward (hold)</string>
+  <string name="fast_forward_note">Audio is muted during fast forward. Actual speed depends on your device and graphics settings.</string>
 </resources>

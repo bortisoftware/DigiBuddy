@@ -8,8 +8,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 final class ControllerBindings {
+  static final int FAST_FORWARD = 14;
   static final String[] LABELS = {
-    "✕", "□", "Select", "Start", "↑", "↓", "←", "→", "○", "△", "L1", "R1", "L2", "R2"
+    "✕", "□", "Select", "Start", "↑", "↓", "←", "→", "○", "△", "L1", "R1", "L2", "R2", "⏩"
   };
   private static final int[] DEFAULT_KEYS = {
     KeyEvent.KEYCODE_BUTTON_A, KeyEvent.KEYCODE_BUTTON_X,

@@ -76,6 +76,8 @@ Las mejoras gráficas afectan principalmente al 3D; los fondos y vídeos conserv
 
 En **Ajustes → Apariencia**, activa **Modo oscuro** para oscurecer el panel inferior y sus ventanas. La elección se guarda y el juego conserva su aspecto.
 
+El botón **⏩** junto a Play activa el avance rápido. Elige ×2, ×3 o ×4 en Ajustes → Gráficos y sonido, o asigna un botón físico para acelerar al mantenerlo pulsado. Durante el avance rápido el audio se silencia; las acciones automáticas de objetos y evolución se ejecutan a velocidad normal. La velocidad real depende del dispositivo y la resolución.
+
 ## Actualizaciones
 
 Consulta las novedades en el [changelog](CHANGELOG.md).
@@ -121,3 +123,4 @@ Código propio bajo [GPL-3.0-or-later](LICENSE). Proyecto de aficionados, sin af
 ## Nota sobre herramientas de IA
 
 Este proyecto puede utilizar herramientas de desarrollo asistido por IA, como **Codex**, para ayudar con la generación de código, la refactorización y la documentación. Todos los cambios siguen siendo revisados por el responsable del proyecto y se validan con las comprobaciones existentes antes de cada release.
+

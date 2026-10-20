@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.4.2
+
+- Avance rápido con botón ⏩ junto a Play, disponible en todas las pestañas.
+- Velocidades ×2, ×3 y ×4 en Ajustes → Gráficos y sonido.
+- Botón físico reasignable para acelerar mientras se mantiene pulsado.
+- Audio silenciado al acelerar; las acciones automáticas de objetos y evolución funcionan a velocidad normal.
+- Fast-forward toggle beside Play, ×2/×3/×4 speeds and a remappable hold button. Audio is muted while speeding up; automated item and evolution actions run at normal speed.
+
+[Release 0.4.2](https://github.com/bortisoftware/DigiBuddy/releases/tag/v0.4.2)
+
 ## 0.4.1
 
 - Modo oscuro en Ajustes → Apariencia, con toggle y preferencia guardada.

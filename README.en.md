@@ -76,6 +76,8 @@ Graphics enhancements mainly affect 3D models. Backgrounds and videos retain the
 
 Enable **Dark mode** in **Settings → Appearance** to darken the companion panel and its dialogs. Your choice is saved; game graphics stay unchanged.
 
+The **⏩** button beside Play toggles fast forward. Select ×2, ×3 or ×4 in Settings → Graphics and sound, or assign a physical button for hold-to-fast-forward. Audio is muted while speeding up; automated item and evolution actions run at normal speed. Actual speed depends on the device and resolution.
+
 ## Updates
 
 See the [changelog](CHANGELOG.md) for release changes.
@@ -121,3 +123,4 @@ Original code is licensed under [GPL-3.0-or-later](LICENSE). A fan project with 
 ## AI tooling note
 
 This project may use AI-assisted development tools, such as **Codex**, to help with code generation, refactoring and documentation. All changes are still reviewed by the maintainer and validated with the project's existing checks before release.
+

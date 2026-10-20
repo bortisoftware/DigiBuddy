@@ -61,7 +61,7 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
   private volatile SpriteAtlas atlas;
   private int atlasGeneration;
   private volatile File cheatBackup;
-  private Button playButton;
+  private Button playButton, fastForwardButton;
   private Dialog panelDialog;
   private ControllerBindings controllerBindings;
   private android.hardware.input.InputManager inputManager;
@@ -937,6 +937,8 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
   }
 
   private void applyGraphics() {
+    String speed = prefs.getString("fastForwardSpeed", "2");
+    session.fastForwardSpeed = "4".equals(speed) ? 4 : "3".equals(speed) ? 3 : 2;
     NativeCore.option(
         "pcsx_rearmed_neon_enhancement_enable",
         prefs.getBoolean("resolution2x", true) ? "enabled" : "disabled");
@@ -973,6 +975,7 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
   }
 
   private void togglePause() {
+    session.resetFastForward();
     if (session.actionBusy)
       showMessage(AppLanguage.text("text_wait_for_the_current_action_to_finish"));
     else session.paused = !session.paused;
@@ -1764,6 +1767,11 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
       if (event.getAction() == KeyEvent.ACTION_UP) onBackPressed();
       return true;
     }
+    if (id == ControllerBindings.FAST_FORWARD) {
+      if (event.getAction() == KeyEvent.ACTION_UP || !session.actionBusy)
+        session.physicalButtons = controllerBindings.key(event);
+      return true;
+    }
     if (id >= 0) {
       if (session.actionBusy || (panelDialog != null && panelDialog.isShowing())) return true;
       session.physicalButtons = controllerBindings.key(event);
@@ -1836,6 +1844,11 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
     controllerView = new ControllerView(panel.ctx, this::showControllerCapture);
     box.addView(controllerView);
     box.addView(controllerStatus);
+    box.addView(
+        button(
+            panel.ctx,
+            AppLanguage.text("fast_forward_hold"),
+            () -> showControllerCapture(ControllerBindings.FAST_FORWARD)));
     box.addView(
         button(
             panel.ctx,
@@ -2054,6 +2067,7 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
 
   @Override
   protected void onPause() {
+    session.resetFastForward();
     session.suspended = true;
     session.physicalButtons = 0;
     if (controllerBindings != null) controllerBindings.clear();
@@ -2132,6 +2146,15 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
                 else resumeGame();
               });
       playButton = play;
+      fastForwardButton =
+          button(
+              ctx,
+              "⏩",
+              () -> {
+                if (session.running && !session.paused && !session.suspended && !session.actionBusy)
+                  session.fastForward = !session.fastForward;
+              });
+      header.addView(fastForwardButton, new LinearLayout.LayoutParams(dp(64), dp(48)));
       header.addView(play, new LinearLayout.LayoutParams(dp(48), dp(48)));
       Button gear = button(ctx, AppLanguage.text("text_settings"), () -> select(6));
       gear.setTextSize(11);
@@ -2526,6 +2549,15 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
     }
 
     private void graphicsSettings(LinearLayout graphics) {
+      choice(
+          graphics,
+          AppLanguage.text("fast_forward_speed"),
+          "fastForwardSpeed",
+          new String[] {"×2", "×3", "×4"},
+          new String[] {"2", "3", "4"},
+          "2",
+          false);
+      graphics.addView(text(ctx, AppLanguage.text("fast_forward_note"), 12, MUTED));
       choice(
           graphics,
           AppLanguage.text("text_graphics_core_stop_the_game_to_change"),
@@ -2934,6 +2966,13 @@ public final class MainActivity extends Activity implements DisplayManager.Displ
       GameData.Snapshot s = snapshot;
       summary.setVisibility(session.running && tab == 0 ? View.VISIBLE : View.GONE);
       portrait.setVisibility(session.running && tab == 0 ? View.VISIBLE : View.GONE);
+      if (fastForwardButton != null) {
+        int speed = session.speedMultiplier();
+        fastForwardButton.setText(speed > 1 ? "⏩ ×" + speed : "⏩");
+        fastForwardButton.setContentDescription(AppLanguage.text("fast_forward") + " ×" + speed);
+        fastForwardButton.setEnabled(session.running && !session.paused && !session.actionBusy);
+        fastForwardButton.setBackground(card(speed > 1 ? RetroSkin.GOLD : 0xffe1e8d6, 0));
+      }
       if (playButton != null) {
         playButton.setText(
             session.actionBusy ? "…" : session.running && !session.paused ? "Ⅱ" : "▶");

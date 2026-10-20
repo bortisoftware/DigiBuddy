@@ -15,6 +15,21 @@ public final class EmulatorSession {
   private static final AtomicBoolean CORE_OWNED = new AtomicBoolean();
   public volatile boolean running, paused, suspended;
   public volatile int physicalButtons, touchButtons;
+  public volatile int fastForwardSpeed = 2;
+  public volatile boolean fastForward;
+
+  public int speedMultiplier() {
+    if (!running || paused || suspended || actionBusy) return 1;
+    return fastForward || (physicalButtons & (1 << ControllerBindings.FAST_FORWARD)) != 0
+        ? Math.max(2, Math.min(4, fastForwardSpeed))
+        : 1;
+  }
+
+  public void resetFastForward() {
+    fastForward = false;
+    physicalButtons &= ~(1 << ControllerBindings.FAST_FORWARD);
+  }
+
   public volatile byte[] ram;
   public volatile String error, saveWarning;
   public volatile File saveFolder;
@@ -46,6 +61,7 @@ public final class EmulatorSession {
     saveWarning = null;
     ram = null;
     paused = false;
+    resetFastForward();
     stopRequested = false;
     running = true;
     appliedSurfaceGeneration = -1;
@@ -90,11 +106,13 @@ public final class EmulatorSession {
       long frameNanos = (long) (1_000_000_000.0 / fps);
       long next = System.nanoTime(), lastSnapshot = 0, lastSave = next;
       boolean audioPaused = false;
+      int previousSpeed = 1;
       while (!stopRequested) {
         applySurface();
         Runnable action;
         while (!stopRequested && (action = commands.poll()) != null) action.run();
         if (paused || suspended) {
+          resetFastForward();
           if (!audioPaused) {
             audio.pause();
             audio.flush();
@@ -109,7 +127,15 @@ public final class EmulatorSession {
           audio.play();
           audioPaused = false;
         }
-        int input = physicalButtons | touchButtons;
+        int speed = speedMultiplier();
+        if (speed != previousSpeed) {
+          audio.pause();
+          audio.flush();
+          audio.play();
+          previousSpeed = speed;
+          next = System.nanoTime();
+        }
+        int input = (physicalButtons & ~(1 << ControllerBindings.FAST_FORWARD)) | touchButtons;
         if (itemUse != null) {
           input = itemUse.advance(NativeCore.memory());
           if (itemUse.finished()) {
@@ -127,7 +153,7 @@ public final class EmulatorSession {
         }
         NativeCore.runFrame(input);
         short[] batch = NativeCore.audio();
-        if (batch != null && batch.length > 0)
+        if (speed == 1 && batch != null && batch.length > 0)
           audio.write(batch, 0, batch.length, AudioTrack.WRITE_NON_BLOCKING);
         long now = System.nanoTime();
         if (now - lastSnapshot > 250_000_000L) {
@@ -138,7 +164,7 @@ public final class EmulatorSession {
           saveCard();
           lastSave = now;
         }
-        next += frameNanos;
+        next += frameNanos / speed;
         long wait = next - System.nanoTime();
         if (wait > 0) Thread.sleep(wait / 1_000_000L, (int) (wait % 1_000_000L));
         else if (wait < -frameNanos * 4) next = System.nanoTime();
@@ -373,6 +399,7 @@ public final class EmulatorSession {
 
   /** No join on the UI thread; ownership remains held until native cleanup finishes. */
   public synchronized void stop() {
+    resetFastForward();
     stopRequested = true;
     physicalButtons = 0;
     touchButtons = 0;
